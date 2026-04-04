@@ -1776,11 +1776,11 @@ function renderCalendar() {
     <div class="t-xl fw-9 mb-4">Plan</div>
     <div class="t-sm t-muted mb-24">34 weeks to Dallas · Nov 21, 2026</div>
 
-    <!-- Phase pills -->
+    <!-- Phase pills (tappable) -->
     <div class="row mb-24" style="gap:6px;flex-wrap:wrap">
       ${PHASES.map(p => {
         const active = currentWeek >= p.weeks[0] && currentWeek <= p.weeks[1];
-        return `<span class="pill ${active ? 'pill-accent' : ''}" style="${!active ? 'opacity:.4' : ''}">${p.emoji} ${p.name} (${p.weeks[0]}-${p.weeks[1]})</span>`;
+        return `<button class="pill ${active ? 'pill-accent' : ''}" style="${!active ? 'opacity:.4' : ''}cursor:pointer" onclick="App.jumpToWeek(${p.weeks[0]})">${p.emoji} ${p.name} (${p.weeks[0]}-${p.weeks[1]})</button>`;
       }).join('')}
     </div>
 
@@ -2022,6 +2022,7 @@ const App = {
 
   calendarPrevWeek() { if(calendarCurrentWeek>1){calendarCurrentWeek--;this.navigate('plan')} },
   calendarNextWeek() { if(calendarCurrentWeek<34){calendarCurrentWeek++;this.navigate('plan')} },
+  jumpToWeek(w) { calendarCurrentWeek = w; this.navigate('plan'); },
   setStatsTab(t) { statsTab=t; this.navigate('stats'); }
 };
 
