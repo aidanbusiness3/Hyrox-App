@@ -507,10 +507,11 @@ const WORKOUT_DETAILS = {
 // =============================================
 
 const PHASES = [
-  { id: 'base',  name: 'Base Build',     weeks: [1, 10],  color: '#00D4FF', emoji: '🏗️' },
-  { id: 'build', name: 'Build',          weeks: [11, 20], color: '#FFA500', emoji: '📈' },
-  { id: 'race',  name: 'Race Specific',  weeks: [21, 30], color: '#FF3B5C', emoji: '🎯' },
-  { id: 'peak',  name: 'Peak & Taper',   weeks: [31, 34], color: '#FFE500', emoji: '⚡' }
+  { id: 'base',  name: 'Base',           weeks: [1, 8],   color: '#3B82F6', emoji: '🏗️' },
+  { id: 'build', name: 'Build',          weeks: [9, 16],  color: '#FF8C00', emoji: '📈' },
+  { id: 'race',  name: 'Race Specific',  weeks: [17, 24], color: '#FF4D4D', emoji: '🎯' },
+  { id: 'peak',  name: 'Peak',           weeks: [25, 30], color: '#FFE500', emoji: '⚡' },
+  { id: 'taper', name: 'Taper',          weeks: [31, 34], color: '#4ADE80', emoji: '🏁' }
 ];
 
 function getPhase(weekNum) {
@@ -518,552 +519,442 @@ function getPhase(weekNum) {
 }
 
 function isDeloadWeek(weekNum) {
-  // Deload every 4th week in base and build phases
-  if (weekNum <= 20) return weekNum % 4 === 0;
-  // Every 3rd week in race phase
-  if (weekNum <= 30) return (weekNum - 20) % 3 === 0;
+  // Deload every 4th week: weeks 4, 8, 12, 16, 20, 24, 28
+  if (weekNum <= 30) return weekNum % 4 === 0;
   return false;
 }
 
-// ===== WEEKLY TEMPLATES BY PHASE =====
+// ===== 5-PHASE TRAINING PROTOCOL =====
+// Based on Hyrox-specific research: Norwegian VO2max method,
+// compromised running, 80/20 polarized training, elite protocols
+
+function getTaperWeek(weekNum) {
+  const isRaceWeek = weekNum === 34;
+  if (isRaceWeek) {
+    return [
+      { day:'Monday', type:'run', title:'Shakeout Run', icon:'🏃', zone:1,
+        exercises:[{name:'Easy Jog',detail:'20 min @ 6:30+/km — legs loose',zone:1}],
+        duration:'20 min', focus:'Just move. Nothing more.' },
+      { day:'Tuesday', type:'intervals', title:'Final Sharpener', icon:'⚡', zone:4,
+        exercises:[
+          {name:'Warm Up',detail:'10 min easy jog',zone:2},
+          {name:'Race Pace',detail:'3 × 400m @ 4:00/km pace — smooth & controlled',zone:4},
+          {name:'Cool Down',detail:'10 min easy',zone:1}],
+        duration:'25 min', focus:'Remind legs what race pace feels like. Stay fresh.' },
+      { day:'Wednesday', type:'rest', title:'Rest', icon:'😴', zone:0,
+        exercises:[{name:'Rest & Prep',detail:'Pack gear, review race plan, visualize',zone:0}],
+        duration:'—', focus:'You are ready. Trust your training.' },
+      { day:'Thursday', type:'run', title:'Easy Jog + Strides', icon:'🏃', zone:1,
+        exercises:[
+          {name:'Easy Jog',detail:'15 min @ Z1',zone:1},
+          {name:'Strides',detail:'4 × 15 sec relaxed fast / walk back',zone:4}],
+        duration:'20 min', focus:'Stay loose. Nothing hard.' },
+      { day:'Friday', type:'rest', title:'Race Eve — Rest', icon:'😴', zone:0,
+        exercises:[
+          {name:'Rest',detail:'Legs up, relax, hydrate',zone:0},
+          {name:'Carb Load Dinner',detail:'Pasta/rice + lean protein. Eat by 7pm.',zone:0},
+          {name:'Gear Check',detail:'Lay out everything tonight',zone:0}],
+        duration:'—', focus:'Early dinner. Early bed. 8+ hours sleep.' },
+      { day:'Saturday', type:'hyrox', title:'RACE DAY — DALLAS', icon:'🏁', zone:5,
+        exercises:[
+          {name:'3 hrs before',detail:'Oatmeal + banana + honey + coffee. 500ml water.',zone:0},
+          {name:'1 hr before',detail:'Small banana or half energy bar. Sip water.',zone:0},
+          {name:'30 min before',detail:'Gel + water. Light warm-up jog + dynamic stretches.',zone:2},
+          {name:'RACE PLAN',detail:'Runs 1-4: 3:55-4:05/km. Runs 5-8: 4:05-4:15/km.',zone:4},
+          {name:'STATION PLAN',detail:'Controlled effort. Technique > speed. Smooth transitions.',zone:0}],
+        duration:'~65 min', focus:'GO GET THAT SUB-1:05.' },
+      { day:'Sunday', type:'rest', title:'Celebrate', icon:'🎉', zone:0,
+        exercises:[{name:'Recovery',detail:'You earned it. Protein shake, full meal, rest.',zone:0}],
+        duration:'—', focus:'🏆' }
+    ];
+  }
+  // Non-race taper weeks (31-33)
+  return [
+    { day:'Monday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
+      exercises:[{name:'Easy Run',detail:'25 min @ 6:15-6:45/km',zone:2}],
+      duration:'25 min', focus:'Keep moving. Stay loose.' },
+    { day:'Tuesday', type:'intervals', title:'Sharpener', icon:'⚡', zone:4,
+      exercises:[
+        {name:'Warm Up',detail:'10 min easy',zone:2},
+        {name:'Intervals',detail:'4 × 400m @ 4:00/km race pace',zone:4},
+        {name:'Cool Down',detail:'10 min easy',zone:1}],
+      duration:'30 min', focus:'Short & sharp. Maintain the edge.' },
+    { day:'Wednesday', type:'hyrox', title:'Light Stations', icon:'🟢', zone:2,
+      exercises:[
+        {name:'Wall Balls',detail:'50 reps @ 80% effort',zone:0},
+        {name:'Sled Push',detail:'25m @ race weight — technique only',zone:0},
+        {name:'Row',detail:'500m easy pace',zone:2}],
+      duration:'20 min', focus:'Stay familiar with movements. Don\'t grind.' },
+    { day:'Thursday', type:'run', title:'Easy Jog + Strides', icon:'🏃', zone:1,
+      exercises:[
+        {name:'Easy Jog',detail:'15 min @ Z1',zone:1},
+        {name:'Strides',detail:'4 × 20 sec relaxed fast',zone:4}],
+      duration:'20 min', focus:'Neuromuscular activation. Easy.' },
+    { day:'Friday', type:'rest', title:'Rest', icon:'😴', zone:0,
+      exercises:[{name:'Rest',detail:'Stretch, foam roll, hydrate',zone:0}],
+      duration:'—', focus:'Let the body absorb the work.' },
+    { day:'Saturday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
+      exercises:[{name:'Easy Run',detail:'20 min @ 6:15/km',zone:2}],
+      duration:'20 min', focus:'Short and easy. Volume is dropping.' },
+    { day:'Sunday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
+      exercises:[{name:'Full Rest',detail:'Sleep 8+ hrs. Eat well. Recover.',zone:0}],
+      duration:'—', focus:'Recovery is where fitness is built.' }
+  ];
+}
 
 function getBaseWeek(weekNum, deload) {
-  const volume = deload ? 0.7 : 1.0;
-  const easyMin = Math.round((40 + weekNum * 2) * volume);
-  const longMin = Math.round((55 + weekNum * 3) * volume);
-  const tempoMin = Math.round((12 + weekNum) * volume);
-  
+  // PHASE 1: BASE (Weeks 1-8)
+  // Build aerobic engine. Easy running. Station technique. Strength maintenance.
+  const v = deload ? 0.7 : 1.0;
+  const easyMin = Math.round((42 + weekNum * 1.5) * v);
+  const longMin = Math.round((55 + weekNum * 3) * v);
+  const tempoMin = Math.round((13 + weekNum) * v);
+
   return [
-    // Monday
-    {
-      day: 'Monday',
-      type: 'run',
-      title: 'Easy Run',
-      icon: '🏃',
-      zone: 2,
-      exercises: [
-        { name: 'Easy Run', detail: `${easyMin} min @ Z2 (5:45-6:15/km)`, zone: 2 },
-        { name: 'Cooldown Stretch', detail: '5 min', zone: 0 }
-      ],
-      duration: `${easyMin + 5} min`,
-      focus: 'Aerobic base — keep it easy, nose breathing'
-    },
-    // Tuesday
-    {
-      day: 'Tuesday',
-      type: 'strength',
-      title: weekNum % 2 === 1 ? 'Upper Body Strength + Core' : 'Lower Body Strength + Core',
-      icon: '💪',
-      zone: 0,
+    // Monday — Easy Run
+    { day:'Monday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
+      exercises:[
+        {name:'Easy Run',detail:`${easyMin} min @ 6:15-6:45/km — HR under 145bpm`,zone:2},
+        {name:'Cooldown Stretch',detail:'5 min',zone:0}],
+      duration:`${easyMin + 5} min`,
+      focus:'Aerobic base. Nose breathing. This should feel easy — if you can\'t hold a conversation, slow down.' },
+
+    // Tuesday — Strength + Stations
+    { day:'Tuesday', type:'strength', title:'Strength + Station Technique', icon:'💪', zone:0,
       exercises: weekNum % 2 === 1 ? [
-        { name: 'Bench Press', detail: '4 × 6-8 reps', zone: 0 },
-        { name: 'Bent-Over Rows', detail: '4 × 8-10 reps', zone: 0 },
-        { name: 'Overhead Press', detail: '3 × 8-10 reps', zone: 0 },
-        { name: 'Pull-Ups', detail: '3 × max reps', zone: 0 },
-        { name: 'Face Pulls', detail: '3 × 15 reps', zone: 0 },
-        { name: 'Plank Hold', detail: '3 × 45 sec', zone: 0 }
+        {name:'Bench Press',detail:'4 × 6-8 reps — maintain strength',zone:0},
+        {name:'Bent-Over Rows',detail:'4 × 8-10 reps',zone:0},
+        {name:'Overhead Press',detail:'3 × 8-10 reps',zone:0},
+        {name:'Pull-Ups',detail:'3 × max reps',zone:0},
+        {name:'SkiErg',detail:'3 × 500m — technique focus, 2 min rest',zone:3},
+        {name:'Wall Balls',detail:'3 × 25 reps — smooth rhythm, 90s rest',zone:0}
       ] : [
-        { name: 'Back Squat', detail: '4 × 6-8 reps', zone: 0 },
-        { name: 'Romanian Deadlift', detail: '4 × 8-10 reps', zone: 0 },
-        { name: 'Bulgarian Split Squat', detail: '3 × 10 each leg', zone: 0 },
-        { name: 'Leg Curl', detail: '3 × 12 reps', zone: 0 },
-        { name: 'Calf Raises', detail: '3 × 15 reps', zone: 0 },
-        { name: 'Dead Bug', detail: '3 × 10 each side', zone: 0 }
+        {name:'Back Squat',detail:'4 × 6-8 reps',zone:0},
+        {name:'Romanian Deadlift',detail:'4 × 8-10 reps',zone:0},
+        {name:'Bulgarian Split Squat',detail:'3 × 10 each leg',zone:0},
+        {name:'Calf Raises',detail:'3 × 15 reps',zone:0},
+        {name:'Row',detail:'3 × 500m — smooth strokes, 2 min rest',zone:3},
+        {name:'Burpee Broad Jumps',detail:'3 × 40m — pacing practice',zone:0}
       ],
-      duration: '55 min',
-      focus: 'Maintain strength base — don\'t push to failure'
-    },
-    // Wednesday
-    {
-      day: 'Wednesday',
-      type: 'run',
-      title: 'Easy Run + Strides',
-      icon: '🏃',
-      zone: 2,
-      exercises: [
-        { name: 'Easy Run', detail: `${easyMin} min @ Z2`, zone: 2 },
-        { name: 'Strides', detail: '6 × 20 sec fast / 40 sec walk', zone: 4 },
-        { name: 'Cooldown', detail: '5 min easy jog', zone: 1 }
-      ],
-      duration: `${easyMin + 15} min`,
-      focus: 'Easy running with neuromuscular activation via strides'
-    },
-    // Thursday
-    {
-      day: 'Thursday',
-      type: 'tempo',
-      title: deload ? 'Easy Run (Deload)' : 'Tempo Run',
-      icon: deload ? '🏃' : '🏃‍♂️',
-      zone: deload ? 2 : 3,
+      duration:'55 min',
+      focus:'Maintain strength. Don\'t push to failure — save energy for running days.' },
+
+    // Wednesday — Easy Run + Strides
+    { day:'Wednesday', type:'run', title:'Easy Run + Strides', icon:'🏃', zone:2,
+      exercises:[
+        {name:'Easy Run',detail:`${easyMin - 5} min @ 6:15-6:45/km`,zone:2},
+        {name:'Strides',detail:'6 × 20 sec fast & relaxed / walk back recovery',zone:4},
+        {name:'Cooldown',detail:'5 min easy jog',zone:1}],
+      duration:`${easyMin + 10} min`,
+      focus:'Easy running + neuromuscular activation. Strides should feel fast but smooth, not all-out.' },
+
+    // Thursday — Tempo Run
+    { day:'Thursday', type:'tempo', title: deload ? 'Easy Run (Deload)' : 'Tempo Run', icon:'🏃‍♂️', zone: deload ? 2 : 3,
       exercises: deload ? [
-        { name: 'Easy Run', detail: '35 min @ Z2', zone: 2 }
+        {name:'Easy Run',detail:'30 min @ 6:15-6:45/km',zone:2}
       ] : [
-        { name: 'Warm Up', detail: '10 min easy jog', zone: 2 },
-        { name: 'Tempo', detail: `${tempoMin} min @ Z3 (5:10-5:30/km)`, zone: 3 },
-        { name: 'Cool Down', detail: '10 min easy jog', zone: 1 }
-      ],
-      duration: deload ? '35 min' : `${tempoMin + 20} min`,
-      focus: deload ? 'Recovery day — keep it very easy' : 'Sustained moderate effort — comfortably hard'
-    },
-    // Friday
-    {
-      day: 'Friday',
-      type: 'hyrox',
-      title: 'Hyrox Station Practice + Easy Run',
-      icon: '🟢',
-      zone: 2,
+        {name:'Warm Up',detail:'10 min easy jog',zone:2},
+        {name:'Tempo',detail:`${tempoMin} min @ 5:00-5:15/km — comfortably hard`,zone:3},
+        {name:'Cool Down',detail:'10 min easy jog',zone:1}],
+      duration: deload ? '30 min' : `${tempoMin + 20} min`,
+      focus: deload ? 'Deload — keep it very easy. Let the body recover.' : 'Sustained moderate effort. This builds lactate clearance. Short sentences only.' },
+
+    // Friday — Station Practice + Easy Run
+    { day:'Friday', type:'hyrox', title:'Station Practice + Easy Run', icon:'🟢', zone:2,
       exercises: deload ? [
-        { name: 'Easy Run', detail: '30 min @ Z2', zone: 2 },
-        { name: 'Wall Balls', detail: '3 × 20 reps (light)', zone: 0 },
-        { name: 'Rowing', detail: '2 × 500m easy', zone: 2 }
+        {name:'Easy Run',detail:'25 min @ Z2',zone:2},
+        {name:'Wall Balls',detail:'3 × 20 reps light',zone:0}
       ] : [
-        { name: 'Easy Run', detail: '20 min @ Z2', zone: 2 },
-        { name: 'SkiErg', detail: '3 × 500m, 2 min rest', zone: 3 },
-        { name: 'Wall Balls', detail: '4 × 25 reps, 90s rest', zone: 0 },
-        { name: 'Burpee Broad Jumps', detail: '3 × 40m, 2 min rest', zone: 0 },
-        { name: 'Rowing', detail: '3 × 500m, 2 min rest', zone: 3 },
-        { name: 'Sandbag Lunges', detail: '2 × 50m', zone: 0 }
-      ],
-      duration: deload ? '50 min' : '70 min',
-      focus: 'Station technique — smooth and efficient, not all-out'
-    },
-    // Saturday
-    {
-      day: 'Saturday',
-      type: 'long',
-      title: 'Long Run',
-      icon: '🛣️',
-      zone: 2,
-      exercises: [
-        { name: 'Long Run', detail: `${longMin} min @ Z2 (5:45-6:15/km)`, zone: 2 }
-      ],
-      duration: `${longMin} min`,
-      focus: 'Build aerobic endurance — easy pace, enjoy it'
-    },
-    // Sunday
-    {
-      day: 'Sunday',
-      type: 'rest',
-      title: 'Rest Day',
-      icon: '😴',
-      zone: 0,
-      exercises: [
-        { name: 'Full Rest', detail: 'Sleep 8+ hours, hydrate, eat well', zone: 0 },
-        { name: 'Optional', detail: 'Light walk, stretching, foam roll', zone: 0 }
-      ],
-      duration: '—',
-      focus: 'Recovery is where fitness is built. Rest hard.'
-    }
+        {name:'Sled Push',detail:'4 × 25m @ race weight — technique: arms locked, low angle, short steps',zone:0},
+        {name:'Sled Pull',detail:'4 × 25m — hand-over-hand rhythm, fast consistent pulls',zone:0},
+        {name:'Row',detail:'3 × 500m @ moderate effort, 2 min rest',zone:3},
+        {name:'Easy Run',detail:'20 min @ 6:15-6:45/km',zone:2}],
+      duration: deload ? '40 min' : '60 min',
+      focus:'Station technique — smooth and efficient. Then easy running to flush the legs.' },
+
+    // Saturday — Long Run
+    { day:'Saturday', type:'long', title:'Long Run', icon:'🛣️', zone:2,
+      exercises:[
+        {name:'Long Run',detail:`${longMin} min @ 6:00-6:30/km — truly conversational`,zone:2}],
+      duration:`${longMin} min`,
+      focus:'Build aerobic endurance. Don\'t chase pace. This run builds capillary density and mitochondria.' },
+
+    // Sunday — OFF
+    { day:'Sunday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
+      exercises:[
+        {name:'Full Rest',detail:'Sleep 8+ hours. Eat 3000+ cal. Hydrate.',zone:0},
+        {name:'Optional',detail:'Light walk, stretching, foam roll',zone:0}],
+      duration:'—',
+      focus:'Recovery is where fitness is built. Rest hard.' }
   ];
 }
 
 function getBuildWeek(weekNum, deload) {
-  const volume = deload ? 0.7 : 1.0;
-  const easyMin = Math.round(55 * volume);
-  const longMin = Math.round((70 + (weekNum - 10) * 2) * volume);
-  const intervalReps = deload ? 4 : Math.min(6 + Math.floor((weekNum - 10) / 2), 10);
-  
+  // PHASE 2: BUILD (Weeks 9-16)
+  // VO2 max intervals enter. Threshold work. Compromised running begins.
+  const v = deload ? 0.7 : 1.0;
+  const easyMin = Math.round(50 * v);
+  const longMin = Math.round((65 + (weekNum - 8) * 2) * v);
+  const intervalReps = deload ? 3 : Math.min(4 + Math.floor((weekNum - 8) / 2), 6);
+
   return [
-    // Monday
-    {
-      day: 'Monday',
-      type: 'run',
-      title: 'Easy Run + Core',
-      icon: '🏃',
-      zone: 2,
-      exercises: [
-        { name: 'Easy Run', detail: `${easyMin} min @ Z2`, zone: 2 },
-        { name: 'Plank Series', detail: '3 × 45s (front, each side)', zone: 0 },
-        { name: 'Dead Bug', detail: '3 × 10 each side', zone: 0 },
-        { name: 'Pallof Press', detail: '3 × 10 each side', zone: 0 }
-      ],
-      duration: `${easyMin + 15} min`,
-      focus: 'Easy aerobic work + core stability'
-    },
-    // Tuesday
-    {
-      day: 'Tuesday',
-      type: 'intervals',
-      title: deload ? 'Easy Run (Deload)' : 'VO2 Max Intervals',
-      icon: deload ? '🏃' : '⚡',
-      zone: deload ? 2 : 5,
+    // Monday — Easy Run + Core
+    { day:'Monday', type:'run', title:'Easy Run + Core', icon:'🏃', zone:2,
+      exercises:[
+        {name:'Easy Run',detail:`${easyMin} min @ 6:15-6:45/km — HR under 145`,zone:2},
+        {name:'Plank Series',detail:'3 × 45s (front + each side)',zone:0},
+        {name:'Dead Bug',detail:'3 × 10 each side',zone:0},
+        {name:'Pallof Press',detail:'3 × 10 each side',zone:0}],
+      duration:`${easyMin + 15} min`,
+      focus:'Easy aerobic work + core stability for running posture.' },
+
+    // Tuesday — VO2 Max Intervals (Norwegian 4x4)
+    { day:'Tuesday', type:'intervals', title: deload ? 'Easy Run (Deload)' : 'VO2 Max Intervals', icon:'⚡', zone: deload ? 2 : 5,
       exercises: deload ? [
-        { name: 'Easy Run', detail: '40 min @ Z2', zone: 2 }
+        {name:'Easy Run',detail:'35 min @ 6:15-6:45/km',zone:2}
       ] : [
-        { name: 'Warm Up', detail: '15 min progressive (Z1→Z2)', zone: 2 },
-        { name: 'Intervals', detail: `${intervalReps} × 1km @ Z4-Z5 (4:20-4:35/km)`, zone: 5 },
-        { name: 'Recovery', detail: '90 sec easy jog between reps', zone: 1 },
-        { name: 'Cool Down', detail: '10 min easy jog', zone: 1 }
-      ],
-      duration: deload ? '40 min' : '55 min',
-      focus: deload ? 'Recovery' : 'Build speed & VO2 max — controlled aggression'
-    },
-    // Wednesday
-    {
-      day: 'Wednesday',
-      type: 'strength',
-      title: 'Functional Strength + Hyrox Stations',
-      icon: '🏋️',
-      zone: 0,
-      exercises: [
-        { name: 'Deadlift', detail: '4 × 5 heavy', zone: 0 },
-        { name: 'Goblet Squat', detail: '3 × 12', zone: 0 },
-        { name: 'Sled Push', detail: '4 × 50m @ race weight', zone: 0 },
-        { name: 'Sled Pull', detail: '4 × 50m, technique focus', zone: 0 },
-        { name: 'Wall Balls', detail: '3 × 30 unbroken', zone: 0 },
-        { name: 'Farmers Walk', detail: '3 × 200m heavy', zone: 0 }
-      ],
-      duration: '65 min',
-      focus: 'Hyrox-specific strength — station simulation'
-    },
-    // Thursday
-    {
-      day: 'Thursday',
-      type: 'run',
-      title: 'Easy Run + Mobility',
-      icon: '🏃',
-      zone: 2,
-      exercises: [
-        { name: 'Easy Run', detail: `${Math.round(40 * volume)} min @ Z2`, zone: 2 },
-        { name: 'Hip Mobility Flow', detail: '10 min', zone: 0 },
-        { name: 'Foam Rolling', detail: '10 min', zone: 0 }
-      ],
-      duration: `${Math.round(40 * volume) + 20} min`,
-      focus: 'Recovery run — truly easy'
-    },
-    // Friday
-    {
-      day: 'Friday',
-      type: 'hyrox',
-      title: deload ? 'Easy Hyrox Practice' : 'Hyrox Combo — Race Pace',
-      icon: '🟢',
-      zone: deload ? 2 : 4,
+        {name:'Warm Up',detail:'15 min progressive jog (Z1 → Z2)',zone:2},
+        {name:'Intervals',detail:`${intervalReps} × 4 min @ 3:50-4:10/km — HR 173-182bpm`,zone:5},
+        {name:'Recovery',detail:'3 min easy jog between reps — HR must drop to 130s',zone:1},
+        {name:'Cool Down',detail:'10 min easy jog',zone:1}],
+      duration: deload ? '35 min' : '55 min',
+      focus: deload ? 'Recovery week. Easy only.' : 'Norwegian 4×4 method. This builds VO2 max. You should NOT be able to talk during work intervals.' },
+
+    // Wednesday — Strength + Hyrox Stations
+    { day:'Wednesday', type:'strength', title:'Strength + Hyrox Stations', icon:'🏋️', zone:0,
+      exercises:[
+        {name:'Deadlift',detail:'4 × 5 heavy — good form',zone:0},
+        {name:'Goblet Squat',detail:'3 × 12',zone:0},
+        {name:'Sled Push',detail:'4 × 50m @ race weight — drive through legs',zone:0},
+        {name:'Sled Pull',detail:'4 × 50m — rhythm over power',zone:0},
+        {name:'Wall Balls',detail:'3 × 30 unbroken — hip drive, don\'t arm press',zone:0},
+        {name:'Farmers Walk',detail:'3 × 200m heavy',zone:0}],
+      duration:'65 min',
+      focus:'Hyrox-specific strength. Simulate station demands.' },
+
+    // Thursday — Easy Run + Mobility
+    { day:'Thursday', type:'run', title:'Easy Run + Mobility', icon:'🏃', zone:2,
+      exercises:[
+        {name:'Easy Run',detail:`${Math.round(40 * v)} min @ 6:15-6:45/km`,zone:2},
+        {name:'Hip Mobility Flow',detail:'10 min',zone:0},
+        {name:'Foam Rolling',detail:'10 min — quads, glutes, calves',zone:0}],
+      duration:`${Math.round(40 * v) + 20} min`,
+      focus:'True recovery run. Truly easy. Then mobilize.' },
+
+    // Friday — Compromised Running (KEY SESSION)
+    { day:'Friday', type:'hyrox', title: deload ? 'Easy Station Touch' : 'Compromised Running', icon:'😤', zone: deload ? 2 : 4,
       exercises: deload ? [
-        { name: '1km Easy Run', detail: 'Z2 pace', zone: 2 },
-        { name: 'SkiErg', detail: '1000m easy', zone: 2 },
-        { name: '1km Easy Run', detail: 'Z2 pace', zone: 2 },
-        { name: 'Wall Balls', detail: '50 reps easy pace', zone: 0 }
+        {name:'Easy Run',detail:'20 min @ Z2',zone:2},
+        {name:'SkiErg',detail:'1000m easy',zone:2},
+        {name:'Easy Run',detail:'15 min @ Z2',zone:2}
       ] : [
-        { name: '1km Run', detail: '@ 4:20/km target pace', zone: 4 },
-        { name: 'SkiErg', detail: '1000m @ race effort', zone: 4 },
-        { name: '1km Run', detail: '@ 4:20/km', zone: 4 },
-        { name: 'Sled Push', detail: '50m @ race weight', zone: 0 },
-        { name: '1km Run', detail: '@ 4:20/km', zone: 4 },
-        { name: 'Wall Balls', detail: '100 reps', zone: 0 },
-        { name: '1km Run', detail: '@ 4:20/km', zone: 4 }
-      ],
-      duration: deload ? '40 min' : '75 min',
-      focus: deload ? 'Easy station touch' : '🏁 AT THE HYROX GYM — Compromised running practice'
-    },
-    // Saturday
-    {
-      day: 'Saturday',
-      type: 'long',
-      title: 'Long Run + Tempo Finish',
-      icon: '🛣️',
-      zone: 2,
+        {name:'1km Run',detail:'@ 4:15-4:25/km — settle into race pace',zone:4},
+        {name:'SkiErg',detail:'1000m @ race effort',zone:4},
+        {name:'1km Run',detail:'@ 4:15-4:25/km — hold pace after SkiErg',zone:4},
+        {name:'Wall Balls',detail:'50 reps — find your rhythm',zone:0},
+        {name:'1km Run',detail:'@ 4:15-4:25/km — breathe: 3 strides in, 2 out',zone:4},
+        {name:'Row',detail:'1000m @ race effort',zone:4},
+        {name:'1km Run',detail:'@ 4:15-4:25/km — track your split degradation',zone:4}],
+      duration: deload ? '40 min' : '70 min',
+      focus: deload ? 'Easy station touch.' : 'THE KEY SESSION. Train your body to run at pace when destroyed. Track every 1km split — goal is <20 sec variance.' },
+
+    // Saturday — Long Run + Tempo Finish
+    { day:'Saturday', type:'long', title:'Long Run + Tempo Finish', icon:'🛣️', zone:2,
       exercises: deload ? [
-        { name: 'Long Run', detail: `${Math.round(longMin * 0.7)} min @ Z2`, zone: 2 }
+        {name:'Easy Run',detail:`${Math.round(longMin * 0.7)} min @ Z2`,zone:2}
       ] : [
-        { name: 'Easy Run', detail: `${longMin - 20} min @ Z2`, zone: 2 },
-        { name: 'Tempo Finish', detail: '20 min @ Z3 (5:10-5:30/km)', zone: 3 },
-        { name: 'Cool Down', detail: '5 min walk', zone: 1 }
-      ],
+        {name:'Easy Run',detail:`${longMin - 20} min @ 6:00-6:30/km`,zone:2},
+        {name:'Tempo Finish',detail:'20 min @ 5:00-5:15/km — practice running tired',zone:3},
+        {name:'Cool Down',detail:'5 min walk',zone:1}],
       duration: deload ? `${Math.round(longMin * 0.7)} min` : `${longMin + 5} min`,
-      focus: deload ? 'Easy long run' : 'Finish strong — practice running tired'
-    },
-    // Sunday
-    {
-      day: 'Sunday',
-      type: 'rest',
-      title: 'Rest Day',
-      icon: '😴',
-      zone: 0,
-      exercises: [
-        { name: 'Full Rest', detail: 'Sleep 8+ hours, hydrate, eat well', zone: 0 },
-        { name: 'Optional', detail: 'Light walk, stretching, foam roll', zone: 0 }
-      ],
-      duration: '—',
-      focus: 'Recovery is where fitness is built.'
-    }
+      focus: deload ? 'Easy long run.' : 'Finish strong. The tempo finish trains race-day fatigue resistance.' },
+
+    // Sunday — OFF
+    { day:'Sunday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
+      exercises:[
+        {name:'Full Rest',detail:'Sleep 8+ hrs. Eat 3000-3500 cal. Hydrate.',zone:0}],
+      duration:'—', focus:'Recovery.' }
   ];
 }
 
 function getRaceWeek(weekNum, deload) {
-  const volume = deload ? 0.65 : 1.0;
-  const intervalReps = deload ? 5 : 8;
-  const isSim = (weekNum - 20) % 3 === 1 && !deload; // Full sim every 3rd week
-  
+  // PHASE 3: RACE SPECIFIC (Weeks 17-24)
+  // Everything at race pace. Full simulations. Compromised running 2x/week.
+  const v = deload ? 0.65 : 1.0;
+  const reps = deload ? 4 : 8;
+  const isSim = !deload && (weekNum % 2 === 1); // Full sim on odd weeks, half on even
+
   return [
-    // Monday
-    {
-      day: 'Monday',
-      type: 'run',
-      title: 'Easy Run',
-      icon: '🏃',
-      zone: 2,
-      exercises: [
-        { name: 'Easy Run', detail: `${Math.round(45 * volume)} min @ Z2`, zone: 2 },
-        { name: 'Cooldown Stretch', detail: '5 min', zone: 0 }
-      ],
-      duration: `${Math.round(45 * volume) + 5} min`,
-      focus: 'Recovery from weekend — keep it truly easy'
-    },
-    // Tuesday
-    {
-      day: 'Tuesday',
-      type: 'intervals',
-      title: deload ? 'Easy Run' : 'Race Pace 1km Repeats',
-      icon: deload ? '🏃' : '🎯',
-      zone: deload ? 2 : 4,
+    // Monday — Easy Run
+    { day:'Monday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
+      exercises:[
+        {name:'Easy Run',detail:`${Math.round(45 * v)} min @ 6:15-6:45/km`,zone:2}],
+      duration:`${Math.round(45 * v)} min`,
+      focus:'Recovery from weekend. Truly easy — HR under 145.' },
+
+    // Tuesday — Race Pace Repeats
+    { day:'Tuesday', type:'intervals', title: deload ? 'Easy Run' : 'Race Pace 1km Repeats', icon:'🎯', zone: deload ? 2 : 4,
       exercises: deload ? [
-        { name: 'Easy Run', detail: '35 min @ Z2', zone: 2 }
+        {name:'Easy Run',detail:'35 min @ Z2',zone:2}
       ] : [
-        { name: 'Warm Up', detail: '15 min progressive', zone: 2 },
-        { name: 'Intervals', detail: `${intervalReps} × 1km @ 4:20/km`, zone: 4 },
-        { name: 'Recovery', detail: '60 sec standing rest between reps', zone: 1 },
-        { name: 'Cool Down', detail: '10 min easy', zone: 1 }
-      ],
+        {name:'Warm Up',detail:'15 min progressive',zone:2},
+        {name:'Intervals',detail:`${reps} × 1km @ 4:00-4:10/km — 60 sec standing rest`,zone:4},
+        {name:'Cool Down',detail:'10 min easy',zone:1}],
       duration: deload ? '35 min' : '60 min',
-      focus: deload ? 'Recovery' : 'Dial in race pace — this should feel controlled'
-    },
-    // Wednesday
-    {
-      day: 'Wednesday',
-      type: 'hyrox',
-      title: isSim ? '🏁 FULL RACE SIMULATION' : 'Half Simulation',
-      icon: '🏁',
-      zone: 4,
+      focus: deload ? 'Recovery.' : 'Dial in race pace. These should feel controlled and repeatable — not all-out.' },
+
+    // Wednesday — Half or Full Simulation
+    { day:'Wednesday', type:'hyrox', title: isSim ? 'FULL RACE SIMULATION' : 'Half Simulation', icon:'🏁', zone:4,
       exercises: isSim ? [
-        { name: '1km Run → SkiErg', detail: 'FULL RACE FORMAT', zone: 4 },
-        { name: '1km Run → Sled Push', detail: '', zone: 4 },
-        { name: '1km Run → Sled Pull', detail: '', zone: 4 },
-        { name: '1km Run → Burpee BJ', detail: '', zone: 4 },
-        { name: '1km Run → Row', detail: '', zone: 4 },
-        { name: '1km Run → Farmers C.', detail: '', zone: 4 },
-        { name: '1km Run → S. Lunges', detail: '', zone: 4 },
-        { name: '1km Run → Wall Balls', detail: '', zone: 4 }
+        {name:'1km Run → SkiErg 1000m',detail:'Race effort — time everything',zone:4},
+        {name:'1km Run → Sled Push 50m',detail:'',zone:4},
+        {name:'1km Run → Sled Pull 50m',detail:'',zone:4},
+        {name:'1km Run → Burpee BJ 80m',detail:'',zone:4},
+        {name:'1km Run → Row 1000m',detail:'',zone:4},
+        {name:'1km Run → Farmers 200m',detail:'',zone:4},
+        {name:'1km Run → Lunges 100m',detail:'',zone:4},
+        {name:'1km Run → Wall Balls 100',detail:'',zone:4}
       ] : [
-        { name: '1km Run', detail: '@ 4:20/km race pace', zone: 4 },
-        { name: 'Sled Push', detail: '50m @ race weight', zone: 0 },
-        { name: '1km Run', detail: '@ 4:20/km', zone: 4 },
-        { name: 'Sled Pull', detail: '50m — technique focus', zone: 0 },
-        { name: '1km Run', detail: '@ 4:20/km', zone: 4 },
-        { name: 'Burpee Broad Jumps', detail: '80m', zone: 0 },
-        { name: '1km Run', detail: '@ 4:20/km', zone: 4 }
-      ],
+        {name:'1km Run',detail:'@ 4:05-4:15/km',zone:4},
+        {name:'Sled Push',detail:'50m @ race weight',zone:0},
+        {name:'1km Run',detail:'@ 4:05-4:15/km — hold pace',zone:4},
+        {name:'Sled Pull',detail:'50m — fast hands',zone:0},
+        {name:'1km Run',detail:'@ 4:05-4:15/km',zone:4},
+        {name:'Wall Balls',detail:'100 reps — sets of 25, 3-5 breaths rest',zone:0},
+        {name:'1km Run',detail:'@ 4:05-4:15/km — final push',zone:4}],
       duration: isSim ? '65-75 min' : '55 min',
-      focus: isSim ? '🏁 AT THE HYROX GYM — Full race rehearsal. Time everything!' : '🏁 AT THE HYROX GYM — Half race practice'
-    },
-    // Thursday
-    {
-      day: 'Thursday',
-      type: 'run',
-      title: 'Easy Run + Strength Maintenance',
-      icon: '🏃',
-      zone: 2,
-      exercises: [
-        { name: 'Easy Run', detail: `${Math.round(35 * volume)} min @ Z1-Z2`, zone: 2 },
-        { name: 'Goblet Squat', detail: '3 × 10', zone: 0 },
-        { name: 'Push-Ups', detail: '3 × 15', zone: 0 },
-        { name: 'Pull-Ups', detail: '3 × max', zone: 0 },
-        { name: 'Plank', detail: '3 × 45s', zone: 0 }
-      ],
-      duration: `${Math.round(35 * volume) + 25} min`,
-      focus: 'Easy + maintenance — stay strong without fatigue'
-    },
-    // Friday
-    {
-      day: 'Friday',
-      type: 'hyrox',
-      title: deload ? 'Easy Station Touch' : 'Compromised Running Combos',
-      icon: '😤',
-      zone: deload ? 2 : 4,
+      focus: isSim ? 'AT THE HYROX GYM. Full race rehearsal. Time every split. Analyze after.' : 'AT THE HYROX GYM. Half race — focus on transitions and pacing.' },
+
+    // Thursday — Easy Run + Maintenance Strength
+    { day:'Thursday', type:'run', title:'Easy Run + Strength', icon:'🏃', zone:2,
+      exercises:[
+        {name:'Easy Run',detail:`${Math.round(35 * v)} min @ Z1-Z2`,zone:2},
+        {name:'Goblet Squat',detail:'3 × 10 — light, maintain',zone:0},
+        {name:'Push-Ups',detail:'3 × 15',zone:0},
+        {name:'Pull-Ups',detail:'3 × max',zone:0},
+        {name:'Plank',detail:'3 × 45s',zone:0}],
+      duration:`${Math.round(35 * v) + 25} min`,
+      focus:'Easy + maintenance. Stay strong without adding fatigue.' },
+
+    // Friday — Compromised Running Combos
+    { day:'Friday', type:'hyrox', title: deload ? 'Easy Station Touch' : 'Compromised Running', icon:'😤', zone: deload ? 2 : 4,
       exercises: deload ? [
-        { name: '1km Easy Run', detail: 'Z2 pace', zone: 2 },
-        { name: 'Wall Balls', detail: '50 reps easy', zone: 0 },
-        { name: '1km Easy Run', detail: 'Z2 pace', zone: 2 }
+        {name:'Easy Run',detail:'20 min @ Z2',zone:2},
+        {name:'Wall Balls',detail:'50 reps easy',zone:0},
+        {name:'Easy Run',detail:'15 min @ Z2',zone:2}
       ] : [
-        { name: '1km Run @ Race Pace', detail: '4:20/km', zone: 4 },
-        { name: 'SkiErg', detail: '1000m race effort', zone: 4 },
-        { name: '1km Run @ Race Pace', detail: 'Hold pace after SkiErg', zone: 4 },
-        { name: 'Wall Balls', detail: '100 reps', zone: 0 },
-        { name: '1km Run @ Race Pace', detail: 'Hold pace after wall balls', zone: 4 },
-        { name: 'Row', detail: '1000m race effort', zone: 4 },
-        { name: '1km Run @ Race Pace', detail: 'Final push', zone: 4 }
-      ],
-      duration: deload ? '30 min' : '70 min',
-      focus: deload ? 'Touch stations, stay sharp' : 'KEY SESSION — Can you hold pace after stations?'
-    },
-    // Saturday
-    {
-      day: 'Saturday',
-      type: 'long',
-      title: 'Long Run with Race Surges',
-      icon: '🛣️',
-      zone: 2,
+        {name:'1km Run',detail:'@ 4:05/km — race pace',zone:4},
+        {name:'SkiErg',detail:'1000m race effort — don\'t blow up, 85% effort',zone:4},
+        {name:'1km Run',detail:'@ 4:05/km — hold it after SkiErg',zone:4},
+        {name:'Wall Balls',detail:'100 reps — aggressive but sustainable sets of 20-25',zone:0},
+        {name:'1km Run',detail:'@ 4:05/km — breathe, posture, forward knee drive',zone:4},
+        {name:'Row',detail:'1000m race effort',zone:4},
+        {name:'1km Run',detail:'@ 4:05/km — leave it all here',zone:4}],
+      duration: deload ? '40 min' : '70 min',
+      focus: deload ? 'Easy station touch.' : 'CAN YOU HOLD PACE AFTER STATIONS? Track every split. This is race rehearsal.' },
+
+    // Saturday — Long Run with Surges
+    { day:'Saturday', type:'long', title:'Long Run with Surges', icon:'🛣️', zone:2,
       exercises: deload ? [
-        { name: 'Easy Run', detail: '45 min @ Z2', zone: 2 }
+        {name:'Easy Run',detail:'40 min @ Z2',zone:2}
       ] : [
-        { name: 'Easy Run', detail: '40 min @ Z2', zone: 2 },
-        { name: 'Surges', detail: '4 × 2 min @ Z4 / 3 min Z2 recovery', zone: 4 },
-        { name: 'Easy Finish', detail: '15 min @ Z2', zone: 2 }
-      ],
-      duration: deload ? '45 min' : '75 min',
-      focus: deload ? 'Easy volume' : 'Race-ready long run — handle pace changes'
-    },
-    // Sunday
-    {
-      day: 'Sunday',
-      type: 'rest',
-      title: 'Rest Day',
-      icon: '😴',
-      zone: 0,
-      exercises: [
-        { name: 'Full Rest', detail: 'Sleep 8+ hours, hydrate, eat well', zone: 0 },
-        { name: 'Optional', detail: 'Light walk, stretching, foam roll', zone: 0 }
-      ],
-      duration: '—',
-      focus: 'Recovery.'
-    }
+        {name:'Easy Run',detail:'40 min @ 6:00-6:30/km',zone:2},
+        {name:'Surges',detail:'4 × 2 min @ 4:00/km / 3 min Z2 recovery',zone:4},
+        {name:'Easy Finish',detail:'15 min @ Z2',zone:2}],
+      duration: deload ? '40 min' : '75 min',
+      focus: deload ? 'Easy volume.' : 'Practice pace changes on tired legs. Race simulation in a long run.' },
+
+    // Sunday — OFF
+    { day:'Sunday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
+      exercises:[{name:'Full Rest',detail:'Sleep 8+ hrs. Eat well. Recover.',zone:0}],
+      duration:'—', focus:'Recovery.' }
   ];
 }
 
-function getPeakWeek(weekNum) {
-  const weekInPhase = weekNum - 30;
-  const volumeMultiplier = 1 - (weekInPhase * 0.15); // 0.85, 0.7, 0.55, 0.4
-  const isRaceWeek = weekNum === 34;
-  
-  if (isRaceWeek) {
-    return [
-      { day: 'Monday', type: 'run', title: 'Easy Shakeout Run', icon: '🏃', zone: 2,
-        exercises: [{ name: 'Easy Run', detail: '25 min @ Z1-Z2', zone: 1 }],
-        duration: '25 min', focus: 'Legs loose, nothing more' },
-      { day: 'Tuesday', type: 'intervals', title: 'Short Sharpener', icon: '⚡', zone: 4,
-        exercises: [
-          { name: 'Warm Up', detail: '10 min easy', zone: 2 },
-          { name: 'Intervals', detail: '4 × 400m @ race pace (4:20/km feel)', zone: 4 },
-          { name: 'Cool Down', detail: '10 min easy', zone: 1 }
-        ],
-        duration: '30 min', focus: 'Stay sharp, stay fresh' },
-      { day: 'Wednesday', type: 'rest', title: 'Rest', icon: '😴', zone: 0,
-        exercises: [{ name: 'Rest & Prep', detail: 'Pack gear, review race plan', zone: 0 }],
-        duration: '—', focus: 'Visualize your race. You\'re ready.' },
-      { day: 'Thursday', type: 'run', title: 'Easy Shakeout', icon: '🏃', zone: 1,
-        exercises: [{ name: 'Easy Jog', detail: '15 min @ Z1', zone: 1 }],
-        duration: '15 min', focus: 'Just move the legs' },
-      { day: 'Friday', type: 'rest', title: 'Rest — Race Prep', icon: '😴', zone: 0,
-        exercises: [
-          { name: 'Rest', detail: 'Legs up, relax', zone: 0 },
-          { name: 'Pre-Race Meal', detail: 'Carb load: rice/pasta, lean protein', zone: 0 },
-          { name: 'Gear Check', detail: 'Lay out everything tonight', zone: 0 }
-        ],
-        duration: '—', focus: 'RACE EVE — Early dinner, early bed' },
-      { day: 'Saturday', type: 'hyrox', title: '🏁 RACE DAY — DALLAS', icon: '🏁', zone: 5,
-        exercises: [
-          { name: 'PRE-RACE', detail: 'Wake 3hrs before. Fuel: oats + banana + coffee', zone: 0 },
-          { name: 'WARM UP', detail: '10 min easy jog + dynamic stretches', zone: 2 },
-          { name: 'RACE', detail: 'Execute the plan. 4:20/km runs. Breathe.', zone: 4 },
-          { name: 'PACING', detail: 'Runs 1-4: 4:15-4:25 | Runs 5-8: 4:20-4:30', zone: 4 },
-          { name: 'STATIONS', detail: 'Smooth transitions. Don\'t rush. Technique > speed.', zone: 0 }
-        ],
-        duration: '~65 min 🔥', focus: 'THIS IS IT. GO GET YOUR PR.' },
-      { day: 'Sunday', type: 'rest', title: 'Recovery & Celebrate', icon: '🎉', zone: 0,
-        exercises: [{ name: 'Celebrate', detail: 'You earned it. Rest, refuel, reflect.', zone: 0 }],
-        duration: '—', focus: '🏆' }
-    ];
-  }
-  
+function getPeakWeek(weekNum, deload) {
+  // PHASE 4: PEAK (Weeks 25-30)
+  // Volume drops. Intensity stays. Get sharp.
+  const weekInPhase = weekNum - 24;
+  const volumeMult = Math.max(0.6, 1 - (weekInPhase * 0.1));
+
   return [
-    { day: 'Monday', type: 'run', title: 'Easy Run', icon: '🏃', zone: 2,
-      exercises: [
-        { name: 'Easy Run', detail: `${Math.round(35 * volumeMultiplier)} min @ Z2`, zone: 2 }
-      ],
-      duration: `${Math.round(35 * volumeMultiplier)} min`, focus: 'Easy — saving energy for race day' },
-    { day: 'Tuesday', type: 'intervals', title: 'Short Sharp Intervals', icon: '⚡', zone: 5,
-      exercises: [
-        { name: 'Warm Up', detail: '10 min easy', zone: 2 },
-        { name: 'Intervals', detail: `${Math.max(3, 6 - weekInPhase)} × 800m @ Z5`, zone: 5 },
-        { name: 'Recovery', detail: '2 min jog between', zone: 1 },
-        { name: 'Cool Down', detail: '10 min easy', zone: 1 }
-      ],
-      duration: '40 min', focus: 'Sharpener — keep the engine tuned' },
-    { day: 'Wednesday', type: 'hyrox', title: 'Light Station Touch', icon: '🟢', zone: 2,
-      exercises: [
-        { name: 'Each Station', detail: '70% effort — just stay familiar', zone: 2 },
-        { name: 'Focus Stations', detail: 'Sled Pull + Wall Balls', zone: 0 }
-      ],
-      duration: '40 min', focus: 'Not hard — just touching the movements' },
-    { day: 'Thursday', type: 'run', title: 'Easy Run', icon: '🏃', zone: 2,
-      exercises: [
-        { name: 'Easy Run', detail: `${Math.round(30 * volumeMultiplier)} min @ Z1-Z2`, zone: 1 }
-      ],
-      duration: `${Math.round(30 * volumeMultiplier)} min`, focus: 'Very easy' },
-    { day: 'Friday', type: 'run', title: 'Race Pace Check-In', icon: '🎯', zone: 4,
-      exercises: [
-        { name: 'Warm Up', detail: '10 min easy', zone: 2 },
-        { name: 'Race Pace', detail: `${Math.max(2, 4 - weekInPhase)} × 1km @ 4:20/km`, zone: 4 },
-        { name: 'Cool Down', detail: '10 min easy', zone: 1 }
-      ],
-      duration: '35 min', focus: 'Remind the legs what race pace feels like' },
-    { day: 'Saturday', type: 'long', title: 'Moderate Long Run', icon: '🛣️', zone: 2,
-      exercises: [
-        { name: 'Easy Run', detail: `${Math.round(50 * volumeMultiplier)} min @ Z2`, zone: 2 }
-      ],
-      duration: `${Math.round(50 * volumeMultiplier)} min`, focus: 'Last long runs — volume dropping weekly' },
-    { day: 'Sunday', type: 'rest', title: 'Rest Day', icon: '😴', zone: 0,
-      exercises: [
-        { name: 'Full Rest', detail: 'Sleep 8+ hours', zone: 0 }
-      ],
-      duration: '—', focus: 'Recover.' }
+    { day:'Monday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
+      exercises:[{name:'Easy Run',detail:`${Math.round(35 * volumeMult)} min @ 6:15/km`,zone:2}],
+      duration:`${Math.round(35 * volumeMult)} min`, focus:'Easy. Saving energy.' },
+
+    { day:'Tuesday', type:'intervals', title: deload ? 'Easy Run' : 'Short Sharp Intervals', icon:'⚡', zone: deload ? 2 : 5,
+      exercises: deload ? [
+        {name:'Easy Run',detail:'30 min @ Z2',zone:2}
+      ] : [
+        {name:'Warm Up',detail:'10 min easy',zone:2},
+        {name:'Intervals',detail:`${Math.max(3, 6 - weekInPhase)} × 800m @ 3:45-3:55/km`,zone:5},
+        {name:'Recovery',detail:'2 min jog between',zone:1},
+        {name:'Cool Down',detail:'10 min easy',zone:1}],
+      duration: deload ? '30 min' : '40 min',
+      focus: deload ? 'Recovery.' : 'Keep the engine tuned. Short, fast, done.' },
+
+    { day:'Wednesday', type:'hyrox', title:'Light Station Touch', icon:'🟢', zone:2,
+      exercises:[
+        {name:'Each Station',detail:'70-80% effort — stay familiar, don\'t grind',zone:2},
+        {name:'Focus: Sled Pull',detail:'3 × 50m — technique refinement',zone:0},
+        {name:'Focus: Wall Balls',detail:'2 × 30 reps — rhythm',zone:0}],
+      duration:'35 min', focus:'Not hard. Just touching the movements so race day feels automatic.' },
+
+    { day:'Thursday', type:'run', title:'Easy Run', icon:'🏃', zone:1,
+      exercises:[{name:'Easy Run',detail:`${Math.round(30 * volumeMult)} min @ Z1`,zone:1}],
+      duration:`${Math.round(30 * volumeMult)} min`, focus:'Very easy.' },
+
+    { day:'Friday', type:'intervals', title:'Race Pace Check-In', icon:'🎯', zone:4,
+      exercises:[
+        {name:'Warm Up',detail:'10 min easy',zone:2},
+        {name:'Race Pace',detail:`${Math.max(2, 4 - weekInPhase)} × 1km @ 4:00/km`,zone:4},
+        {name:'Cool Down',detail:'10 min easy',zone:1}],
+      duration:'35 min', focus:'Remind the legs what race pace feels like. Controlled.' },
+
+    { day:'Saturday', type:'long', title:'Moderate Long Run', icon:'🛣️', zone:2,
+      exercises:[{name:'Easy Run',detail:`${Math.round(50 * volumeMult)} min @ Z2`,zone:2}],
+      duration:`${Math.round(50 * volumeMult)} min`, focus:'Volume dropping weekly. Trust the taper.' },
+
+    { day:'Sunday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
+      exercises:[{name:'Full Rest',detail:'Sleep 8+ hrs.',zone:0}],
+      duration:'—', focus:'Recover.' }
   ];
 }
 
 // ===== MASTER PLAN GENERATOR =====
-
 function generateTrainingPlan() {
   const plan = [];
   const startDate = new Date('2026-04-06');
-  
+
   for (let week = 1; week <= 34; week++) {
     const phase = getPhase(week);
     const deload = isDeloadWeek(week);
-    
+
     let weekDays;
-    if (week <= 10) weekDays = getBaseWeek(week, deload);
-    else if (week <= 20) weekDays = getBuildWeek(week, deload);
-    else if (week <= 30) weekDays = getRaceWeek(week, deload);
-    else weekDays = getPeakWeek(week);
-    
-    // Calculate dates for each day
+    if (week <= 8) weekDays = getBaseWeek(week, deload);
+    else if (week <= 16) weekDays = getBuildWeek(week, deload);
+    else if (week <= 24) weekDays = getRaceWeek(week, deload);
+    else if (week <= 30) weekDays = getPeakWeek(week, deload);
+    else weekDays = getTaperWeek(week);
+
     const weekStartDate = new Date(startDate);
     weekStartDate.setDate(weekStartDate.getDate() + (week - 1) * 7);
-    
-    const weekData = {
+
+    plan.push({
       week,
-      phase: phase,
+      phase,
       deload,
       startDate: new Date(weekStartDate),
       days: weekDays.map((day, i) => {
         const dayDate = new Date(weekStartDate);
         dayDate.setDate(dayDate.getDate() + i);
-        return {
-          ...day,
-          date: dayDate,
-          dateStr: dayDate.toISOString().split('T')[0],
-          weekNum: week,
-          dayIndex: i
-        };
+        return { ...day, date: dayDate, dateStr: dayDate.toISOString().split('T')[0], weekNum: week, dayIndex: i };
       })
-    };
-    
-    plan.push(weekData);
+    });
   }
-  
   return plan;
 }
 
-// Generate the plan
 const TRAINING_PLAN = generateTrainingPlan();
 
 // =============================================
