@@ -1284,6 +1284,49 @@ const Storage = {
   getExerciseLog(dateStr, exerciseIndex) {
     const data = this._load();
     return data.completedWorkouts[dateStr]?.logs?.[exerciseIndex] || {};
+  },
+
+  // Run stats logging
+  saveRunStats(dateStr, stats) {
+    const data = this._load();
+    if (!data.completedWorkouts[dateStr]) {
+      data.completedWorkouts[dateStr] = { completed: false, exercises: {}, logs: {} };
+    }
+    data.completedWorkouts[dateStr].runStats = stats;
+    this._save();
+  },
+
+  getRunStats(dateStr) {
+    const data = this._load();
+    return data.completedWorkouts[dateStr]?.runStats || {};
+  },
+
+  // Find previous log for same exercise name
+  getPreviousLog(currentDateStr, exerciseName) {
+    const data = this._load();
+    let lastLog = null;
+    const dates = Object.keys(data.completedWorkouts).filter(d => d < currentDateStr).sort().reverse();
+    for (const d of dates) {
+      const w = data.completedWorkouts[d];
+      if (!w.logs) continue;
+      for (const [idx, log] of Object.entries(w.logs)) {
+        // Match by checking if we stored the exercise name
+        if (log.exerciseName === exerciseName && (log.weight || log.reps)) return log;
+      }
+    }
+    return null;
+  },
+
+  // Get all run stats for chart (HR over time at easy pace)
+  getAllRunStats() {
+    const data = this._load();
+    const stats = [];
+    for (const [dateStr, workout] of Object.entries(data.completedWorkouts)) {
+      if (workout.runStats && workout.runStats.avgHR) {
+        stats.push({ date: dateStr, ...workout.runStats });
+      }
+    }
+    return stats.sort((a, b) => a.date.localeCompare(b.date));
   }
 };
 
@@ -1730,22 +1773,55 @@ function renderToday(overrideDate) {
             ${ex.zone ? `<span class="pill z${ex.zone}">Z${ex.zone}</span>` : ''}
           </div>
           ${isLoggable ? `
-          <div class="set-grid" style="margin-top:10px">
+          ${(() => {
+            const prev = Storage.getPreviousLog(dateStr, ex.name);
+            return prev ? `<div class="t-xs t-faint" style="padding-left:40px;margin-top:6px">Last: ${prev.weight ? prev.weight + ' lbs' : ''}${prev.weight && prev.reps ? ' × ' : ''}${prev.reps || ''}${prev.sets ? ' · ' + prev.sets + ' sets' : ''}</div>` : '';
+          })()}
+          <div class="set-grid" style="margin-top:${Storage.getPreviousLog(dateStr, ex.name) ? '6' : '10'}px">
             <div class="set-grid-header"></div>
             <div class="set-grid-header">Weight</div>
             <div class="set-grid-header">Reps</div>
             <div class="set-grid-header">Sets</div>
             <div class="set-grid-header"></div>
             <div class="set-num">1</div>
-            <input class="input" type="text" inputmode="decimal" placeholder="lbs" id="log-w-${i}" value="${log.weight||''}" onchange="App.saveLog('${dateStr}',${i})" style="font-size:13px;padding:8px 4px">
-            <input class="input" type="text" inputmode="numeric" placeholder="reps" id="log-r-${i}" value="${log.reps||''}" onchange="App.saveLog('${dateStr}',${i})" style="font-size:13px;padding:8px 4px">
-            <input class="input" type="text" inputmode="numeric" placeholder="sets" id="log-s-${i}" value="${log.sets||''}" onchange="App.saveLog('${dateStr}',${i})" style="font-size:13px;padding:8px 4px">
+            <input class="input" type="text" inputmode="decimal" placeholder="lbs" id="log-w-${i}" value="${log.weight||''}" onchange="App.saveLog('${dateStr}',${i},'${ex.name.replace(/'/g,"\\'")}')" style="font-size:13px;padding:8px 4px">
+            <input class="input" type="text" inputmode="numeric" placeholder="reps" id="log-r-${i}" value="${log.reps||''}" onchange="App.saveLog('${dateStr}',${i},'${ex.name.replace(/'/g,"\\'")}')" style="font-size:13px;padding:8px 4px">
+            <input class="input" type="text" inputmode="numeric" placeholder="sets" id="log-s-${i}" value="${log.sets||''}" onchange="App.saveLog('${dateStr}',${i},'${ex.name.replace(/'/g,"\\'")}')" style="font-size:13px;padding:8px 4px">
             <div></div>
           </div>
           ` : ''}
         </div>`;
       }).join('')}
     </div>
+
+    <!-- Run Stats (for running workouts) -->
+    ${(workout.type === 'run' || workout.type === 'tempo' || workout.type === 'intervals' || workout.type === 'long') ? `
+    <div class="label">Run Stats <span class="t-faint" style="text-transform:none;letter-spacing:0;font-weight:400">from Garmin</span></div>
+    <div class="card mb-24" style="padding:14px 16px">
+      ${(() => {
+        const rs = Storage.getRunStats(dateStr);
+        return `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <div class="t-xs t-faint mb-4">Avg HR</div>
+            <input class="input" type="text" inputmode="numeric" placeholder="bpm" id="rs-hr" value="${rs.avgHR||''}" onchange="App.saveRunStats('${dateStr}')" style="text-align:left;padding:8px 10px;font-size:14px">
+          </div>
+          <div>
+            <div class="t-xs t-faint mb-4">Avg Pace</div>
+            <input class="input" type="text" placeholder="0:00/km" id="rs-pace" value="${rs.avgPace||''}" onchange="App.saveRunStats('${dateStr}')" style="text-align:left;padding:8px 10px;font-size:14px">
+          </div>
+          <div>
+            <div class="t-xs t-faint mb-4">Distance</div>
+            <input class="input" type="text" inputmode="decimal" placeholder="km" id="rs-dist" value="${rs.distance||''}" onchange="App.saveRunStats('${dateStr}')" style="text-align:left;padding:8px 10px;font-size:14px">
+          </div>
+          <div>
+            <div class="t-xs t-faint mb-4">Garmin VO2 Max</div>
+            <input class="input" type="text" inputmode="decimal" placeholder="—" id="rs-vo2" value="${rs.vo2max||''}" onchange="App.saveRunStats('${dateStr}')" style="text-align:left;padding:8px 10px;font-size:14px">
+          </div>
+        </div>`;
+      })()}
+    </div>
+    ` : ''}
 
     <!-- Complete -->
     ${!isComplete ? `
@@ -1869,7 +1945,14 @@ function renderStats() {
     </div>
     <div class="spacer"></div>
     <div class="label">VO2 Max Trend</div>
-    <div class="card"><canvas id="vo2-chart" style="width:100%;height:130px"></canvas></div>
+    <div class="card mb-24"><canvas id="vo2-chart" style="width:100%;height:130px"></canvas></div>
+
+    <div class="label">Avg Heart Rate Over Time</div>
+    ${(() => {
+      const runData = Storage.getAllRunStats().filter(r => r.avgHR);
+      if (runData.length < 2) return '<div class="card"><div class="t-sm t-muted" style="text-align:center;padding:20px">Log 2+ runs to see your HR trend</div></div>';
+      return '<div class="card"><canvas id="hr-chart" style="width:100%;height:130px"></canvas></div>';
+    })()}
     ` : ''}
 
     ${statsTab === 'races' ? `
@@ -1935,6 +2018,15 @@ function initDashboardCharts() {
     const points = ATHLETE.vo2maxHistory.map(p => ({ value: p.value, label: Dates.formatDateShort(p.date) }));
     Charts.lineChart(canvas, points, { color: '#FFE500' });
   }
+  // HR over time chart
+  const hrCanvas = document.getElementById('hr-chart');
+  if (hrCanvas) {
+    const runData = Storage.getAllRunStats().filter(r => r.avgHR);
+    if (runData.length >= 2) {
+      const points = runData.map(r => ({ value: parseInt(r.avgHR), label: Dates.formatDateShort(r.date) }));
+      Charts.lineChart(hrCanvas, points, { color: '#3B82F6' });
+    }
+  }
 }
 
 function initRaceCharts() {
@@ -1999,11 +2091,20 @@ const App = {
     if (name) { name.style.textDecoration = done ? 'line-through' : ''; name.style.opacity = done ? '.4' : ''; }
   },
 
-  saveLog(dateStr, index) {
+  saveLog(dateStr, index, exName) {
     const w = document.getElementById('log-w-'+index)?.value || '';
     const r = document.getElementById('log-r-'+index)?.value || '';
     const s = document.getElementById('log-s-'+index)?.value || '';
-    Storage.saveExerciseLog(dateStr, index, {weight:w, reps:r, sets:s});
+    Storage.saveExerciseLog(dateStr, index, {weight:w, reps:r, sets:s, exerciseName: exName});
+  },
+
+  saveRunStats(dateStr) {
+    Storage.saveRunStats(dateStr, {
+      avgHR: document.getElementById('rs-hr')?.value || '',
+      avgPace: document.getElementById('rs-pace')?.value || '',
+      distance: document.getElementById('rs-dist')?.value || '',
+      vo2max: document.getElementById('rs-vo2')?.value || ''
+    });
   },
 
   selectRPE(v) {
