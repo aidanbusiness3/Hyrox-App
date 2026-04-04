@@ -320,31 +320,21 @@ a { color: inherit; text-decoration: none; }
 /* ============ CARDS ============ */
 .card {
   background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
-  transition: all var(--transition-base);
-}
-
-.card:hover {
-  border-color: var(--border-default);
 }
 
 .card-glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid var(--glass-border);
+  background: var(--bg-card);
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
 }
 
 .card-accent {
   background: var(--bg-card);
-  border: 1px solid var(--border-accent);
+  border-left: 3px solid var(--accent-primary);
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
-  box-shadow: var(--shadow-glow);
 }
 
 .card-glow {
@@ -353,20 +343,12 @@ a { color: inherit; text-decoration: none; }
 }
 
 .card-glow::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
-  opacity: 0.5;
+  display: none;
 }
 
 /* ============ HERO STAT CARD ============ */
 .stat-card {
   background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: var(--space-md);
   text-align: center;
@@ -405,31 +387,26 @@ a { color: inherit; text-decoration: none; }
 .badge-green {
   background: rgba(255, 229, 0, 0.12);
   color: var(--accent-primary);
-  border: 1px solid rgba(255, 229, 0, 0.2);
 }
 
 .badge-blue {
   background: var(--accent-secondary-dim);
   color: var(--accent-secondary);
-  border: 1px solid rgba(0, 212, 255, 0.2);
 }
 
 .badge-orange {
   background: rgba(255, 107, 53, 0.12);
   color: var(--accent-warning);
-  border: 1px solid rgba(255, 107, 53, 0.2);
 }
 
 .badge-red {
   background: rgba(255, 59, 92, 0.12);
   color: var(--accent-danger);
-  border: 1px solid rgba(255, 59, 92, 0.2);
 }
 
 .badge-gold {
   background: rgba(255, 215, 0, 0.12);
   color: var(--accent-gold);
-  border: 1px solid rgba(255, 215, 0, 0.2);
 }
 
 /* Phase badges */
@@ -445,10 +422,10 @@ a { color: inherit; text-decoration: none; }
   text-transform: uppercase;
 }
 
-.phase-base { background: rgba(0, 212, 255, 0.12); color: #00D4FF; border: 1px solid rgba(0, 212, 255, 0.25); }
-.phase-build { background: rgba(255, 165, 0, 0.12); color: #FFA500; border: 1px solid rgba(255, 165, 0, 0.25); }
-.phase-race { background: rgba(255, 59, 92, 0.12); color: #FF3B5C; border: 1px solid rgba(255, 59, 92, 0.25); }
-.phase-peak { background: rgba(255, 229, 0, 0.12); color: #FFE500; border: 1px solid rgba(255, 229, 0, 0.25); }
+.phase-base { background: rgba(0, 212, 255, 0.12); color: #00D4FF; }
+.phase-build { background: rgba(255, 165, 0, 0.12); color: #FFA500; }
+.phase-race { background: rgba(255, 59, 92, 0.12); color: #FF3B5C; }
+.phase-peak { background: rgba(255, 229, 0, 0.12); color: #FFE500; }
 
 /* ============ BUTTONS ============ */
 .btn {
@@ -469,16 +446,10 @@ a { color: inherit; text-decoration: none; }
 .btn-primary {
   background: var(--accent-primary);
   color: #000;
-  box-shadow: var(--shadow-glow);
-}
-
-.btn-primary:hover {
-  box-shadow: var(--shadow-glow-strong);
-  transform: translateY(-1px);
 }
 
 .btn-primary:active {
-  transform: translateY(0) scale(0.98);
+  opacity: 0.85;
 }
 
 .btn-secondary {
@@ -515,7 +486,6 @@ a { color: inherit; text-decoration: none; }
 /* ============ EXERCISE CARD ============ */
 .exercise-card {
   background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: var(--space-md);
   display: flex;
@@ -526,13 +496,11 @@ a { color: inherit; text-decoration: none; }
 }
 
 .exercise-card:active {
-  transform: scale(0.98);
   background: var(--bg-card-hover);
 }
 
 .exercise-card.completed {
-  border-color: rgba(255, 229, 0, 0.2);
-  background: rgba(255, 229, 0, 0.03);
+  opacity: 0.6;
 }
 
 .exercise-card.completed .exercise-check {
@@ -677,7 +645,6 @@ a { color: inherit; text-decoration: none; }
 
 .countdown-item {
   background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: var(--space-md) var(--space-sm);
 }
@@ -1049,8 +1016,8 @@ a { color: inherit; text-decoration: none; }
 .stagger-in > *:nth-child(9) { animation-delay: 0.45s; }
 .stagger-in > *:nth-child(10) { animation-delay: 0.5s; }
 
-/* Glow animation for accent cards */
-.glow { animation: glowPulse 3s ease-in-out infinite; }
+/* Glow animation — disabled for clean look */
+.glow { }
 
 /* Bar grow for race comparison */
 .bar-animate { animation: barGrow 1s cubic-bezier(0.16, 1, 0.3, 1) both; }
@@ -2713,182 +2680,117 @@ function renderDashboard() {
   const streak = Storage.getStreak();
   const weekStats = Storage.getWeeklyCompleted(currentWeek);
   const totalCompleted = Storage.getCompletedCount();
-  
-  const phaseBadgeClass = `phase-${phase.id}`;
-  
+  const daysLeft = countdown.days;
+  const totalDays = Math.round((new Date(ATHLETE.goalDate) - new Date(ATHLETE.trainingStart)) / (1000*60*60*24));
+  const progressPct = Math.min(100, Math.round(((totalDays - daysLeft) / totalDays) * 100));
+
   let workoutCard = '';
   if (todayWorkout) {
     const isComplete = Storage.isWorkoutComplete(today);
     workoutCard = `
-      <div class="card card-glow mb-lg tap-scale" onclick="App.navigate('workout')" style="cursor:pointer">
-        <div class="flex-between mb-md">
-          <div style="display:flex;align-items:center;gap:12px">
-            <div class="workout-type-icon type-${todayWorkout.type}">
-              ${todayWorkout.icon}
-            </div>
-            <div>
-              <div class="text-xs text-secondary">${Dates.getDayName(today)} — Today</div>
-              <div class="text-lg font-bold">${todayWorkout.title}</div>
-            </div>
+      <div class="card mb-lg" onclick="App.navigate('workout')" style="cursor:pointer;padding:20px">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="workout-type-icon type-${todayWorkout.type}">
+            ${todayWorkout.icon}
           </div>
-          ${isComplete ? '<span class="badge badge-green">✓ Done</span>' : `<span class="badge badge-blue">${todayWorkout.duration}</span>`}
-        </div>
-        <p class="text-sm text-secondary mb-md">${todayWorkout.focus}</p>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="text-xs text-tertiary">${todayWorkout.exercises.length} exercises</span>
-          ${todayWorkout.zone ? `<span class="exercise-zone zone-${todayWorkout.zone}">Z${todayWorkout.zone}</span>` : ''}
-          <span style="margin-left:auto;color:var(--accent-primary);font-size:13px;font-weight:600">View Workout →</span>
+          <div style="flex:1;min-width:0">
+            <div class="text-sm font-bold">${todayWorkout.title}</div>
+            <div class="text-xs text-secondary">${todayWorkout.duration} · ${todayWorkout.exercises.length} exercises${todayWorkout.zone ? ' · Z' + todayWorkout.zone : ''}</div>
+          </div>
+          ${isComplete ? '<span style="color:var(--accent-success);font-size:20px">✓</span>' : '<span style="color:var(--text-tertiary);font-size:16px">›</span>'}
         </div>
       </div>
     `;
   } else {
     workoutCard = `
-      <div class="card mb-lg">
-        <div class="empty-state" style="padding:24px 0">
-          <div class="empty-state-icon">📋</div>
-          <div class="empty-state-title">No workout today</div>
-          <div class="empty-state-text">Training starts ${Dates.formatDate(ATHLETE.trainingStart)}</div>
-        </div>
+      <div class="card mb-lg" style="padding:20px;text-align:center">
+        <div class="text-sm text-secondary">No workout today</div>
       </div>
     `;
   }
-  
+
   return `
     <div class="view active" id="view-dashboard">
       <!-- Header -->
-      <div class="flex-between mb-lg">
-        <div>
-          <div class="text-xs text-secondary" style="letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">
-            ${Dates.formatDateFull(new Date())}
-          </div>
-          <h1 class="text-2xl font-black" style="letter-spacing:-1px">
-            Hey, Aidan 👋
-          </h1>
-        </div>
-        <div class="phase-badge ${phaseBadgeClass}">
-          ${phase.emoji} ${phase.name}
-        </div>
+      <div style="margin-bottom:28px">
+        <div class="text-xs text-secondary" style="margin-bottom:2px">${Dates.formatDateFull(new Date())}</div>
+        <h1 style="font-size:24px;font-weight:800;letter-spacing:-0.5px">Hey, Aidan</h1>
       </div>
-      
-      <!-- Dallas Countdown -->
-      <div class="card-accent glow mb-lg">
-        <div class="flex-between mb-md">
-          <div>
-            <div class="text-xs text-tertiary" style="text-transform:uppercase;letter-spacing:1px">Target Race</div>
-            <div class="text-lg font-bold">🏁 Dallas — Nov 22</div>
-          </div>
-          <div style="text-align:right">
-            <div class="text-xs text-tertiary">Week ${currentWeek} of 34</div>
-            <div class="progress-bar" style="width:100px;margin-top:4px">
-              <div class="progress-fill" style="width:${Fmt.percent(currentWeek, 34)}%"></div>
-            </div>
+
+      <!-- Big Circle — Days to Dallas -->
+      <div style="text-align:center;margin-bottom:28px">
+        <div style="position:relative;width:180px;height:180px;margin:0 auto">
+          <svg viewBox="0 0 180 180" style="transform:rotate(-90deg)">
+            <circle cx="90" cy="90" r="80" fill="none" stroke="var(--bg-card)" stroke-width="10"/>
+            <circle cx="90" cy="90" r="80" fill="none" stroke="var(--accent-primary)" stroke-width="10"
+              stroke-dasharray="${2 * Math.PI * 80}"
+              stroke-dashoffset="${2 * Math.PI * 80 * (1 - progressPct / 100)}"
+              stroke-linecap="round"/>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div style="font-size:42px;font-weight:900;color:var(--accent-primary);line-height:1">${daysLeft}</div>
+            <div style="font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-top:4px">Days to Dallas</div>
           </div>
         </div>
-        <div class="countdown">
-          <div class="countdown-item">
-            <div class="countdown-value">${countdown.months}</div>
-            <div class="countdown-label">Months</div>
+        <div style="display:flex;justify-content:center;gap:24px;margin-top:16px">
+          <div style="text-align:center">
+            <div style="font-size:18px;font-weight:700">${currentWeek}<span style="font-size:12px;color:var(--text-tertiary);font-weight:500">/34</span></div>
+            <div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1px">Week</div>
           </div>
-          <div class="countdown-item">
-            <div class="countdown-value">${countdown.weeks}</div>
-            <div class="countdown-label">Weeks</div>
+          <div style="width:1px;background:var(--border-subtle);height:32px"></div>
+          <div style="text-align:center">
+            <div style="font-size:18px;font-weight:700">${streak}<span style="font-size:12px;color:var(--text-tertiary);font-weight:500"> 🔥</span></div>
+            <div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1px">Streak</div>
           </div>
-          <div class="countdown-item">
-            <div class="countdown-value">${countdown.remainingDays}</div>
-            <div class="countdown-label">Days</div>
-          </div>
-          <div class="countdown-item">
-            <div class="countdown-value">${streak}</div>
-            <div class="countdown-label">Streak 🔥</div>
+          <div style="width:1px;background:var(--border-subtle);height:32px"></div>
+          <div style="text-align:center">
+            <div style="font-size:18px;font-weight:700">${totalCompleted}</div>
+            <div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1px">Done</div>
           </div>
         </div>
       </div>
-      
+
       <!-- Today's Workout -->
-      <div class="section-header">
-        <div class="section-title">Today's Workout</div>
-      </div>
+      <div style="font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Today's Workout</div>
       ${workoutCard}
-      
-      <!-- Quick Stats -->
-      <div class="grid-3 mb-lg">
-        <div class="stat-card">
-          <div class="stat-value text-accent">${ATHLETE.vo2max}</div>
-          <div class="stat-label">VO2 Max</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">${ATHLETE.prTime.substring(0, 4)}</div>
-          <div class="stat-label">PR Time</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">${totalCompleted}</div>
-          <div class="stat-label">Workouts</div>
-        </div>
+
+      <!-- This Week -->
+      <div class="flex-between" style="margin-bottom:10px">
+        <div style="font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px">This Week</div>
+        <span class="text-sm font-bold" style="color:var(--accent-primary)">${weekStats.completed}/${weekStats.total}</span>
       </div>
-      
-      <!-- This Week Overview -->
-      <div class="section-header">
-        <div class="flex-between">
-          <div class="section-title">This Week</div>
-          <span class="text-sm text-accent font-bold">${weekStats.completed}/${weekStats.total}</span>
-        </div>
-      </div>
-      <div class="card mb-lg">
-        <div class="progress-bar mb-md" style="height:8px">
+      <div class="card mb-lg" style="padding:16px">
+        <div class="progress-bar mb-md" style="height:6px">
           <div class="progress-fill" style="width:${Fmt.percent(weekStats.completed, weekStats.total)}%"></div>
         </div>
         ${renderWeekPreview(currentWeek)}
       </div>
-      
+
+      <!-- Quick Stats -->
+      <div style="font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Stats</div>
+      <div class="card mb-lg" style="padding:0">
+        <div class="metric-row" style="padding:14px 20px">
+          <span class="metric-label">VO2 Max</span>
+          <span class="metric-value" style="color:var(--accent-primary)">${ATHLETE.vo2max}</span>
+        </div>
+        <div class="metric-row" style="padding:14px 20px">
+          <span class="metric-label">PR Time</span>
+          <span class="metric-value">${ATHLETE.prTime}</span>
+        </div>
+        <div class="metric-row" style="padding:14px 20px">
+          <span class="metric-label">Goal</span>
+          <span class="metric-value" style="color:var(--accent-primary)">Sub ${ATHLETE.goalTimeA}</span>
+        </div>
+        <div class="metric-row" style="padding:14px 20px">
+          <span class="metric-label">Time to Find</span>
+          <span class="metric-value">10:09</span>
+        </div>
+      </div>
+
       <!-- VO2 Max Trend -->
-      <div class="section-header">
-        <div class="flex-between">
-          <div class="section-title">VO2 Max Trend</div>
-          <span class="text-xs text-tertiary">FROM GARMIN</span>
-        </div>
-      </div>
-      <div class="card mb-lg">
-        <canvas id="vo2-chart" style="width:100%;height:160px"></canvas>
-      </div>
-      
-      <!-- Goal Breakdown -->
-      <div class="section-header">
-        <div class="section-title">Goal Breakdown</div>
-        <div class="text-sm text-secondary">What sub-1:05 requires vs your PR</div>
-      </div>
-      <div class="card mb-lg">
-        <div class="metric-row">
-          <span class="metric-label">Running (8 × 1km)</span>
-          <div>
-            <span class="metric-value" style="color:var(--accent-warning)">${RACES[0].totals.running.time}</span>
-            <span class="text-xs text-tertiary"> → </span>
-            <span class="metric-value text-accent">${GOAL_SPLITS.runs.total}</span>
-          </div>
-        </div>
-        <div class="metric-row">
-          <span class="metric-label">Avg Run Pace</span>
-          <div>
-            <span class="metric-value" style="color:var(--accent-warning)">4:53/km</span>
-            <span class="text-xs text-tertiary"> → </span>
-            <span class="metric-value text-accent">${GOAL_SPLITS.runs.avgPace}/km</span>
-          </div>
-        </div>
-        <div class="metric-row">
-          <span class="metric-label">Stations Total</span>
-          <div>
-            <span class="metric-value" style="color:var(--accent-warning)">${RACES[0].totals.workouts.time}</span>
-            <span class="text-xs text-tertiary"> → </span>
-            <span class="metric-value text-accent">26:15</span>
-          </div>
-        </div>
-        <div class="metric-row">
-          <span class="metric-label">Roxzone</span>
-          <div>
-            <span class="metric-value" style="color:var(--accent-warning)">${RACES[0].totals.roxzone.time}</span>
-            <span class="text-xs text-tertiary"> → </span>
-            <span class="metric-value text-accent">${GOAL_SPLITS.roxzone.target}</span>
-          </div>
-        </div>
+      <div style="font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">VO2 Max Trend</div>
+      <div class="card mb-lg" style="padding:16px">
+        <canvas id="vo2-chart" style="width:100%;height:140px"></canvas>
       </div>
     </div>
   `;
