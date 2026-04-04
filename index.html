@@ -97,6 +97,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             <span>Plan</span>
         </button>
+        <button class="nav-btn" data-view="fuel">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
+            <span>Fuel</span>
+        </button>
         <button class="nav-btn" data-view="stats">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
             <span>Stats</span>
@@ -1753,10 +1757,43 @@ function renderToday(overrideDate) {
     </div>
     ` : ''}
 
-    <!-- Exercises -->
+    <!-- Exercises (with auto warm-up/cooldown) -->
     <div class="label">Exercises</div>
     <div class="mb-24">
-      ${workout.exercises.map((ex, i) => {
+      ${(() => {
+        // Build full exercise list with warm-up + cooldown
+        const isRunType = ['run','tempo','intervals','long'].includes(workout.type);
+        const isStrengthType = ['strength'].includes(workout.type);
+        const isHyroxType = ['hyrox'].includes(workout.type);
+        const isRestType = ['rest'].includes(workout.type);
+        const warmUp = [];
+        const coolDown = [];
+        if (!isRestType && workout.title !== 'Rest Day' && workout.title !== 'Rest' && !workout.title.includes('RACE DAY') && !workout.title.includes('Race Eve')) {
+          if (isRunType) {
+            warmUp.push({name:'Dynamic Warm-Up',detail:'Leg swings (15 ea), walking lunges w/ rotation (8 ea), A-skips + B-skips (20m ea), single-leg glute bridges (8 ea)',zone:0,isWarmUp:true});
+          }
+          if (isStrengthType) {
+            warmUp.push({name:'Activation',detail:'Banded walks (15 steps ea direction), banded clamshells (15 ea), wall slides (10), goblet squat hold (30s)',zone:0,isWarmUp:true});
+          }
+          if (isHyroxType) {
+            warmUp.push({name:'Dynamic Warm-Up',detail:'Leg swings, walking lunges w/ rotation, A-skips, single-leg glute bridges (8 ea)',zone:0,isWarmUp:true});
+          }
+          // Tib raises every training day
+          warmUp.push({name:'Tib Raises',detail:'3 × 25 reps — #1 shin splint prevention at your bodyweight',zone:0,isWarmUp:true});
+          // Cooldown
+          if (isRunType || isHyroxType) {
+            coolDown.push({name:'Foam Roll',detail:'Quads, TFL, calves, glutes — 60-90 sec each',zone:0,isCoolDown:true});
+            coolDown.push({name:'Stretch: Hip Flexor',detail:'Couch stretch — 60 sec each side. Your #1 priority.',zone:0,isCoolDown:true});
+            coolDown.push({name:'Stretch: Calves',detail:'Straight leg + bent knee against wall — 45 sec each',zone:0,isCoolDown:true});
+            coolDown.push({name:'Stretch: Pigeon',detail:'60 sec each side — hip external rotators',zone:0,isCoolDown:true});
+          }
+          if (isStrengthType) {
+            coolDown.push({name:'Foam Roll',detail:'Quads, glutes, upper back — 60 sec each',zone:0,isCoolDown:true});
+            coolDown.push({name:'Stretch: Hip Flexor',detail:'Half-kneeling lunge stretch — 60 sec each side',zone:0,isCoolDown:true});
+          }
+        }
+        const allExercises = [...warmUp, ...workout.exercises, ...coolDown];
+        return allExercises.map((ex, i) => {
         const isDone = Storage.isExerciseComplete(dateStr, i);
         const log = Storage.getExerciseLog(dateStr, i);
         const isLoggable = !ex.zone && ex.name !== 'Full Rest' && ex.name !== 'Optional' && ex.name !== 'Rest & Prep' && ex.name !== 'Rest' && ex.name !== 'Celebrate' && ex.name !== 'Cooldown Stretch' && ex.name !== 'Cool Down' && ex.name !== 'Cooldown' && ex.name !== 'Warm Up' && ex.name !== 'Recovery' && ex.name !== 'Hip Mobility Flow' && ex.name !== 'Foam Rolling' && ex.name !== 'Pre-Race Meal' && ex.name !== 'Gear Check' && ex.name !== 'PRE-RACE' && ex.name !== 'WARM UP' && ex.name !== 'RACE' && ex.name !== 'PACING' && ex.name !== 'STATIONS';
@@ -1791,7 +1828,8 @@ function renderToday(overrideDate) {
           </div>
           ` : ''}
         </div>`;
-      }).join('')}
+      }).join('');
+      })()}
     </div>
 
     <!-- Run Stats (for running workouts) -->
@@ -2041,6 +2079,154 @@ function initRaceCharts() {
 }
 
 // =============================================
+// FUEL VIEW
+// =============================================
+let fuelTab = 'macros';
+
+function renderFuel() {
+  return `<div class="view">
+    <div class="t-xl fw-9 mb-4">Fuel</div>
+    <div class="t-sm t-muted mb-20">Eat for performance, not aesthetics.</div>
+
+    <div class="tabs">
+      <button class="tab ${fuelTab==='macros'?'active':''}" onclick="App.setFuelTab('macros')">Macros</button>
+      <button class="tab ${fuelTab==='meals'?'active':''}" onclick="App.setFuelTab('meals')">Meals</button>
+      <button class="tab ${fuelTab==='grocery'?'active':''}" onclick="App.setFuelTab('grocery')">Grocery</button>
+      <button class="tab ${fuelTab==='raceday'?'active':''}" onclick="App.setFuelTab('raceday')">Race Day</button>
+    </div>
+
+    ${fuelTab === 'macros' ? `
+    <div class="label">Training Days</div>
+    <div class="card mb-20" style="padding:14px 16px">
+      <div style="text-align:center;margin-bottom:16px">
+        <div class="t-2xl fw-9 t-accent">3,200 - 3,500</div>
+        <div class="t-xs t-faint mt-4">CALORIES PER DAY</div>
+      </div>
+      <div class="metric"><span class="t-sm t-muted">Protein</span><span class="t-sm fw-7">150g <span class="t-faint">(1.8 g/kg)</span></span></div>
+      <div class="metric"><span class="t-sm t-muted">Carbs</span><span class="t-sm fw-7 t-accent">450 - 550g <span class="t-faint">(5-7 g/kg)</span></span></div>
+      <div class="metric"><span class="t-sm t-muted">Fat</span><span class="t-sm fw-7">80 - 100g</span></div>
+    </div>
+
+    <div class="label">Rest Days</div>
+    <div class="card mb-20" style="padding:14px 16px">
+      <div style="text-align:center;margin-bottom:16px">
+        <div class="t-2xl fw-9">2,600 - 2,800</div>
+        <div class="t-xs t-faint mt-4">CALORIES PER DAY</div>
+      </div>
+      <div class="metric"><span class="t-sm t-muted">Protein</span><span class="t-sm fw-7">140g</span></div>
+      <div class="metric"><span class="t-sm t-muted">Carbs</span><span class="t-sm fw-7">200 - 250g</span></div>
+      <div class="metric"><span class="t-sm t-muted">Fat</span><span class="t-sm fw-7">100 - 115g</span></div>
+    </div>
+
+    <div class="label">Hydration (Austin Heat)</div>
+    <div class="card mb-20" style="padding:14px 16px">
+      <div class="metric"><span class="t-sm t-muted">Daily Water</span><span class="t-sm fw-7">3.5 - 4+ liters</span></div>
+      <div class="metric"><span class="t-sm t-muted">Sodium/hr (training)</span><span class="t-sm fw-7">500 - 1000mg</span></div>
+      <div class="metric"><span class="t-sm t-muted">Use</span><span class="t-sm fw-7">LMNT or SaltStick</span></div>
+      <div class="metric"><span class="t-sm t-muted">Gatorade enough?</span><span class="t-sm fw-7" style="color:var(--red)">No — too low sodium</span></div>
+    </div>
+
+    <div class="label">Supplements</div>
+    <div class="card" style="padding:14px 16px">
+      <div class="metric"><span class="t-sm t-muted">Creatine</span><span class="t-sm fw-7">5g daily</span></div>
+      <div class="metric"><span class="t-sm t-muted">Vitamin D</span><span class="t-sm fw-7">2,000-5,000 IU daily</span></div>
+      <div class="metric"><span class="t-sm t-muted">Magnesium</span><span class="t-sm fw-7">300-400mg glycinate (bedtime)</span></div>
+      <div class="metric"><span class="t-sm t-muted">Omega-3</span><span class="t-sm fw-7">2-3g EPA/DHA daily</span></div>
+      <div class="metric"><span class="t-sm t-muted">Caffeine (race day)</span><span class="t-sm fw-7">200-400mg</span></div>
+      <div class="metric"><span class="t-sm t-muted">Electrolytes</span><span class="t-sm fw-7">Every run in heat</span></div>
+    </div>
+    ` : ''}
+
+    ${fuelTab === 'meals' ? `
+    <div class="label">Portion Guide (No Scale Needed)</div>
+    <div class="card mb-20" style="padding:14px 16px">
+      <div class="metric"><span class="t-sm t-muted">Protein/meal</span><span class="t-sm fw-7">Palm-sized (~35g)</span></div>
+      <div class="metric"><span class="t-sm t-muted">Carbs/meal</span><span class="t-sm fw-7">2 fists rice/pasta (~70g)</span></div>
+      <div class="metric"><span class="t-sm t-muted">Veggies</span><span class="t-sm fw-7">1 fist-sized portion</span></div>
+      <div class="metric"><span class="t-sm t-muted">Fats</span><span class="t-sm fw-7">Thumb-sized or 2 tbsp PB</span></div>
+    </div>
+
+    <div class="label">Pre-Run (60-90 min before)</div>
+    <div class="card mb-16" style="padding:14px 16px">
+      <div class="ex-row" style="border:none;padding:10px 0"><div class="t-sm fw-6">Oatmeal + Banana + Honey</div><div class="t-xs t-muted mt-4">~65g carbs. The go-to.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Toast + PB + Banana</div><div class="t-xs t-muted mt-4">~55g carbs. Quick option.</div></div>
+      <div class="ex-row" style="padding:10px 0;border:none"><div class="t-sm fw-6">Rice Cakes + Honey</div><div class="t-xs t-muted mt-4">~45g carbs. Light option.</div></div>
+    </div>
+
+    <div class="label">Post-Run (within 30 min)</div>
+    <div class="card mb-16" style="padding:14px 16px">
+      <div class="ex-row" style="border:none;padding:10px 0"><div class="t-sm fw-6">Smoothie: Greek yogurt + banana + berries + protein</div><div class="t-xs t-muted mt-4">~70g carbs, 40g protein. Best option.</div></div>
+      <div class="ex-row" style="padding:10px 0;border:none"><div class="t-sm fw-6">Chocolate milk (16 oz)</div><div class="t-xs t-muted mt-4">Quick + effective. Legit recovery drink.</div></div>
+    </div>
+
+    <div class="label">Easy Meals</div>
+    <div class="card" style="padding:14px 16px">
+      <div class="ex-row" style="border:none;padding:10px 0"><div class="t-sm fw-6">Burrito Bowl</div><div class="t-xs t-muted mt-4">2 cups rice + black beans + chicken + salsa + avocado. ~900 cal.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Stir Fry</div><div class="t-xs t-muted mt-4">2 cups rice + steak/chicken + veggies + soy sauce. ~800 cal.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Pasta + Meat Sauce</div><div class="t-xs t-muted mt-4">3-4 oz pasta + ground beef + marinara + bread. ~850 cal.</div></div>
+      <div class="ex-row" style="padding:10px 0;border:none"><div class="t-sm fw-6">Eggs + Toast + Fruit</div><div class="t-xs t-muted mt-4">4 eggs scrambled + 2 toast + OJ. Quick breakfast. ~650 cal.</div></div>
+    </div>
+    ` : ''}
+
+    ${fuelTab === 'grocery' ? `
+    <div class="label">Weekly Grocery List</div>
+    <div class="t-xs t-muted mb-16">Sunday meal prep: cook rice, grill protein, roast veggies. ~90 min.</div>
+
+    <div class="label" style="color:var(--accent)">Carbs (the engine fuel)</div>
+    <div class="card mb-16" style="padding:14px 16px">
+      <div class="t-sm" style="line-height:2">White rice (5 lb bag)<br>Oats (large canister)<br>Pasta (2-3 boxes)<br>Bread (sourdough or whole wheat)<br>Bananas (bunch of 6-8)<br>Sweet potatoes (4-5)<br>Rice cakes<br>Honey<br>Tortillas</div>
+    </div>
+
+    <div class="label" style="color:var(--accent)">Protein</div>
+    <div class="card mb-16" style="padding:14px 16px">
+      <div class="t-sm" style="line-height:2">Chicken thighs (3-4 lbs)<br>Ground beef 85/15 (1-2 lbs)<br>Eggs (18 ct)<br>Greek yogurt (large tub)<br>Whey protein powder<br>Salmon or fish (2 fillets/week)</div>
+    </div>
+
+    <div class="label" style="color:var(--accent)">Fats + Extras</div>
+    <div class="card mb-16" style="padding:14px 16px">
+      <div class="t-sm" style="line-height:2">Peanut butter or almond butter<br>Avocados (3-4)<br>Olive oil<br>Cheese (shredded + string)<br>Trail mix<br>Frozen berries<br>Mixed vegetables (fresh or frozen)<br>Salsa + hot sauce<br>Soy sauce<br>Marinara sauce<br>Coffee</div>
+    </div>
+
+    <div class="label" style="color:var(--accent)">Hydration + Supplements</div>
+    <div class="card" style="padding:14px 16px">
+      <div class="t-sm" style="line-height:2">LMNT or SaltStick electrolytes<br>Creatine monohydrate<br>Magnesium glycinate<br>Vitamin D<br>Fish oil (omega-3)<br>Orange juice</div>
+    </div>
+    ` : ''}
+
+    ${fuelTab === 'raceday' ? `
+    <div class="label">Race Day Protocol — Dallas</div>
+
+    <div class="label" style="margin-top:20px">3 Days Before</div>
+    <div class="card mb-16" style="padding:14px 16px">
+      <div class="t-sm" style="line-height:1.8">Carb load: 8-10 g/kg (650-820g carbs/day)<br>Switch to white rice, pasta, bread — low fiber<br>Reduce training volume (already tapering)<br>Hydrate well, add extra electrolytes</div>
+    </div>
+
+    <div class="label">Night Before</div>
+    <div class="card mb-16" style="padding:14px 16px">
+      <div class="t-sm" style="line-height:1.8">Large pasta or rice dinner — nothing new<br>No alcohol<br>Bed by 9pm<br>Lay out all gear tonight</div>
+    </div>
+
+    <div class="label">Race Morning</div>
+    <div class="card mb-16" style="padding:14px 16px">
+      <div class="metric"><span class="t-sm t-muted">3-4 hrs before</span><span class="t-sm fw-6">Oatmeal + banana + honey + coffee (600-800 cal)</span></div>
+      <div class="metric"><span class="t-sm t-muted">90 min before</span><span class="t-sm fw-6">Small banana or energy bar</span></div>
+      <div class="metric"><span class="t-sm t-muted">30 min before</span><span class="t-sm fw-6">Gel + water. Caffeine 200-400mg.</span></div>
+    </div>
+
+    <div class="label">During Race</div>
+    <div class="card mb-16" style="padding:14px 16px">
+      <div class="t-sm" style="line-height:1.8">Sip sports drink at Roxzones<br>Gel at station 4 transition if energy dipping<br>Target: 30-60g carbs/hour<br>Practice this in training simulations first</div>
+    </div>
+
+    <div class="label">After Race</div>
+    <div class="card" style="padding:14px 16px">
+      <div class="t-sm" style="line-height:1.8">Immediately: sports drink + protein shake<br>Within 2 hours: large meal — whatever sounds good<br>You earned it.</div>
+    </div>
+    ` : ''}
+  </div>`;
+}
+
+// =============================================
 // APP CONTROLLER
 // =============================================
 const App = {
@@ -2072,6 +2258,7 @@ const App = {
     switch(view) {
       case 'today': app.innerHTML = renderToday(this.detailDate); break;
       case 'plan': app.innerHTML = renderCalendar(); break;
+      case 'fuel': app.innerHTML = renderFuel(); break;
       case 'stats': app.innerHTML = renderStats(); requestAnimationFrame(()=>{initDashboardCharts();initRaceCharts()}); break;
     }
     if (!this.detailDate) app.scrollTop = 0;
@@ -2124,7 +2311,8 @@ const App = {
   calendarPrevWeek() { if(calendarCurrentWeek>1){calendarCurrentWeek--;this.navigate('plan')} },
   calendarNextWeek() { if(calendarCurrentWeek<34){calendarCurrentWeek++;this.navigate('plan')} },
   jumpToWeek(w) { calendarCurrentWeek = w; this.navigate('plan'); },
-  setStatsTab(t) { statsTab=t; this.navigate('stats'); }
+  setStatsTab(t) { statsTab=t; this.navigate('stats'); },
+  setFuelTab(t) { fuelTab=t; this.navigate('fuel'); }
 };
 
 document.addEventListener('DOMContentLoaded', () => App.init());
