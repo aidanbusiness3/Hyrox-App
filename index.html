@@ -5,1079 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0a0a0a">
-    <meta name="description" content="Aidan Nelson's personalized 34-week Hyrox training plan — Dallas November 2025">
-    <title>HYROX Training — Aidan Nelson</title>
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="Aidan Nelson's Hyrox Training — Dallas 2026">
+    <title>HYROX — Aidan</title>
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-/* =============================================
-   HYROX TRAINING APP — Design System
-   Dark theme with Hyrox yellow branding
-   ============================================= */
-
-:root {
-  /* Core Colors */
-  --bg-primary: #0a0a0a;
-  --bg-secondary: #111111;
-  --bg-card: #161616;
-  --bg-card-hover: #1c1c1c;
-  --bg-elevated: #1a1a1a;
-  --bg-input: #1e1e1e;
-
-  /* Accent Colors */
-  --accent-primary: #FFE500;
-  --accent-primary-dim: rgba(255, 229, 0, 0.12);
-  --accent-primary-glow: rgba(255, 229, 0, 0.25);
-  --accent-secondary: #FF8C00;
-  --accent-secondary-dim: rgba(255, 140, 0, 0.15);
-  --accent-warning: #FF6B35;
-  --accent-danger: #FF3B5C;
-  --accent-success: #4ADE80;
-  --accent-gold: #FFE500;
-
-  /* Text */
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.6);
-  --text-tertiary: rgba(255, 255, 255, 0.35);
-  --text-accent: #FFE500;
-
-  /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.08);
-  --border-accent: rgba(255, 229, 0, 0.25);
-
-  /* Glassmorphism */
-  --glass-bg: rgba(22, 22, 22, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-blur: 20px;
-
-  /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 20px rgba(255, 229, 0, 0.1);
-  --shadow-glow-strong: 0 0 40px rgba(255, 229, 0, 0.2);
-  
-  /* Spacing */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-2xl: 48px;
-  
-  /* Radii */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-full: 999px;
-  
-  /* Typography */
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  --font-xs: 11px;
-  --font-sm: 13px;
-  --font-base: 15px;
-  --font-lg: 18px;
-  --font-xl: 22px;
-  --font-2xl: 28px;
-  --font-3xl: 36px;
-  --font-4xl: 48px;
-  
-  /* Transitions */
-  --transition-fast: 150ms ease;
-  --transition-base: 250ms ease;
-  --transition-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
-  
-  /* Safe Areas */
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --nav-height: 72px;
-}
-
-/* ============ RESET ============ */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-  -webkit-text-size-adjust: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-body {
-  font-family: var(--font-family);
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  line-height: 1.5;
-  min-height: 100%;
-  overflow: hidden;
-  position: fixed;
-  width: 100%;
-}
-
-#app {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: var(--nav-height);
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: var(--safe-bottom);
-}
-
-img { max-width: 100%; display: block; }
-button { cursor: pointer; border: none; background: none; font-family: inherit; color: inherit; }
-input, select, textarea { font-family: inherit; color: inherit; }
-a { color: inherit; text-decoration: none; }
-
-/* Scrollbar */
-#app::-webkit-scrollbar { width: 4px; }
-#app::-webkit-scrollbar-track { background: transparent; }
-#app::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
-
-/* ============ LAYOUT ============ */
-.view {
-  display: none;
-  padding: var(--space-lg);
-  padding-top: calc(var(--safe-top) + var(--space-lg));
-  min-height: 100%;
-}
-
-.view.active {
-  display: block;
-  animation: viewEnter 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.section-header {
-  margin-bottom: var(--space-lg);
-}
-
-.section-title {
-  font-size: var(--font-xl);
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  margin-bottom: var(--space-xs);
-}
-
-.section-subtitle {
-  font-size: var(--font-sm);
-  color: var(--text-secondary);
-}
-
-/* ============ TYPOGRAPHY ============ */
-.text-accent { color: var(--accent-primary); }
-.text-secondary { color: var(--text-secondary); }
-.text-tertiary { color: var(--text-tertiary); }
-.text-warning { color: var(--accent-warning); }
-.text-danger { color: var(--accent-danger); }
-
-.font-bold { font-weight: 700; }
-.font-extrabold { font-weight: 800; }
-.font-black { font-weight: 900; }
-
-.text-xs { font-size: var(--font-xs); }
-.text-sm { font-size: var(--font-sm); }
-.text-base { font-size: var(--font-base); }
-.text-lg { font-size: var(--font-lg); }
-.text-xl { font-size: var(--font-xl); }
-.text-2xl { font-size: var(--font-2xl); }
-.text-3xl { font-size: var(--font-3xl); }
-.text-4xl { font-size: var(--font-4xl); }
-
-.text-mono {
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.5px;
-}
-
-/* ============ LOADING SCREEN ============ */
-.loading-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background: var(--bg-primary);
-}
-
-.loading-logo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.loading-h {
-  font-size: 64px;
-  font-weight: 900;
-  color: var(--accent-primary);
-  text-shadow: 0 0 40px rgba(255, 229, 0, 0.4);
-  animation: loadPulse 1.5s ease-in-out infinite;
-}
-
-.loading-bar {
-  width: 120px;
-  height: 3px;
-  background: var(--bg-card);
-  border-radius: 3px;
-  overflow: hidden;
-  position: relative;
-}
-
-.loading-bar::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 40%;
-  background: var(--accent-primary);
-  border-radius: 3px;
-  animation: loadSlide 1s ease-in-out infinite;
-}
-
-.loading-text {
-  font-size: var(--font-sm);
-  color: var(--text-tertiary);
-  letter-spacing: 0.5px;
-}
-
-/* =============================================
-   COMPONENT STYLES
-   ============================================= */
-
-/* ============ BOTTOM NAVIGATION ============ */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: var(--nav-height);
-  background: rgba(10, 10, 10, 0.92);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border-top: 1px solid var(--border-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding-bottom: var(--safe-bottom);
-  z-index: 100;
-}
-
-.nav-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 8px 12px;
-  border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
-  color: var(--text-tertiary);
-  position: relative;
-}
-
-.nav-btn span {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-}
-
-.nav-btn.active {
-  color: var(--accent-primary);
-}
-
-.nav-btn.active::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 2px;
-  background: var(--accent-primary);
-  border-radius: 2px;
-}
-
-.nav-btn:active {
-  transform: scale(0.92);
-}
-
-/* ============ CARDS ============ */
-.card {
-  background: var(--bg-card);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-}
-
-.card-glass {
-  background: var(--bg-card);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-}
-
-.card-accent {
-  background: var(--bg-card);
-  border-left: 3px solid var(--accent-primary);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-}
-
-.card-glow {
-  position: relative;
-  overflow: hidden;
-}
-
-.card-glow::before {
-  display: none;
-}
-
-/* ============ HERO STAT CARD ============ */
-.stat-card {
-  background: var(--bg-card);
-  border-radius: var(--radius-md);
-  padding: var(--space-md);
-  text-align: center;
-}
-
-.stat-value {
-  font-size: var(--font-2xl);
-  font-weight: 800;
-  color: var(--text-primary);
-  line-height: 1.1;
-  margin-bottom: 2px;
-  font-variant-numeric: tabular-nums;
-}
-
-.stat-label {
-  font-size: var(--font-xs);
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: 600;
-}
-
-/* ============ BADGES / PILLS ============ */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: var(--radius-full);
-  font-size: var(--font-xs);
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.badge-green {
-  background: rgba(255, 229, 0, 0.12);
-  color: var(--accent-primary);
-}
-
-.badge-blue {
-  background: var(--accent-secondary-dim);
-  color: var(--accent-secondary);
-}
-
-.badge-orange {
-  background: rgba(255, 107, 53, 0.12);
-  color: var(--accent-warning);
-}
-
-.badge-red {
-  background: rgba(255, 59, 92, 0.12);
-  color: var(--accent-danger);
-}
-
-.badge-gold {
-  background: rgba(255, 215, 0, 0.12);
-  color: var(--accent-gold);
-}
-
-/* Phase badges */
-.phase-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  border-radius: var(--radius-full);
-  font-size: var(--font-xs);
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.phase-base { background: rgba(0, 212, 255, 0.12); color: #00D4FF; }
-.phase-build { background: rgba(255, 165, 0, 0.12); color: #FFA500; }
-.phase-race { background: rgba(255, 59, 92, 0.12); color: #FF3B5C; }
-.phase-peak { background: rgba(255, 229, 0, 0.12); color: #FFE500; }
-
-/* ============ BUTTONS ============ */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 24px;
-  border-radius: var(--radius-full);
-  font-size: var(--font-sm);
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  transition: all var(--transition-base);
-  cursor: pointer;
-  border: none;
-}
-
-.btn-primary {
-  background: var(--accent-primary);
-  color: #000;
-}
-
-.btn-primary:active {
-  opacity: 0.85;
-}
-
-.btn-secondary {
-  background: var(--bg-card);
-  color: var(--text-primary);
-  border: 1px solid var(--border-default);
-}
-
-.btn-secondary:hover {
-  border-color: var(--border-accent);
-  background: var(--bg-card-hover);
-}
-
-.btn-ghost {
-  background: transparent;
-  color: var(--text-secondary);
-  padding: 8px 16px;
-}
-
-.btn-ghost:hover {
-  color: var(--text-primary);
-  background: rgba(255,255,255,0.05);
-}
-
-.btn-sm {
-  padding: 8px 16px;
-  font-size: var(--font-xs);
-}
-
-.btn-block {
-  width: 100%;
-}
-
-/* ============ EXERCISE CARD ============ */
-.exercise-card {
-  background: var(--bg-card);
-  border-radius: var(--radius-md);
-  padding: var(--space-md);
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  transition: all var(--transition-base);
-  cursor: pointer;
-}
-
-.exercise-card:active {
-  background: var(--bg-card-hover);
-}
-
-.exercise-card.completed {
-  opacity: 0.6;
-}
-
-.exercise-card.completed .exercise-check {
-  background: var(--accent-primary);
-  border-color: var(--accent-primary);
-}
-
-.exercise-card.completed .exercise-check svg {
-  opacity: 1;
-}
-
-.exercise-check {
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  border-radius: 50%;
-  border: 2px solid var(--border-default);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all var(--transition-fast);
-}
-
-.exercise-check svg {
-  opacity: 0;
-  color: #000;
-  transition: opacity var(--transition-fast);
-}
-
-.exercise-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.exercise-name {
-  font-size: var(--font-base);
-  font-weight: 700;
-  margin-bottom: 2px;
-}
-
-.exercise-detail {
-  font-size: var(--font-xs);
-  color: var(--text-secondary);
-}
-
-.exercise-meta {
-  text-align: right;
-  flex-shrink: 0;
-}
-
-.exercise-zone {
-  font-size: var(--font-xs);
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-}
-
-.zone-1 { background: rgba(0, 150, 255, 0.15); color: #0096FF; }
-.zone-2 { background: rgba(0, 212, 255, 0.15); color: #00D4FF; }
-.zone-3 { background: rgba(255, 165, 0, 0.15); color: #FFA500; }
-.zone-4 { background: rgba(255, 80, 50, 0.15); color: #FF5032; }
-.zone-5 { background: rgba(255, 59, 92, 0.15); color: #FF3B5C; }
-
-/* ============ PROGRESS BAR ============ */
-.progress-bar {
-  width: 100%;
-  height: 6px;
-  background: var(--bg-input);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent-primary), #FFA500);
-  border-radius: 3px;
-  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* ============ RACE COMPARISON BAR ============ */
-.race-bar-container {
-  margin-bottom: var(--space-md);
-}
-
-.race-bar-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-
-.race-bar-name {
-  font-size: var(--font-sm);
-  font-weight: 600;
-}
-
-.race-bar-time {
-  font-size: var(--font-sm);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.race-bar {
-  height: 28px;
-  border-radius: 6px;
-  position: relative;
-  overflow: hidden;
-}
-
-.race-bar-fill {
-  height: 100%;
-  border-radius: 6px;
-  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 8px;
-}
-
-.race-bar-phoenix {
-  background: linear-gradient(90deg, rgba(255, 229, 0, 0.2), rgba(255, 229, 0, 0.4));
-  border: 1px solid rgba(255, 229, 0, 0.3);
-}
-
-.race-bar-houston {
-  background: linear-gradient(90deg, rgba(255, 107, 53, 0.2), rgba(255, 107, 53, 0.4));
-  border: 1px solid rgba(255, 107, 53, 0.3);
-}
-
-.race-bar-goal {
-  background: linear-gradient(90deg, rgba(0, 212, 255, 0.2), rgba(0, 212, 255, 0.4));
-  border: 1px solid rgba(0, 212, 255, 0.3);
-}
-
-/* ============ COUNTDOWN ============ */
-.countdown {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-sm);
-  text-align: center;
-}
-
-.countdown-item {
-  background: var(--bg-card);
-  border-radius: var(--radius-md);
-  padding: var(--space-md) var(--space-sm);
-}
-
-.countdown-value {
-  font-size: var(--font-2xl);
-  font-weight: 900;
-  color: var(--accent-primary);
-  line-height: 1;
-  margin-bottom: 4px;
-  font-variant-numeric: tabular-nums;
-}
-
-.countdown-label {
-  font-size: 9px;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  font-weight: 700;
-}
-
-/* ============ CALENDAR ============ */
-.calendar-week {
-  margin-bottom: var(--space-md);
-}
-
-.calendar-week-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-sm);
-  padding: 0 var(--space-xs);
-}
-
-.calendar-week-title {
-  font-size: var(--font-sm);
-  font-weight: 700;
-}
-
-.calendar-days {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-}
-
-.calendar-day-header {
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  text-align: center;
-  padding-bottom: 6px;
-}
-
-.calendar-day {
-  aspect-ratio: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-sm);
-  font-size: var(--font-xs);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  position: relative;
-  gap: 3px;
-  border: 1px solid transparent;
-}
-
-.calendar-day:hover {
-  background: var(--bg-card-hover);
-}
-
-.calendar-day.today {
-  border-color: var(--accent-primary);
-  background: rgba(255, 229, 0, 0.05);
-}
-
-.calendar-day.completed {
-  background: rgba(255, 229, 0, 0.08);
-}
-
-.calendar-day.rest {
-  color: var(--text-tertiary);
-}
-
-.calendar-day-dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-}
-
-.dot-run { background: var(--accent-secondary); }
-.dot-strength { background: var(--accent-warning); }
-.dot-hyrox { background: var(--accent-primary); }
-.dot-rest { background: var(--text-tertiary); }
-.dot-complete { background: var(--accent-primary); }
-
-/* ============ TABS ============ */
-.tabs {
-  display: flex;
-  gap: 4px;
-  background: var(--bg-card);
-  border-radius: var(--radius-full);
-  padding: 4px;
-  margin-bottom: var(--space-lg);
-}
-
-.tab {
-  flex: 1;
-  padding: 10px 16px;
-  border-radius: var(--radius-full);
-  font-size: var(--font-xs);
-  font-weight: 700;
-  text-align: center;
-  color: var(--text-tertiary);
-  transition: all var(--transition-fast);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.tab.active {
-  background: var(--accent-primary);
-  color: #000;
-}
-
-.tab:not(.active):hover {
-  color: var(--text-secondary);
-}
-
-/* ============ METRIC ROW ============ */
-.metric-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-md) 0;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.metric-row:last-child {
-  border-bottom: none;
-}
-
-.metric-label {
-  font-size: var(--font-sm);
-  color: var(--text-secondary);
-}
-
-.metric-value {
-  font-size: var(--font-sm);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-/* ============ ZONE TABLE ============ */
-.zone-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 4px;
-}
-
-.zone-table th {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  text-align: left;
-  padding: 8px 12px;
-}
-
-.zone-table td {
-  padding: 10px 12px;
-  font-size: var(--font-sm);
-  font-weight: 500;
-  background: var(--bg-card);
-}
-
-.zone-table tr td:first-child {
-  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-  font-weight: 700;
-}
-
-.zone-table tr td:last-child {
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-}
-
-/* ============ EMPTY STATE ============ */
-.empty-state {
-  text-align: center;
-  padding: var(--space-2xl) var(--space-lg);
-}
-
-.empty-state-icon {
-  font-size: 48px;
-  margin-bottom: var(--space-md);
-}
-
-.empty-state-title {
-  font-size: var(--font-lg);
-  font-weight: 700;
-  margin-bottom: var(--space-sm);
-}
-
-.empty-state-text {
-  font-size: var(--font-sm);
-  color: var(--text-secondary);
-  max-width: 280px;
-  margin: 0 auto;
-}
-
-/* ============ GRID HELPERS ============ */
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-md);
-}
-
-.grid-3 {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--space-md);
-}
-
-.grid-4 {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-sm);
-}
-
-.flex-between {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.gap-sm { gap: var(--space-sm); }
-.gap-md { gap: var(--space-md); }
-.gap-lg { gap: var(--space-lg); }
-
-.mb-sm { margin-bottom: var(--space-sm); }
-.mb-md { margin-bottom: var(--space-md); }
-.mb-lg { margin-bottom: var(--space-lg); }
-.mb-xl { margin-bottom: var(--space-xl); }
-.mb-2xl { margin-bottom: var(--space-2xl); }
-
-.mt-md { margin-top: var(--space-md); }
-.mt-lg { margin-top: var(--space-lg); }
-
-/* ============ NUTRITION CARD ============ */
-.nutrition-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: var(--space-md);
-}
-
-.nutrition-card .macro-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-}
-
-.nutrition-card .macro-row + .macro-row {
-  border-top: 1px solid var(--border-subtle);
-}
-
-.macro-name {
-  font-size: var(--font-sm);
-  font-weight: 600;
-}
-
-.macro-value {
-  font-size: var(--font-sm);
-  font-weight: 700;
-  color: var(--accent-primary);
-  font-variant-numeric: tabular-nums;
-}
-
-/* ============ WORKOUT TYPE ICONS ============ */
-.workout-type-icon {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-}
-
-.type-run { background: rgba(0, 212, 255, 0.12); }
-.type-strength { background: rgba(255, 107, 53, 0.12); }
-.type-hyrox { background: rgba(255, 229, 0, 0.12); }
-.type-rest { background: rgba(255, 255, 255, 0.05); }
-.type-intervals { background: rgba(255, 59, 92, 0.12); }
-.type-tempo { background: rgba(255, 165, 0, 0.12); }
-.type-long { background: rgba(138, 43, 226, 0.12); }
-
-/* =============================================
-   ANIMATIONS
-   ============================================= */
-
-@keyframes viewEnter {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes loadPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.05); }
-}
-
-@keyframes loadSlide {
-  0% { left: -40%; }
-  100% { left: 100%; }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes countUp {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes glowPulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(255, 229, 0, 0.1); }
-  50% { box-shadow: 0 0 30px rgba(255, 229, 0, 0.25); }
-}
-
-@keyframes barGrow {
-  from { width: 0; }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-
-/* Stagger children animation */
-.stagger-in > * {
-  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.stagger-in > *:nth-child(1) { animation-delay: 0.05s; }
-.stagger-in > *:nth-child(2) { animation-delay: 0.1s; }
-.stagger-in > *:nth-child(3) { animation-delay: 0.15s; }
-.stagger-in > *:nth-child(4) { animation-delay: 0.2s; }
-.stagger-in > *:nth-child(5) { animation-delay: 0.25s; }
-.stagger-in > *:nth-child(6) { animation-delay: 0.3s; }
-.stagger-in > *:nth-child(7) { animation-delay: 0.35s; }
-.stagger-in > *:nth-child(8) { animation-delay: 0.4s; }
-.stagger-in > *:nth-child(9) { animation-delay: 0.45s; }
-.stagger-in > *:nth-child(10) { animation-delay: 0.5s; }
-
-/* Glow animation — disabled for clean look */
-.glow { }
-
-/* Bar grow for race comparison */
-.bar-animate { animation: barGrow 1s cubic-bezier(0.16, 1, 0.3, 1) both; }
-
-/* Shimmer for loading states */
-.shimmer {
-  background: linear-gradient(90deg,
-    var(--bg-card) 25%,
-    var(--bg-card-hover) 50%,
-    var(--bg-card) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
-}
-
-/* Fade class for transitions */
-.fade-enter { animation: fadeIn 0.3s ease both; }
-
-/* Scale tap feedback */
-.tap-scale {
-  transition: transform var(--transition-fast);
-}
-
-.tap-scale:active {
-  transform: scale(0.96);
-}
-
-/* Number change animation */
-.number-change {
-  animation: countUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-    </style>
-</head>
-<body>
-    <div id="app">
-        <div id="loading-screen" class="loading-screen">
-            <div class="loading-logo">
-                <span class="loading-h">H</span>
-                <div class="loading-bar"></div>
-            </div>
-            <p class="loading-text">Loading your training plan...</p>
-        </div>
-    </div>
-
-    <nav id="bottom-nav" class="bottom-nav" style="display:none;">
-        <button class="nav-btn active" data-view="today" id="nav-today">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11M6.5 17.5h11M2 12h2M20 12h2M6 6.5V4M6 20v-2.5M18 6.5V4M18 20v-2.5M6 12h12"/></svg>
-            <span>Today</span>
-        </button>
-        <button class="nav-btn" data-view="plan" id="nav-plan">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <span>Plan</span>
-        </button>
-        <button class="nav-btn" data-view="stats" id="nav-stats">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
-            <span>Stats</span>
-        </button>
-    </nav>
-
+/* === RESET === */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+html{height:100%;overflow:hidden;-webkit-text-size-adjust:100%}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+input,textarea{font-family:inherit;color:inherit}
+
+/* === DESIGN SYSTEM === */
+:root{
+  --bg:#000000;
+  --bg2:#0E0E0E;
+  --bg3:#1A1A1A;
+  --text:#FFFFFF;
+  --text2:rgba(255,255,255,.55);
+  --text3:rgba(255,255,255,.3);
+  --accent:#FFE500;
+  --accent-dim:rgba(255,229,0,.1);
+  --border:rgba(255,255,255,.06);
+  --green:#4ADE80;
+  --red:#FF4D4D;
+  --blue:#3B82F6;
+  --orange:#FF8C00;
+  --font:'Inter',system-ui,-apple-system,sans-serif;
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-t:env(safe-area-inset-top,0px);
+  --nav:64px;
+}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.4;
+  position:fixed;width:100%;height:100%;overflow:hidden;
+}
+#app{
+  position:fixed;top:0;left:0;right:0;
+  bottom:var(--nav);
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:var(--safe-b);
+}
+#app::-webkit-scrollbar{display:none}
+
+/* === NAV === */
+.nav{
+  position:fixed;bottom:0;left:0;right:0;
+  height:var(--nav);
+  background:rgba(0,0,0,.95);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-around;
+  padding-bottom:var(--safe-b);
+  z-index:100;
+}
+.nav-btn{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:8px 16px;color:var(--text3);transition:color .15s;
+}
+.nav-btn span{font-size:10px;font-weight:600;letter-spacing:.3px}
+.nav-btn.active{color:var(--accent)}
+.nav-btn:active{opacity:.7}
+
+/* === VIEW === */
+.view{padding:20px;padding-top:calc(var(--safe-t) + 16px);min-height:100%}
+.view{animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* === TYPOGRAPHY === */
+.t-xs{font-size:11px}.t-sm{font-size:13px}.t-md{font-size:15px}.t-lg{font-size:18px}.t-xl{font-size:22px}.t-2xl{font-size:28px}.t-3xl{font-size:36px}
+.t-muted{color:var(--text2)}.t-faint{color:var(--text3)}.t-accent{color:var(--accent)}
+.fw-5{font-weight:500}.fw-6{font-weight:600}.fw-7{font-weight:700}.fw-8{font-weight:800}.fw-9{font-weight:900}
+.tabular{font-variant-numeric:tabular-nums}
+
+/* === SPACING === */
     <script>
 // =============================================
 // ATHLETE PROFILE — Aidan Nelson
@@ -2676,18 +1685,20 @@ const Charts = {
 };
 
 // =============================================
-// TODAY VIEW — Workout front and center
+// VIEWS
 // =============================================
 
+let calendarCurrentWeek = null;
+let statsTab = 'profile';
 let currentWorkoutDate = null;
 
+// === TODAY VIEW ===
 function renderToday(overrideDate) {
   const dateStr = overrideDate || Dates.todayStr();
   currentWorkoutDate = dateStr;
   const isToday = Dates.isToday(dateStr);
 
-  let workout = null;
-  let weekNum = 0;
+  let workout = null, weekNum = 0;
   for (const week of TRAINING_PLAN) {
     for (const day of week.days) {
       if (day.dateStr === dateStr) { workout = day; weekNum = week.week; break; }
@@ -2695,1026 +1706,385 @@ function renderToday(overrideDate) {
     if (workout) break;
   }
 
-  // Header with date navigation
-  const headerDate = isToday ? 'Today' : Dates.getDayName(dateStr);
   const phase = weekNum ? getPhase(weekNum) : null;
-  const isComplete = workout ? Storage.isWorkoutComplete(dateStr) : false;
-  const countdown = Dates.countdownTo(ATHLETE.goalDate);
+  const headerLabel = isToday ? 'Today' : Dates.getDayName(dateStr);
 
   if (!workout) {
-    return `
-      <div class="view active">
-        <div class="flex-between mb-lg">
-          <button class="btn btn-ghost" onclick="App.prevDay('${dateStr}')" style="padding:8px">←</button>
-          <div style="text-align:center">
-            <div style="font-size:16px;font-weight:700">${headerDate}</div>
-            <div class="text-xs text-secondary">${Dates.formatDate(dateStr)}</div>
-          </div>
-          <button class="btn btn-ghost" onclick="App.nextDay('${dateStr}')" style="padding:8px">→</button>
-        </div>
-        <div class="empty-state" style="margin-top:40px">
-          <div style="font-size:40px;margin-bottom:12px">📋</div>
-          <div style="font-size:16px;font-weight:700;margin-bottom:6px">No Workout</div>
-          <div class="text-sm text-secondary">Training starts ${Dates.formatDate(ATHLETE.trainingStart)}</div>
-        </div>
-      </div>
-    `;
-  }
-
-  return `
-    <div class="view active">
-      <!-- Date Nav -->
-      <div class="flex-between" style="margin-bottom:20px">
-        <button class="btn btn-ghost" onclick="App.prevDay('${dateStr}')" style="padding:8px">←</button>
+    return `<div class="view">
+      <div class="row-between mb-24">
+        <button class="nav-btn" onclick="App.prevDay('${dateStr}')" style="padding:8px 12px">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
         <div style="text-align:center">
-          <div style="font-size:16px;font-weight:700">${headerDate}</div>
-          <div class="text-xs text-secondary">${Dates.formatDate(dateStr)}${phase ? ' · Week ' + weekNum : ''}</div>
+          <div class="t-md fw-7">${headerLabel}</div>
+          <div class="t-xs t-muted">${Dates.formatDate(dateStr)}</div>
         </div>
-        <button class="btn btn-ghost" onclick="App.nextDay('${dateStr}')" style="padding:8px">→</button>
-      </div>
-
-      <!-- Workout Title -->
-      <div style="margin-bottom:20px">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-          <div class="workout-type-icon type-${workout.type}">${workout.icon}</div>
-          <div>
-            <div style="font-size:20px;font-weight:800">${workout.title}</div>
-            <div class="text-xs text-secondary">${workout.duration}${workout.zone ? ' · Zone ' + workout.zone : ''}</div>
-          </div>
-        </div>
-        <div style="font-size:13px;color:var(--text-secondary);line-height:1.5;padding-left:52px">${workout.focus}</div>
-      </div>
-
-      ${workout.zone && workout.zone >= 2 ? `
-      <!-- Zone Info Bar -->
-      <div class="card" style="padding:12px 16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <span class="exercise-zone zone-${workout.zone}" style="margin-right:8px">Z${workout.zone}</span>
-          <span class="text-sm">${ZONES[workout.zone - 1].name}</span>
-        </div>
-        <div class="text-sm text-secondary">${ZONES[workout.zone - 1].paceRange}/km · ${ZONES[workout.zone - 1].hrRange} bpm</div>
-      </div>
-      ` : ''}
-
-      <!-- Exercise Checklist -->
-      <div style="margin-bottom:20px">
-        ${workout.exercises.map((ex, i) => {
-          const isDone = Storage.isExerciseComplete(dateStr, i);
-          const log = Storage.getExerciseLog(dateStr, i);
-          const isStrength = !ex.zone || ex.zone === 0;
-          return `
-            <div style="border-bottom:1px solid var(--border-subtle);padding:14px 0">
-              <div style="display:flex;align-items:center;gap:12px" onclick="App.toggleExercise('${dateStr}', ${i}, this.parentElement.parentElement)">
-                <div class="exercise-check ${isDone ? 'completed' : ''}" style="${isDone ? 'background:var(--accent-primary);border-color:var(--accent-primary)' : ''}">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${isDone ? '#000' : 'currentColor'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="opacity:${isDone ? 1 : 0}"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-                <div style="flex:1">
-                  <div style="font-size:15px;font-weight:600;${isDone ? 'text-decoration:line-through;opacity:0.5' : ''}">${ex.name}</div>
-                  <div style="font-size:12px;color:var(--text-secondary);margin-top:2px">${ex.detail}</div>
-                </div>
-                ${ex.zone ? `<span class="exercise-zone zone-${ex.zone}">Z${ex.zone}</span>` : ''}
-              </div>
-              ${isStrength && ex.name !== 'Full Rest' && ex.name !== 'Optional' && ex.name !== 'Rest & Prep' && ex.name !== 'Rest' && ex.name !== 'Celebrate' ? `
-              <div style="display:flex;gap:8px;margin-top:8px;padding-left:44px">
-                <input type="text" id="log-weight-${i}" placeholder="Weight" value="${log.weight || ''}"
-                  onchange="App.saveExerciseLog('${dateStr}',${i})"
-                  style="width:70px;background:var(--bg-input);border:1px solid var(--border-subtle);border-radius:6px;padding:6px 8px;color:var(--text-primary);font-size:12px;outline:none">
-                <input type="text" id="log-reps-${i}" placeholder="Reps" value="${log.reps || ''}"
-                  onchange="App.saveExerciseLog('${dateStr}',${i})"
-                  style="width:60px;background:var(--bg-input);border:1px solid var(--border-subtle);border-radius:6px;padding:6px 8px;color:var(--text-primary);font-size:12px;outline:none">
-                <input type="text" id="log-sets-${i}" placeholder="Sets" value="${log.sets || ''}"
-                  onchange="App.saveExerciseLog('${dateStr}',${i})"
-                  style="width:60px;background:var(--bg-input);border:1px solid var(--border-subtle);border-radius:6px;padding:6px 8px;color:var(--text-primary);font-size:12px;outline:none">
-              </div>
-              ` : ''}
-            </div>
-          `;
-        }).join('')}
-      </div>
-
-      <!-- Complete Section -->
-      ${!isComplete ? `
-      <div style="margin-bottom:24px">
-        <div style="font-size:13px;font-weight:600;margin-bottom:8px">How hard was it? (RPE)</div>
-        <div style="display:flex;gap:6px;margin-bottom:16px">
-          ${[1,2,3,4,5,6,7,8,9,10].map(n => `
-            <button class="rpe-btn" data-rpe="${n}" onclick="App.selectRPE(${n})"
-              style="flex:1;padding:10px 0;background:var(--bg-card);border:none;border-radius:8px;color:var(--text-secondary);font-size:13px;font-weight:700;cursor:pointer">${n}</button>
-          `).join('')}
-        </div>
-        <textarea id="workout-notes" placeholder="Notes (optional)..."
-          style="width:100%;background:var(--bg-card);border:none;border-radius:10px;padding:12px;color:var(--text-primary);font-size:14px;resize:none;min-height:50px;outline:none;margin-bottom:12px"></textarea>
-        <button class="btn btn-primary btn-block" onclick="App.completeWorkout('${dateStr}')" style="padding:14px;border-radius:12px;font-size:15px">
-          Complete Workout ✓
+        <button class="nav-btn" onclick="App.nextDay('${dateStr}')" style="padding:8px 12px">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
         </button>
       </div>
-      ` : `
-      <div style="text-align:center;padding:20px;margin-bottom:24px">
-        <div style="font-size:36px;margin-bottom:6px">✅</div>
-        <div style="font-size:16px;font-weight:700;color:var(--accent-primary)">Done!</div>
+      <div style="text-align:center;padding:60px 20px">
+        <div style="font-size:40px;margin-bottom:12px">🏋️</div>
+        <div class="t-lg fw-7 mb-8">Rest Day</div>
+        <div class="t-sm t-muted">Training starts ${Dates.formatDate(ATHLETE.trainingStart)}</div>
       </div>
-      `}
+    </div>`;
+  }
 
-      <!-- Mini countdown -->
-      <div style="text-align:center;padding:12px;margin-bottom:20px">
-        <div class="text-xs text-tertiary">${countdown.days} days to Dallas · Week ${weekNum} of 34</div>
+  const isComplete = Storage.isWorkoutComplete(dateStr);
+  const zoneInfo = workout.zone && workout.zone >= 1 ? ZONES[workout.zone - 1] : null;
+
+  return `<div class="view">
+    <!-- Date Nav -->
+    <div class="row-between mb-20">
+      <button onclick="App.prevDay('${dateStr}')" style="padding:8px 12px;color:var(--text2)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div style="text-align:center">
+        <div class="t-md fw-7">${headerLabel}</div>
+        <div class="t-xs t-muted">${Dates.formatDate(dateStr)}${phase ? ' · W' + weekNum : ''}</div>
+      </div>
+      <button onclick="App.nextDay('${dateStr}')" style="padding:8px 12px;color:var(--text2)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+
+    <!-- Title -->
+    <div class="mb-4">
+      <div class="t-xl fw-9">${workout.title}</div>
+    </div>
+    <div class="row mb-16" style="gap:8px">
+      <span class="t-sm t-muted">${workout.duration}</span>
+      ${workout.zone ? `<span class="pill z${workout.zone}">Z${workout.zone}</span>` : ''}
+      ${phase ? `<span class="pill pill-accent">${phase.name}</span>` : ''}
+      ${isComplete ? '<span class="pill pill-green">Done</span>' : ''}
+    </div>
+
+    <!-- Focus -->
+    <div class="t-sm t-muted mb-20" style="line-height:1.6">${workout.focus}</div>
+
+    ${zoneInfo ? `
+    <div class="card mb-20" style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <span class="pill z${workout.zone}" style="margin-right:6px">Z${workout.zone} ${zoneInfo.name}</span>
+      </div>
+      <div class="t-xs t-muted tabular">${zoneInfo.paceRange}/km · ${zoneInfo.hrRange} bpm</div>
+    </div>
+    ` : ''}
+
+    <!-- Exercises -->
+    <div class="label">Exercises</div>
+    <div class="mb-24">
+      ${workout.exercises.map((ex, i) => {
+        const isDone = Storage.isExerciseComplete(dateStr, i);
+        const log = Storage.getExerciseLog(dateStr, i);
+        const isLoggable = !ex.zone && ex.name !== 'Full Rest' && ex.name !== 'Optional' && ex.name !== 'Rest & Prep' && ex.name !== 'Rest' && ex.name !== 'Celebrate' && ex.name !== 'Cooldown Stretch' && ex.name !== 'Cool Down' && ex.name !== 'Cooldown' && ex.name !== 'Warm Up' && ex.name !== 'Recovery' && ex.name !== 'Hip Mobility Flow' && ex.name !== 'Foam Rolling' && ex.name !== 'Pre-Race Meal' && ex.name !== 'Gear Check' && ex.name !== 'PRE-RACE' && ex.name !== 'WARM UP' && ex.name !== 'RACE' && ex.name !== 'PACING' && ex.name !== 'STATIONS';
+
+        return `<div class="ex-row">
+          <div class="row" onclick="App.toggleExercise('${dateStr}',${i},this.closest('.ex-row'))">
+            <div class="ex-check ${isDone ? 'done' : ''}">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${isDone ? '#000' : '#fff'}" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div class="t-md fw-6" style="${isDone ? 'text-decoration:line-through;opacity:.4' : ''}">${ex.name}</div>
+              <div class="t-xs t-muted mt-4">${ex.detail}</div>
+            </div>
+            ${ex.zone ? `<span class="pill z${ex.zone}">Z${ex.zone}</span>` : ''}
+          </div>
+          ${isLoggable ? `
+          <div class="set-grid" style="margin-top:10px">
+            <div class="set-grid-header"></div>
+            <div class="set-grid-header">Weight</div>
+            <div class="set-grid-header">Reps</div>
+            <div class="set-grid-header">Sets</div>
+            <div class="set-grid-header"></div>
+            <div class="set-num">1</div>
+            <input class="input" type="text" inputmode="decimal" placeholder="lbs" id="log-w-${i}" value="${log.weight||''}" onchange="App.saveLog('${dateStr}',${i})" style="font-size:13px;padding:8px 4px">
+            <input class="input" type="text" inputmode="numeric" placeholder="reps" id="log-r-${i}" value="${log.reps||''}" onchange="App.saveLog('${dateStr}',${i})" style="font-size:13px;padding:8px 4px">
+            <input class="input" type="text" inputmode="numeric" placeholder="sets" id="log-s-${i}" value="${log.sets||''}" onchange="App.saveLog('${dateStr}',${i})" style="font-size:13px;padding:8px 4px">
+            <div></div>
+          </div>
+          ` : ''}
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- Complete -->
+    ${!isComplete ? `
+    <div class="label">Finish Up</div>
+    <div class="mb-12 t-sm fw-6">How hard was it?</div>
+    <div class="row mb-16" style="gap:4px">
+      ${[1,2,3,4,5,6,7,8,9,10].map(n => `<button class="rpe" data-rpe="${n}" onclick="App.selectRPE(${n})">${n}</button>`).join('')}
+    </div>
+    <textarea class="textarea mb-16" id="workout-notes" placeholder="Notes..."></textarea>
+    <button class="btn btn-accent mb-24" onclick="App.completeWorkout('${dateStr}')">Complete Workout</button>
+    ` : `
+    <div style="text-align:center;padding:20px 0" class="mb-24">
+      <div style="font-size:32px;margin-bottom:4px">✅</div>
+      <div class="t-md fw-7 t-accent">Done</div>
+    </div>
+    `}
+  </div>`;
+}
+
+// === PLAN VIEW ===
+function renderCalendar() {
+  const currentWeek = calendarCurrentWeek || Dates.getCurrentWeek();
+  calendarCurrentWeek = currentWeek;
+  const phase = getPhase(currentWeek);
+  const week = TRAINING_PLAN.find(w => w.week === currentWeek);
+
+  return `<div class="view">
+    <div class="t-xl fw-9 mb-4">Plan</div>
+    <div class="t-sm t-muted mb-24">34 weeks to Dallas · Nov 21, 2026</div>
+
+    <!-- Phase pills -->
+    <div class="row mb-24" style="gap:6px;flex-wrap:wrap">
+      ${PHASES.map(p => {
+        const active = currentWeek >= p.weeks[0] && currentWeek <= p.weeks[1];
+        return `<span class="pill ${active ? 'pill-accent' : ''}" style="${!active ? 'opacity:.4' : ''}">${p.emoji} ${p.name} (${p.weeks[0]}-${p.weeks[1]})</span>`;
+      }).join('')}
+    </div>
+
+    <!-- Week nav -->
+    <div class="row-between mb-16">
+      <button onclick="App.calendarPrevWeek()" style="padding:8px 12px;color:var(--text2);${currentWeek <= 1 ? 'opacity:.2' : ''}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div style="text-align:center">
+        <div class="t-lg fw-8">Week ${currentWeek}</div>
+        <div class="t-xs t-muted">${phase.emoji} ${phase.name}${isDeloadWeek(currentWeek) ? ' · Deload' : ''}</div>
+      </div>
+      <button onclick="App.calendarNextWeek()" style="padding:8px 12px;color:var(--text2);${currentWeek >= 34 ? 'opacity:.2' : ''}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+
+    ${week ? `
+    <div class="t-xs t-muted mb-16">${Dates.formatDate(week.startDate)} — ${Dates.formatDate(new Date(week.startDate.getTime() + 6*24*60*60*1000))}</div>
+
+    ${week.days.map(day => {
+      const today = Dates.isToday(day.dateStr);
+      const done = Storage.isWorkoutComplete(day.dateStr);
+      const past = Dates.isPast(day.dateStr) && !today;
+      return `
+        <div onclick="App.showWorkoutForDate('${day.dateStr}')" style="padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;${past && !done ? 'opacity:.4' : ''}">
+          <div class="row">
+            <div style="width:36px;text-align:center;font-size:18px">${done ? '✅' : day.icon}</div>
+            <div style="flex:1">
+              <div class="row-between">
+                <div>
+                  <span class="t-xs t-faint fw-6" style="margin-right:6px">${day.day.substring(0,3).toUpperCase()}</span>
+                  <span class="t-xs t-muted">${Dates.formatDate(day.dateStr)}</span>
+                  ${today ? '<span class="pill pill-accent" style="margin-left:6px;font-size:9px;padding:1px 6px">TODAY</span>' : ''}
+                </div>
+                <div class="t-xs t-muted">${day.duration}</div>
+              </div>
+              <div class="t-sm fw-6 mt-4">${day.title}</div>
+            </div>
+          </div>
+        </div>`;
+    }).join('')}
+    ` : '<div class="t-sm t-muted" style="text-align:center;padding:40px">No plan data</div>'}
+  </div>`;
+}
+
+// === STATS VIEW ===
+function renderStats() {
+  const countdown = Dates.countdownTo(ATHLETE.goalDate);
+  const currentWeek = Dates.getCurrentWeek();
+  const completed = Storage.getCompletedCount();
+  const streak = Storage.getStreak();
+  const daysLeft = countdown.days;
+
+  return `<div class="view">
+    <div class="t-xl fw-9 mb-24">Stats</div>
+
+    <!-- Big number -->
+    <div style="text-align:center;margin-bottom:32px">
+      <div class="t-3xl fw-9 t-accent tabular" style="line-height:1">${daysLeft}</div>
+      <div class="t-xs t-faint fw-6 mt-8" style="text-transform:uppercase;letter-spacing:1.5px">Days to Dallas</div>
+      <div class="row mb-0 mt-16" style="justify-content:center;gap:24px">
+        <div style="text-align:center"><div class="t-lg fw-8 tabular">${currentWeek}/34</div><div class="t-xs t-faint">Week</div></div>
+        <div style="text-align:center"><div class="t-lg fw-8 tabular">${streak}</div><div class="t-xs t-faint">Streak</div></div>
+        <div style="text-align:center"><div class="t-lg fw-8 tabular">${completed}</div><div class="t-xs t-faint">Done</div></div>
       </div>
     </div>
-  `;
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab ${statsTab==='profile'?'active':''}" onclick="App.setStatsTab('profile')">Profile</button>
+      <button class="tab ${statsTab==='races'?'active':''}" onclick="App.setStatsTab('races')">Races</button>
+      <button class="tab ${statsTab==='goals'?'active':''}" onclick="App.setStatsTab('goals')">Goals</button>
+    </div>
+
+    ${statsTab === 'profile' ? `
+    <div>
+      <div class="metric"><span class="t-sm t-muted">VO2 Max</span><span class="t-sm fw-7 t-accent tabular">${ATHLETE.vo2max}</span></div>
+      <div class="metric"><span class="t-sm t-muted">Weight</span><span class="t-sm fw-7 tabular">${ATHLETE.weight} lbs</span></div>
+      <div class="metric"><span class="t-sm t-muted">LT Pace</span><span class="t-sm fw-7 tabular">${ATHLETE.ltPacePerKm}/km @ ${ATHLETE.ltHeartRate}bpm</span></div>
+      <div class="metric"><span class="t-sm t-muted">Easy Pace</span><span class="t-sm fw-7 tabular">${ATHLETE.easyPacePerKm}/km</span></div>
+      <div class="metric"><span class="t-sm t-muted">Bench 1RM</span><span class="t-sm fw-7 tabular">${ATHLETE.benchPress1RM} lbs</span></div>
+      <div class="metric"><span class="t-sm t-muted">PR</span><span class="t-sm fw-7 tabular">${ATHLETE.prTime}</span></div>
+      <div class="metric"><span class="t-sm t-muted">A Goal</span><span class="t-sm fw-7 t-accent">Sub ${ATHLETE.goalTimeA}</span></div>
+      <div class="metric"><span class="t-sm t-muted">Stretch</span><span class="t-sm fw-7" style="color:var(--orange)">Sub ${ATHLETE.goalTimeStretch}</span></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="label">VO2 Max Trend</div>
+    <div class="card"><canvas id="vo2-chart" style="width:100%;height:130px"></canvas></div>
+    ` : ''}
+
+    ${statsTab === 'races' ? `
+    <div class="row mb-20" style="gap:12px">
+      <div class="card" style="flex:1;text-align:center">
+        <div class="t-xs t-accent fw-7 mb-4">PR — PHOENIX</div>
+        <div class="t-2xl fw-9 t-accent tabular">${RACES[0].totalTime}</div>
+      </div>
+      <div class="card" style="flex:1;text-align:center">
+        <div class="t-xs fw-7 mb-4" style="color:var(--orange)">HOUSTON</div>
+        <div class="t-2xl fw-9 tabular" style="color:var(--orange)">${RACES[1].totalTime}</div>
+      </div>
+    </div>
+    <div class="label">Station Comparison</div>
+    ${RACES[0].stations.filter(s=>s.type==='station').map((ps,i) => {
+      const hs = RACES[1].stations.filter(s=>s.type==='station')[i];
+      const diff = hs.seconds - ps.seconds;
+      return `<div class="metric">
+        <div class="row" style="gap:8px"><span>${ps.icon}</span><span class="t-sm t-muted">${ps.name}</span></div>
+        <div class="row" style="gap:10px">
+          <span class="t-xs t-accent tabular">${ps.time}</span>
+          <span class="t-xs tabular" style="color:var(--orange)">${hs.time}</span>
+          <span class="t-xs fw-7 tabular ${diff > 0 ? '' : 't-accent'}" style="${diff > 0 ? 'color:var(--red)' : ''}">${Fmt.timeDiff(diff)}</span>
+        </div>
+      </div>`;
+    }).join('')}
+    <div class="spacer"></div>
+    <div class="label">Run Pacing</div>
+    <div class="card"><canvas id="run-pacing-chart" style="width:100%;height:160px"></canvas></div>
+    ` : ''}
+
+    ${statsTab === 'goals' ? `
+    <div style="text-align:center;margin-bottom:24px">
+      <div class="t-3xl fw-9 t-accent">Sub 1:05</div>
+      <div class="t-sm t-muted mt-8">Current PR: ${ATHLETE.prTime} · Find 10:09</div>
+    </div>
+    <div class="label">Running (8 x 1km)</div>
+    <div class="metric"><span class="t-sm t-muted">Current Avg</span><span class="t-sm fw-7 tabular">4:53/km</span></div>
+    <div class="metric"><span class="t-sm t-muted">Target Avg</span><span class="t-sm fw-7 t-accent tabular">4:00-4:07/km</span></div>
+    <div class="metric"><span class="t-sm t-muted">Time Savings</span><span class="t-sm fw-7 t-accent tabular">~4:22</span></div>
+    <div class="spacer"></div>
+    <div class="label">Station Targets</div>
+    ${RACES[0].stations.filter(s=>s.type==='station').map(ps => {
+      const goal = GOAL_SPLITS.stations[ps.name];
+      if (!goal) return '';
+      const diff = ps.seconds - goal.seconds;
+      return `<div class="metric">
+        <div class="row" style="gap:8px"><span>${ps.icon}</span><span class="t-sm t-muted">${ps.name}</span></div>
+        <div class="row" style="gap:8px">
+          <span class="t-xs t-muted tabular">${ps.time}</span>
+          <span class="t-xs t-faint">→</span>
+          <span class="t-xs fw-7 t-accent tabular">${goal.target}</span>
+        </div>
+      </div>`;
+    }).join('')}
+    ` : ''}
+  </div>`;
 }
 
 function initDashboardCharts() {
   const canvas = document.getElementById('vo2-chart');
-  if (!canvas) return;
-  const points = ATHLETE.vo2maxHistory.map(p => ({ value: p.value, label: Dates.formatDateShort(p.date) }));
-  Charts.lineChart(canvas, points, { color: '#FFE500' });
-}
-
-// =============================================
-// CALENDAR / PLAN VIEW
-// =============================================
-
-let calendarCurrentWeek = null;
-
-function renderCalendar() {
-  const currentWeek = calendarCurrentWeek || Dates.getCurrentWeek();
-  calendarCurrentWeek = currentWeek;
-  
-  const phase = getPhase(currentWeek);
-  const week = TRAINING_PLAN.find(w => w.week === currentWeek);
-  
-  // Phase summary
-  const phaseWeeks = PHASES.map(p => {
-    const isActive = currentWeek >= p.weeks[0] && currentWeek <= p.weeks[1];
-    const progress = isActive ? Fmt.percent(currentWeek - p.weeks[0] + 1, p.weeks[1] - p.weeks[0] + 1) : 
-                     currentWeek > p.weeks[1] ? 100 : 0;
-    return { ...p, isActive, progress };
-  });
-  
-  return `
-    <div class="view active" id="view-calendar">
-      <div class="section-header">
-        <h1 class="section-title">Training Plan</h1>
-        <div class="section-subtitle">34-Week Periodized Plan → Dallas Nov 22</div>
-      </div>
-      
-      <!-- Phase Timeline -->
-      <div class="card mb-lg">
-        <div style="display:flex;flex-direction:column;gap:10px">
-          ${phaseWeeks.map(p => `
-            <div style="display:flex;align-items:center;gap:10px;opacity:${p.isActive ? 1 : p.progress === 100 ? 0.5 : 0.35}">
-              <div class="phase-badge phase-${p.id}" style="min-width:120px;font-size:9px;padding:4px 8px;justify-content:center">
-                ${p.emoji} ${p.name}
-              </div>
-              <div style="flex:1">
-                <div class="progress-bar" style="height:4px">
-                  <div class="progress-fill" style="width:${p.progress}%;${p.isActive ? 'background:' + p.color : ''}"></div>
-                </div>
-              </div>
-              <div class="text-xs text-tertiary" style="min-width:50px;text-align:right">W${p.weeks[0]}-${p.weeks[1]}</div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-      
-      <!-- Week Navigator -->
-      <div class="flex-between mb-md">
-        <button class="btn btn-ghost btn-sm" onclick="App.calendarPrevWeek()" ${currentWeek <= 1 ? 'disabled style="opacity:0.3"' : ''}>
-          ← Week ${currentWeek - 1}
-        </button>
-        <div class="text-sm font-bold">
-          Week ${currentWeek}
-          ${isDeloadWeek(currentWeek) ? ' <span class="badge badge-blue" style="font-size:9px;padding:2px 8px">DELOAD</span>' : ''}
-        </div>
-        <button class="btn btn-ghost btn-sm" onclick="App.calendarNextWeek()" ${currentWeek >= 34 ? 'disabled style="opacity:0.3"' : ''}>
-          Week ${currentWeek + 1} →
-        </button>
-      </div>
-      
-      <!-- Week Details -->
-      ${week ? `
-      <div class="mb-md">
-        <div class="flex-between mb-sm">
-          <span class="text-xs text-secondary">${Dates.formatDate(week.startDate)} — ${Dates.formatDate(new Date(week.startDate.getTime() + 6 * 24 * 60 * 60 * 1000))}</span>
-          <div class="phase-badge phase-${phase.id}" style="font-size:9px;padding:3px 8px">
-            ${phase.emoji} ${phase.name}
-          </div>
-        </div>
-      </div>
-      
-      <div class="stagger-in" style="display:flex;flex-direction:column;gap:8px">
-        ${week.days.map(day => {
-          const isToday = Dates.isToday(day.dateStr);
-          const isDone = Storage.isWorkoutComplete(day.dateStr);
-          const isPast = Dates.isPast(day.dateStr) && !isToday;
-          
-          return `
-            <div class="card tap-scale" onclick="App.showWorkoutForDate('${day.dateStr}')" 
-                 style="padding:14px 16px;cursor:pointer;${isToday ? 'border-color:var(--border-accent);' : ''}${isDone ? 'border-color:rgba(255,229,0,0.15);background:rgba(255,229,0,0.02);' : ''}${isPast && !isDone ? 'opacity:0.5;' : ''}">
-              <div style="display:flex;align-items:center;gap:12px">
-                <div class="workout-type-icon type-${day.type}" style="width:36px;height:36px;min-width:36px;font-size:16px">
-                  ${isDone ? '✅' : day.icon}
-                </div>
-                <div style="flex:1;min-width:0">
-                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
-                    <span class="text-xs text-tertiary">${day.day.substring(0,3).toUpperCase()}</span>
-                    <span class="text-xs text-tertiary">${Dates.formatDateShort(day.dateStr)}</span>
-                    ${isToday ? '<span class="badge badge-green" style="font-size:8px;padding:1px 6px">TODAY</span>' : ''}
-                  </div>
-                  <div class="text-sm font-bold" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${day.title}</div>
-                </div>
-                <div style="text-align:right;flex-shrink:0">
-                  <div class="text-xs text-tertiary">${day.duration}</div>
-                  ${day.zone ? `<span class="exercise-zone zone-${day.zone}" style="font-size:10px;padding:1px 6px;margin-top:4px;display:inline-block">Z${day.zone}</span>` : ''}
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('')}
-      </div>
-      ` : `
-      <div class="empty-state">
-        <div class="empty-state-icon">📅</div>
-        <div class="empty-state-title">No plan for this week</div>
-      </div>
-      `}
-    </div>
-  `;
-}
-
-// =============================================
-// RACES VIEW
-// =============================================
-
-let statsTab = 'overview';
-
-function renderStats() {
-  const countdown = Dates.countdownTo(ATHLETE.goalDate);
-  const currentWeek = Dates.getCurrentWeek();
-  const totalCompleted = Storage.getCompletedCount();
-  const streak = Storage.getStreak();
-  const daysLeft = countdown.days;
-  const totalDays = Math.round((new Date(ATHLETE.goalDate) - new Date(ATHLETE.trainingStart)) / (1000*60*60*24));
-  const progressPct = Math.min(100, Math.round(((totalDays - daysLeft) / totalDays) * 100));
-
-  return `
-    <div class="view active">
-      <div style="margin-bottom:24px">
-        <h1 style="font-size:24px;font-weight:800">Stats</h1>
-      </div>
-
-      <!-- Countdown Circle -->
-      <div style="text-align:center;margin-bottom:24px">
-        <div style="position:relative;width:150px;height:150px;margin:0 auto">
-          <svg viewBox="0 0 150 150" style="transform:rotate(-90deg)">
-            <circle cx="75" cy="75" r="65" fill="none" stroke="var(--bg-card)" stroke-width="8"/>
-            <circle cx="75" cy="75" r="65" fill="none" stroke="var(--accent-primary)" stroke-width="8"
-              stroke-dasharray="${2 * Math.PI * 65}"
-              stroke-dashoffset="${2 * Math.PI * 65 * (1 - progressPct / 100)}"
-              stroke-linecap="round"/>
-          </svg>
-          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-            <div style="font-size:32px;font-weight:900;color:var(--accent-primary);line-height:1">${daysLeft}</div>
-            <div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-top:4px">Days to Dallas</div>
-          </div>
-        </div>
-        <div style="display:flex;justify-content:center;gap:20px;margin-top:14px">
-          <div style="text-align:center">
-            <div style="font-size:16px;font-weight:700">${currentWeek}/34</div>
-            <div style="font-size:10px;color:var(--text-tertiary)">Week</div>
-          </div>
-          <div style="text-align:center">
-            <div style="font-size:16px;font-weight:700">${streak} 🔥</div>
-            <div style="font-size:10px;color:var(--text-tertiary)">Streak</div>
-          </div>
-          <div style="text-align:center">
-            <div style="font-size:16px;font-weight:700">${totalCompleted}</div>
-            <div style="font-size:10px;color:var(--text-tertiary)">Workouts</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tabs -->
-      <div class="tabs" style="margin-bottom:20px">
-        <button class="tab ${statsTab === 'overview' ? 'active' : ''}" onclick="App.setStatsTab('overview')">Profile</button>
-        <button class="tab ${statsTab === 'races' ? 'active' : ''}" onclick="App.setStatsTab('races')">Races</button>
-        <button class="tab ${statsTab === 'goals' ? 'active' : ''}" onclick="App.setStatsTab('goals')">Goals</button>
-      </div>
-
-      ${statsTab === 'overview' ? renderStatsOverview() : ''}
-      ${statsTab === 'races' ? renderStatsRaces() : ''}
-      ${statsTab === 'goals' ? renderRaceGoals(RACES[0]) : ''}
-    </div>
-  `;
-}
-
-function renderStatsOverview() {
-  return `
-    <div class="card mb-lg" style="padding:0">
-      <div class="metric-row" style="padding:14px 20px"><span class="metric-label">VO2 Max</span><span class="metric-value" style="color:var(--accent-primary)">${ATHLETE.vo2max}</span></div>
-      <div class="metric-row" style="padding:14px 20px"><span class="metric-label">Weight</span><span class="metric-value">${ATHLETE.weight} lbs</span></div>
-      <div class="metric-row" style="padding:14px 20px"><span class="metric-label">LT Pace</span><span class="metric-value">${ATHLETE.ltPacePerKm}/km @ ${ATHLETE.ltHeartRate}bpm</span></div>
-      <div class="metric-row" style="padding:14px 20px"><span class="metric-label">Easy Pace</span><span class="metric-value">${ATHLETE.easyPacePerKm}/km</span></div>
-      <div class="metric-row" style="padding:14px 20px"><span class="metric-label">Bench 1RM</span><span class="metric-value">${ATHLETE.benchPress1RM} lbs</span></div>
-      <div class="metric-row" style="padding:14px 20px"><span class="metric-label">PR</span><span class="metric-value">${ATHLETE.prTime}</span></div>
-      <div class="metric-row" style="padding:14px 20px"><span class="metric-label">A Goal</span><span class="metric-value" style="color:var(--accent-primary)">Sub ${ATHLETE.goalTimeA}</span></div>
-    </div>
-
-    <div style="font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">VO2 Max Trend</div>
-    <div class="card mb-lg" style="padding:16px">
-      <canvas id="vo2-chart" style="width:100%;height:140px"></canvas>
-    </div>
-  `;
-}
-
-function renderStatsRaces() {
-  const phoenix = RACES[0];
-  const houston = RACES[1];
-  return `
-    <div class="grid-2 mb-lg">
-      <div class="card" style="text-align:center">
-        <div class="text-xs text-accent font-bold" style="margin-bottom:4px">PR — PHOENIX</div>
-        <div style="font-size:24px;font-weight:900;color:var(--accent-primary)">${phoenix.totalTime}</div>
-      </div>
-      <div class="card" style="text-align:center">
-        <div class="text-xs font-bold" style="color:var(--accent-warning);margin-bottom:4px">HOUSTON</div>
-        <div style="font-size:24px;font-weight:900;color:var(--accent-warning)">${houston.totalTime}</div>
-      </div>
-    </div>
-
-    <div class="card mb-lg" style="padding:16px">
-      <div class="text-xs text-tertiary font-bold mb-md" style="text-transform:uppercase;letter-spacing:1px">Run Pacing</div>
-      <canvas id="run-pacing-chart" style="width:100%;height:160px"></canvas>
-    </div>
-
-    <div class="card mb-lg" style="padding:0">
-      ${phoenix.stations.filter(s => s.type === 'station').map((ps, i) => {
-        const hs = houston.stations.filter(s => s.type === 'station')[i];
-        const diff = hs.seconds - ps.seconds;
-        return `
-          <div class="metric-row" style="padding:12px 20px">
-            <div style="display:flex;align-items:center;gap:8px">
-              <span>${ps.icon}</span>
-              <span class="metric-label">${ps.name}</span>
-            </div>
-            <div style="display:flex;gap:10px;align-items:center">
-              <span class="text-xs text-accent">${ps.time}</span>
-              <span class="text-xs" style="color:var(--accent-warning)">${hs.time}</span>
-              <span class="text-xs font-bold ${diff > 0 ? 'text-danger' : 'text-accent'}">${Fmt.timeDiff(diff)}</span>
-            </div>
-          </div>
-        `;
-      }).join('')}
-    </div>
-  `;
-}
-
-let racesTab = 'comparison';
-
-function renderRaces() {
-  const phoenix = RACES[0];
-  const houston = RACES[1];
-  
-  return `
-    <div class="view active" id="view-races">
-      <div class="section-header">
-        <h1 class="section-title">Race History</h1>
-        <div class="section-subtitle">2 races completed — Phoenix PR</div>
-      </div>
-      
-      <!-- Tabs -->
-      <div class="tabs">
-        <button class="tab ${racesTab === 'comparison' ? 'active' : ''}" onclick="App.setRacesTab('comparison')">Compare</button>
-        <button class="tab ${racesTab === 'stations' ? 'active' : ''}" onclick="App.setRacesTab('stations')">Stations</button>
-        <button class="tab ${racesTab === 'goals' ? 'active' : ''}" onclick="App.setRacesTab('goals')">Goals</button>
-      </div>
-      
-      ${racesTab === 'comparison' ? renderRaceComparison(phoenix, houston) : ''}
-      ${racesTab === 'stations' ? renderRaceStations(phoenix, houston) : ''}
-      ${racesTab === 'goals' ? renderRaceGoals(phoenix) : ''}
-    </div>
-  `;
-}
-
-function renderRaceComparison(phoenix, houston) {
-  return `
-    <!-- Race Cards -->
-    <div class="grid-2 mb-lg">
-      <div class="card" style="border-color:rgba(255,229,0,0.2)">
-        <div class="text-xs text-accent font-bold mb-sm" style="letter-spacing:1px">🏆 PR — PHOENIX</div>
-        <div class="text-2xl font-black text-accent" style="letter-spacing:-1px">${phoenix.totalTime}</div>
-        <div class="text-xs text-secondary mt-md">Season ${phoenix.season}</div>
-      </div>
-      <div class="card" style="border-color:rgba(255,107,53,0.2)">
-        <div class="text-xs font-bold mb-sm" style="color:var(--accent-warning);letter-spacing:1px">HOUSTON</div>
-        <div class="text-2xl font-black" style="letter-spacing:-1px;color:var(--accent-warning)">${houston.totalTime}</div>
-        <div class="text-xs text-secondary mt-md">Season ${houston.season}</div>
-      </div>
-    </div>
-    
-    <!-- Totals Comparison -->
-    <div class="card mb-lg">
-      <div class="text-xs text-tertiary font-bold mb-md" style="text-transform:uppercase;letter-spacing:1px">Total Times</div>
-      
-      <div class="race-bar-container">
-        <div class="race-bar-label">
-          <span class="race-bar-name">Running</span>
-          <span class="race-bar-time">${phoenix.totals.running.time} <span class="text-xs ${houston.totals.running.seconds > phoenix.totals.running.seconds ? 'text-danger' : 'text-accent'}">${Fmt.timeDiff(houston.totals.running.seconds - phoenix.totals.running.seconds)}</span></span>
-        </div>
-        <div class="race-bar" style="margin-bottom:4px">
-          <div class="race-bar-fill race-bar-phoenix bar-animate" style="width:${Fmt.percent(phoenix.totals.running.seconds, phoenix.totalSeconds)}%"></div>
-        </div>
-        <div class="race-bar">
-          <div class="race-bar-fill race-bar-houston bar-animate" style="width:${Fmt.percent(houston.totals.running.seconds, houston.totalSeconds)}%"></div>
-        </div>
-      </div>
-      
-      <div class="race-bar-container">
-        <div class="race-bar-label">
-          <span class="race-bar-name">Workouts</span>
-          <span class="race-bar-time">${phoenix.totals.workouts.time} <span class="text-xs ${houston.totals.workouts.seconds > phoenix.totals.workouts.seconds ? 'text-danger' : 'text-accent'}">${Fmt.timeDiff(houston.totals.workouts.seconds - phoenix.totals.workouts.seconds)}</span></span>
-        </div>
-        <div class="race-bar" style="margin-bottom:4px">
-          <div class="race-bar-fill race-bar-phoenix bar-animate" style="width:${Fmt.percent(phoenix.totals.workouts.seconds, phoenix.totalSeconds)}%"></div>
-        </div>
-        <div class="race-bar">
-          <div class="race-bar-fill race-bar-houston bar-animate" style="width:${Fmt.percent(houston.totals.workouts.seconds, houston.totalSeconds)}%"></div>
-        </div>
-      </div>
-      
-      <div class="race-bar-container" style="margin-bottom:0">
-        <div class="race-bar-label">
-          <span class="race-bar-name">Roxzone</span>
-          <span class="race-bar-time">${phoenix.totals.roxzone.time} <span class="text-xs ${houston.totals.roxzone.seconds > phoenix.totals.roxzone.seconds ? 'text-danger' : 'text-accent'}">${Fmt.timeDiff(houston.totals.roxzone.seconds - phoenix.totals.roxzone.seconds)}</span></span>
-        </div>
-        <div class="race-bar" style="margin-bottom:4px">
-          <div class="race-bar-fill race-bar-phoenix bar-animate" style="width:${Fmt.percent(phoenix.totals.roxzone.seconds, phoenix.totalSeconds * 0.3)}%"></div>
-        </div>
-        <div class="race-bar">
-          <div class="race-bar-fill race-bar-houston bar-animate" style="width:${Fmt.percent(houston.totals.roxzone.seconds, houston.totalSeconds * 0.3)}%"></div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Chart -->
-    <div class="card mb-lg">
-      <div class="text-xs text-tertiary font-bold mb-md" style="text-transform:uppercase;letter-spacing:1px">Run Pacing — All 8 Runs</div>
-      <canvas id="run-pacing-chart" style="width:100%;height:180px"></canvas>
-      <div style="display:flex;gap:16px;justify-content:center;margin-top:12px">
-        <div style="display:flex;align-items:center;gap:6px">
-          <div style="width:12px;height:3px;background:rgba(255,229,0,0.6);border-radius:2px"></div>
-          <span class="text-xs text-secondary">Phoenix</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px">
-          <div style="width:12px;height:3px;background:rgba(255,107,53,0.6);border-radius:2px"></div>
-          <span class="text-xs text-secondary">Houston</span>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Race Notes -->
-    <div class="grid-2 mb-lg">
-      <div class="card">
-        <div class="text-xs text-accent font-bold mb-sm">Phoenix Notes</div>
-        <p class="text-xs text-secondary" style="line-height:1.5">${phoenix.notes}</p>
-      </div>
-      <div class="card">
-        <div class="text-xs font-bold mb-sm" style="color:var(--accent-warning)">Houston Notes</div>
-        <p class="text-xs text-secondary" style="line-height:1.5">${houston.notes}</p>
-      </div>
-    </div>
-  `;
-}
-
-function renderRaceStations(phoenix, houston) {
-  const phoenixStations = phoenix.stations.filter(s => s.type === 'station');
-  const houstonStations = houston.stations.filter(s => s.type === 'station');
-  
-  return `
-    <div class="card mb-lg">
-      <div class="text-xs text-tertiary font-bold mb-md" style="text-transform:uppercase;letter-spacing:1px">Station by Station</div>
-      <canvas id="station-compare-chart" style="width:100%;height:200px"></canvas>
-      <div style="display:flex;gap:16px;justify-content:center;margin-top:12px">
-        <div style="display:flex;align-items:center;gap:6px">
-          <div style="width:12px;height:8px;background:rgba(255,229,0,0.5);border-radius:2px"></div>
-          <span class="text-xs text-secondary">Phoenix (PR)</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px">
-          <div style="width:12px;height:8px;background:rgba(255,107,53,0.5);border-radius:2px"></div>
-          <span class="text-xs text-secondary">Houston</span>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Station Details -->
-    ${phoenixStations.map((ps, i) => {
-      const hs = houstonStations[i];
-      const diff = hs.seconds - ps.seconds;
-      const diffColor = diff > 0 ? 'text-danger' : 'text-accent';
-      
-      return `
-        <div class="card mb-sm" style="padding:14px 16px">
-          <div style="display:flex;align-items:center;gap:12px">
-            <div style="font-size:20px;width:32px;text-align:center">${ps.icon}</div>
-            <div style="flex:1">
-              <div class="text-sm font-bold">${ps.name}</div>
-              <div style="display:flex;gap:12px;margin-top:4px">
-                <span class="text-xs text-accent">${ps.time}</span>
-                <span class="text-xs" style="color:var(--accent-warning)">${hs.time}</span>
-                <span class="text-xs ${diffColor} font-bold">${Fmt.timeDiff(diff)}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('')}
-  `;
-}
-
-function renderRaceGoals(phoenix) {
-  const phoenixStations = phoenix.stations.filter(s => s.type === 'station');
-  
-  return `
-    <div class="card-accent glow mb-lg">
-      <div class="flex-between mb-md">
-        <div>
-          <div class="text-xs text-accent font-bold" style="letter-spacing:1px">TARGET</div>
-          <div class="text-3xl font-black text-accent">Sub 1:05</div>
-        </div>
-        <div style="text-align:right">
-          <div class="text-xs text-tertiary">Current PR</div>
-          <div class="text-xl font-bold">${ATHLETE.prTime}</div>
-          <div class="text-xs text-secondary">Time to find: <span class="text-accent font-bold">10:09</span></div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="section-header">
-      <div class="section-title">What It Takes</div>
-      <div class="section-subtitle">Your PR vs sub-1:05 targets</div>
-    </div>
-    
-    <!-- Running -->
-    <div class="card mb-md">
-      <div class="text-xs text-tertiary font-bold mb-sm" style="text-transform:uppercase;letter-spacing:1px">Running (8 × 1km)</div>
-      <div class="metric-row">
-        <span class="metric-label">Current Avg</span>
-        <span class="metric-value">4:53/km</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Target Avg</span>
-        <span class="metric-value text-accent">4:20/km</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Time Savings</span>
-        <span class="metric-value text-accent">~4:22</span>
-      </div>
-    </div>
-    
-    <!-- Station Targets -->
-    <div class="card mb-lg">
-      <div class="text-xs text-tertiary font-bold mb-sm" style="text-transform:uppercase;letter-spacing:1px">Station Targets</div>
-      ${phoenixStations.map(ps => {
-        const goal = GOAL_SPLITS.stations[ps.name];
-        if (!goal) return '';
-        const diff = ps.seconds - goal.seconds;
-        return `
-          <div class="metric-row">
-            <div style="display:flex;align-items:center;gap:8px">
-              <span>${ps.icon}</span>
-              <span class="metric-label">${ps.name}</span>
-            </div>
-            <div>
-              <span class="text-xs text-secondary">${ps.time} →</span>
-              <span class="metric-value text-accent">${goal.target}</span>
-              <span class="text-xs ${diff > 0 ? 'text-accent' : 'text-danger'}">(${diff > 0 ? '-' : '+'}${Math.floor(Math.abs(diff)/60)}:${String(Math.abs(diff)%60).padStart(2,'0')})</span>
-            </div>
-          </div>
-        `;
-      }).join('')}
-    </div>
-    
-    <div class="card mb-lg" style="text-align:center;border-color:rgba(255,229,0,0.15)">
-      <div class="text-sm text-secondary mb-sm">Biggest Gains Available In:</div>
-      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-        <span class="badge badge-green">🏃 Running (-4:22)</span>
-        <span class="badge badge-green">🪢 Sled Pull (-0:53)</span>
-        <span class="badge badge-green">🎯 Wall Balls (-0:41)</span>
-        <span class="badge badge-green">⏱️ Roxzone (-1:59)</span>
-      </div>
-    </div>
-  `;
+  if (canvas) {
+    const points = ATHLETE.vo2maxHistory.map(p => ({ value: p.value, label: Dates.formatDateShort(p.date) }));
+    Charts.lineChart(canvas, points, { color: '#FFE500' });
+  }
 }
 
 function initRaceCharts() {
-  // Run pacing chart
   const runChart = document.getElementById('run-pacing-chart');
   if (runChart) {
     const phoenixRuns = RACES[0].stations.filter(s => s.type === 'run');
     const houstonRuns = RACES[1].stations.filter(s => s.type === 'run');
-    
-    const pairs = phoenixRuns.map((pr, i) => ({
-      label: `R${i + 1}`,
-      val1: pr.seconds,
-      val2: houstonRuns[i].seconds
-    }));
-    
-    Charts.dualBarChart(runChart, pairs);
+    Charts.dualBarChart(runChart, phoenixRuns.map((pr, i) => ({
+      label: 'R' + (i+1), val1: pr.seconds, val2: houstonRuns[i].seconds
+    })));
   }
-  
-  // Station comparison chart
-  const stationChart = document.getElementById('station-compare-chart');
-  if (stationChart) {
-    const phoenixStations = RACES[0].stations.filter(s => s.type === 'station');
-    const houstonStations = RACES[1].stations.filter(s => s.type === 'station');
-    
-    const pairs = phoenixStations.map((ps, i) => ({
-      label: ps.name.substring(0, 4),
-      val1: ps.seconds,
-      val2: houstonStations[i].seconds
-    }));
-    
-    Charts.dualBarChart(stationChart, pairs);
-  }
-}
-
-// =============================================
-// PROFILE VIEW
-// =============================================
-
-let profileTab = 'overview';
-
-function renderProfile() {
-  return `
-    <div class="view active" id="view-profile">
-      <div class="section-header">
-        <h1 class="section-title">Athlete Profile</h1>
-        <div class="section-subtitle">Aidan Nelson — Hyrox Men's Open</div>
-      </div>
-      
-      <!-- Tabs -->
-      <div class="tabs">
-        <button class="tab ${profileTab === 'overview' ? 'active' : ''}" onclick="App.setProfileTab('overview')">Profile</button>
-        <button class="tab ${profileTab === 'zones' ? 'active' : ''}" onclick="App.setProfileTab('zones')">Zones</button>
-        <button class="tab ${profileTab === 'nutrition' ? 'active' : ''}" onclick="App.setProfileTab('nutrition')">Nutrition</button>
-      </div>
-      
-      ${profileTab === 'overview' ? renderProfileOverview() : ''}
-      ${profileTab === 'zones' ? renderProfileZones() : ''}
-      ${profileTab === 'nutrition' ? renderProfileNutrition() : ''}
-    </div>
-  `;
-}
-
-function renderProfileOverview() {
-  return `
-    <!-- Physio -->
-    <div class="card mb-lg">
-      <div class="text-xs text-tertiary font-bold mb-md" style="text-transform:uppercase;letter-spacing:1px">Physiological</div>
-      <div class="metric-row">
-        <span class="metric-label">VO2 Max</span>
-        <span class="metric-value text-accent">${ATHLETE.vo2max}</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Lactate Threshold</span>
-        <span class="metric-value">${ATHLETE.ltPacePerKm}/km @ ${ATHLETE.ltHeartRate} bpm</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Easy Pace</span>
-        <span class="metric-value">${ATHLETE.easyPacePerKm}/km</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Max HR (est.)</span>
-        <span class="metric-value">${ATHLETE.maxHR} bpm</span>
-      </div>
-    </div>
-    
-    <!-- Body -->
-    <div class="card mb-lg">
-      <div class="text-xs text-tertiary font-bold mb-md" style="text-transform:uppercase;letter-spacing:1px">Body</div>
-      <div class="metric-row">
-        <span class="metric-label">Weight</span>
-        <span class="metric-value">${ATHLETE.weight} lbs / ${ATHLETE.weightKg} kg</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Bench Press 1RM</span>
-        <span class="metric-value">${ATHLETE.benchPress1RM} lbs</span>
-      </div>
-    </div>
-    
-    <!-- Hyrox Specs -->
-    <div class="card mb-lg">
-      <div class="text-xs text-tertiary font-bold mb-md" style="text-transform:uppercase;letter-spacing:1px">Hyrox Standards — Men's Open</div>
-      <div class="metric-row">
-        <span class="metric-label">🛷 Sled Push</span>
-        <span class="metric-value">${ATHLETE.sledPushWeight}</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">🪢 Sled Pull</span>
-        <span class="metric-value">${ATHLETE.sledPullWeight}</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">🎯 Wall Ball</span>
-        <span class="metric-value">${ATHLETE.wallBallWeight} → ${ATHLETE.wallBallTarget}</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">🏋️ Farmers Carry</span>
-        <span class="metric-value">${ATHLETE.farmersCarryWeight}</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">🦵 Sandbag Lunges</span>
-        <span class="metric-value">${ATHLETE.sandbagLungeWeight}</span>
-      </div>
-    </div>
-    
-    <!-- Goals -->
-    <div class="card-accent glow mb-lg">
-      <div class="text-xs text-accent font-bold mb-md" style="text-transform:uppercase;letter-spacing:1px">Goals</div>
-      <div class="metric-row">
-        <span class="metric-label">Target Race</span>
-        <span class="metric-value text-accent">${ATHLETE.goalRace} — ${Dates.formatDate(ATHLETE.goalDate)}</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">A Goal</span>
-        <span class="metric-value text-accent">${ATHLETE.goalTimeA}</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Stretch Goal</span>
-        <span class="metric-value" style="color:var(--accent-gold)">${ATHLETE.goalTimeStretch}</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Current PR</span>
-        <span class="metric-value">${ATHLETE.prTime}</span>
-      </div>
-    </div>
-  `;
-}
-
-function renderProfileZones() {
-  return `
-    <div class="card mb-lg">
-      <div class="text-xs text-tertiary font-bold mb-md" style="text-transform:uppercase;letter-spacing:1px">Training Zones — Based on LT ${ATHLETE.ltPacePerKm}/km @ ${ATHLETE.ltHeartRate}bpm</div>
-      
-      ${ZONES.map(z => `
-        <div style="padding:14px 0;border-bottom:1px solid var(--border-subtle)">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-            <div style="display:flex;align-items:center;gap:8px">
-              <span class="exercise-zone zone-${z.zone}" style="min-width:28px;text-align:center">Z${z.zone}</span>
-              <span class="text-sm font-bold">${z.name}</span>
-            </div>
-          </div>
-          <div style="display:flex;gap:16px;margin-bottom:6px;padding-left:36px">
-            <div>
-              <div class="text-xs text-tertiary">Pace</div>
-              <div class="text-sm font-bold">${z.paceRange}/km</div>
-            </div>
-            <div>
-              <div class="text-xs text-tertiary">Heart Rate</div>
-              <div class="text-sm font-bold">${z.hrRange} bpm</div>
-            </div>
-          </div>
-          <div style="padding-left:36px">
-            <div class="text-xs text-secondary">${z.description}</div>
-            <div class="text-xs text-tertiary" style="margin-top:4px;font-style:italic">"${z.feel}"</div>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-    
-    <div class="card mb-lg" style="border-color:rgba(255,229,0,0.15)">
-      <div class="text-xs text-accent font-bold mb-sm">💡 The 80/20 Rule</div>
-      <p class="text-sm text-secondary" style="line-height:1.6">
-        80% of your running should be in Zone 1-2 (easy, conversational). Only 20% should be Zone 3+. 
-        This builds your aerobic base without accumulating fatigue — and will reverse your VO2 max decline.
-        When your Garmin says VO2 max is dropping, it's often because you're running too fast on easy days.
-      </p>
-    </div>
-  `;
-}
-
-function renderProfileNutrition() {
-  const n = NUTRITION;
-  
-  return `
-    <!-- Daily Macros -->
-    <div class="card mb-lg">
-      <div class="text-xs text-tertiary font-bold mb-md" style="text-transform:uppercase;letter-spacing:1px">Daily Macros — Training Days</div>
-      <div class="flex-between mb-sm">
-        <span class="text-sm text-secondary">Calories</span>
-        <span class="text-sm font-bold text-accent">${n.overview.dailyCalories.training}</span>
-      </div>
-      <div class="nutrition-card">
-        <div class="macro-row">
-          <span class="macro-name">🥩 Protein</span>
-          <span class="macro-value">${n.macros.training.protein.grams}</span>
-        </div>
-        <div class="macro-row">
-          <span class="macro-name">🍚 Carbs</span>
-          <span class="macro-value">${n.macros.training.carbs.grams}</span>
-        </div>
-        <div class="macro-row">
-          <span class="macro-name">🥑 Fat</span>
-          <span class="macro-value">${n.macros.training.fat.grams}</span>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Pre-Workout -->
-    <div class="card mb-lg">
-      <div class="text-xs text-tertiary font-bold mb-sm" style="text-transform:uppercase;letter-spacing:1px">${n.preWorkout.title}</div>
-      <div class="text-xs text-secondary mb-md">Eat ${n.preWorkout.timing}</div>
-      ${n.preWorkout.meals.map(meal => `
-        <div style="padding:10px 0;border-bottom:1px solid var(--border-subtle)">
-          <div class="text-sm font-bold mb-xs">${meal.name}</div>
-          <div class="text-xs text-secondary">${meal.details}</div>
-          <div class="text-xs text-accent" style="margin-top:4px">${meal.macros}</div>
-        </div>
-      `).join('')}
-      <div style="padding-top:12px">
-        <div class="text-xs text-accent font-bold mb-xs">⚡ 30-45 min Before (Top-Up)</div>
-        ${n.preWorkout.topUp.options.map(o => `
-          <div class="text-xs text-secondary" style="padding:2px 0">• ${o}</div>
-        `).join('')}
-      </div>
-    </div>
-    
-    <!-- During Workout -->
-    <div class="card mb-lg">
-      <div class="text-xs text-tertiary font-bold mb-sm" style="text-transform:uppercase;letter-spacing:1px">${n.duringWorkout.title}</div>
-      ${n.duringWorkout.rules.map(r => `
-        <div style="padding:8px 0;border-bottom:1px solid var(--border-subtle)">
-          <div class="text-xs font-bold">${r.rule}</div>
-          <div class="text-xs text-secondary">${r.action}</div>
-        </div>
-      `).join('')}
-      <div class="text-xs text-secondary" style="padding-top:8px;font-style:italic">💧 ${n.duringWorkout.hydration}</div>
-    </div>
-    
-    <!-- Race Day Protocol -->
-    <div class="card-accent glow mb-lg">
-      <div class="text-xs text-accent font-bold mb-md" style="text-transform:uppercase;letter-spacing:1px">${n.raceDay.title}</div>
-      ${n.raceDay.timeline.map(t => `
-        <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border-subtle)">
-          <div class="text-xs font-bold text-accent" style="min-width:80px">${t.time}</div>
-          <div class="text-xs text-secondary">${t.action}</div>
-        </div>
-      `).join('')}
-      <div style="margin-top:12px">
-        <div class="text-xs font-bold text-danger mb-xs">⚠️ AVOID on Race Day</div>
-        ${n.raceDay.avoidRaceDay.map(a => `
-          <div class="text-xs text-secondary" style="padding:2px 0">❌ ${a}</div>
-        `).join('')}
-      </div>
-    </div>
-    
-    <!-- Supplements -->
-    <div class="card mb-lg">
-      <div class="text-xs text-tertiary font-bold mb-md" style="text-transform:uppercase;letter-spacing:1px">${n.supplements.title}</div>
-      ${n.supplements.items.map(s => `
-        <div style="padding:10px 0;border-bottom:1px solid var(--border-subtle)">
-          <div class="flex-between mb-xs">
-            <span class="text-sm font-bold">${s.name}</span>
-            <span class="text-xs text-accent">${s.dose}</span>
-          </div>
-          <div class="text-xs text-secondary">${s.why}</div>
-        </div>
-      `).join('')}
-    </div>
-    
-    <!-- Body Note -->
-    <div class="card mb-lg" style="border-color:rgba(255,215,0,0.2)">
-      <div class="text-xs font-bold mb-sm" style="color:var(--accent-gold)">💡 Note on Body Composition</div>
-      <p class="text-xs text-secondary" style="line-height:1.6">
-        ${n.overview.bodyFatNote}
-        At ${n.overview.weight} lbs very lean, your glycogen stores are low. Prioritize carb intake around workouts — 
-        this is the #1 thing that will fuel your running and stop your Garmin VO2 max from dropping.
-      </p>
-    </div>
-  `;
 }
 
 // =============================================
 // APP CONTROLLER
 // =============================================
-
 const App = {
   currentView: 'today',
   selectedRPE: null,
-  detailDate: null, // for viewing a specific day from Plan
+  detailDate: null,
 
   init() {
     setTimeout(() => {
-      const loading = document.getElementById('loading-screen');
-      if (loading) {
-        loading.style.opacity = '0';
-        loading.style.transition = 'opacity 0.4s ease';
-        setTimeout(() => loading.remove(), 400);
-      }
-      document.getElementById('bottom-nav').style.display = 'flex';
+      const l = document.getElementById('loading');
+      if (l) { l.style.opacity='0'; l.style.transition='opacity .3s'; setTimeout(()=>l.remove(),300); }
+      document.getElementById('nav').style.display = 'flex';
       this.navigate('today');
-      this.registerSW();
-    }, 600);
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(r=>r.forEach(reg=>reg.unregister()));
+        navigator.serviceWorker.register('./sw.js').catch(()=>{});
+      }
+    }, 400);
 
     document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        this.detailDate = null;
-        this.navigate(btn.dataset.view);
-      });
+      btn.addEventListener('click', () => { this.detailDate = null; this.navigate(btn.dataset.view); });
     });
   },
 
   navigate(view) {
     this.currentView = view;
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.view === view);
-    });
-
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.view === view));
     const app = document.getElementById('app');
-    switch (view) {
-      case 'today':
-        app.innerHTML = renderToday(this.detailDate);
-        break;
-      case 'plan':
-        app.innerHTML = renderCalendar();
-        break;
-      case 'stats':
-        app.innerHTML = renderStats();
-        requestAnimationFrame(() => { initDashboardCharts(); initRaceCharts(); });
-        break;
+    switch(view) {
+      case 'today': app.innerHTML = renderToday(this.detailDate); break;
+      case 'plan': app.innerHTML = renderCalendar(); break;
+      case 'stats': app.innerHTML = renderStats(); requestAnimationFrame(()=>{initDashboardCharts();initRaceCharts()}); break;
     }
     if (!this.detailDate) app.scrollTop = 0;
   },
 
-  showWorkoutForDate(dateStr) {
-    this.detailDate = dateStr;
-    this.navigate('today');
-  },
+  showWorkoutForDate(d) { this.detailDate = d; this.navigate('today'); },
+  prevDay(d) { const dt=new Date(d+'T00:00:00'); dt.setDate(dt.getDate()-1); this.showWorkoutForDate(dt.toISOString().split('T')[0]); },
+  nextDay(d) { const dt=new Date(d+'T00:00:00'); dt.setDate(dt.getDate()+1); this.showWorkoutForDate(dt.toISOString().split('T')[0]); },
 
   toggleExercise(dateStr, index, el) {
-    const isComplete = Storage.toggleExercise(dateStr, index);
-    if (isComplete) {
-      el.classList.add('completed');
-    } else {
-      el.classList.remove('completed');
-    }
+    const done = Storage.toggleExercise(dateStr, index);
+    const check = el.querySelector('.ex-check');
+    const name = el.querySelector('.t-md');
+    check.classList.toggle('done', done);
+    check.querySelector('svg').style.opacity = done ? 1 : 0;
+    check.querySelector('svg').setAttribute('stroke', done ? '#000' : '#fff');
+    if (name) { name.style.textDecoration = done ? 'line-through' : ''; name.style.opacity = done ? '.4' : ''; }
   },
 
-  saveExerciseLog(dateStr, index) {
-    const weight = document.getElementById('log-weight-' + index)?.value || '';
-    const reps = document.getElementById('log-reps-' + index)?.value || '';
-    const sets = document.getElementById('log-sets-' + index)?.value || '';
-    Storage.saveExerciseLog(dateStr, index, { weight, reps, sets });
+  saveLog(dateStr, index) {
+    const w = document.getElementById('log-w-'+index)?.value || '';
+    const r = document.getElementById('log-r-'+index)?.value || '';
+    const s = document.getElementById('log-s-'+index)?.value || '';
+    Storage.saveExerciseLog(dateStr, index, {weight:w, reps:r, sets:s});
   },
 
-  selectRPE(value) {
-    this.selectedRPE = value;
-    document.querySelectorAll('.rpe-btn').forEach(btn => {
-      const rpe = parseInt(btn.dataset.rpe);
-      btn.style.background = rpe === value ? 'var(--accent-primary)' : '';
-      btn.style.color = rpe === value ? '#000' : '';
+  selectRPE(v) {
+    this.selectedRPE = v;
+    document.querySelectorAll('.rpe').forEach(b => {
+      b.classList.toggle('sel', parseInt(b.dataset.rpe) === v);
     });
   },
 
   completeWorkout(dateStr) {
     const notes = document.getElementById('workout-notes')?.value || '';
-    const rpe = this.selectedRPE || 0;
-    Storage.markWorkoutComplete(dateStr, rpe, notes);
+    Storage.markWorkoutComplete(dateStr, this.selectedRPE || 0, notes);
     this.selectedRPE = null;
     this.navigate('today');
   },
 
-  prevDay(dateStr) {
-    const date = new Date(dateStr + 'T00:00:00');
-    date.setDate(date.getDate() - 1);
-    this.showWorkoutForDate(date.toISOString().split('T')[0]);
-  },
-
-  nextDay(dateStr) {
-    const date = new Date(dateStr + 'T00:00:00');
-    date.setDate(date.getDate() + 1);
-    this.showWorkoutForDate(date.toISOString().split('T')[0]);
-  },
-
-  calendarPrevWeek() {
-    if (calendarCurrentWeek > 1) { calendarCurrentWeek--; this.navigate('plan'); }
-  },
-
-  calendarNextWeek() {
-    if (calendarCurrentWeek < 34) { calendarCurrentWeek++; this.navigate('plan'); }
-  },
-
-  setStatsTab(tab) {
-    statsTab = tab;
-    this.navigate('stats');
-  },
-
-  registerSW() {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(r => r.forEach(reg => reg.unregister()));
-      if ('caches' in window) caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
-    }
-  }
+  calendarPrevWeek() { if(calendarCurrentWeek>1){calendarCurrentWeek--;this.navigate('plan')} },
+  calendarNextWeek() { if(calendarCurrentWeek<34){calendarCurrentWeek++;this.navigate('plan')} },
+  setStatsTab(t) { statsTab=t; this.navigate('stats'); }
 };
 
 document.addEventListener('DOMContentLoaded', () => App.init());
