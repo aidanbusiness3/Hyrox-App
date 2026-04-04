@@ -17,7 +17,7 @@
     <style>
 /* =============================================
    HYROX TRAINING APP — Design System
-   Dark theme with neon green Hyrox branding
+   Dark theme with Hyrox yellow branding
    ============================================= */
 
 :root {
@@ -28,40 +28,40 @@
   --bg-card-hover: #1c1c1c;
   --bg-elevated: #1a1a1a;
   --bg-input: #1e1e1e;
-  
+
   /* Accent Colors */
-  --accent-primary: #39FF14;
-  --accent-primary-dim: rgba(57, 255, 20, 0.15);
-  --accent-primary-glow: rgba(57, 255, 20, 0.3);
-  --accent-secondary: #00D4FF;
-  --accent-secondary-dim: rgba(0, 212, 255, 0.15);
+  --accent-primary: #FFE500;
+  --accent-primary-dim: rgba(255, 229, 0, 0.12);
+  --accent-primary-glow: rgba(255, 229, 0, 0.25);
+  --accent-secondary: #FF8C00;
+  --accent-secondary-dim: rgba(255, 140, 0, 0.15);
   --accent-warning: #FF6B35;
   --accent-danger: #FF3B5C;
-  --accent-success: #39FF14;
-  --accent-gold: #FFD700;
-  
+  --accent-success: #4ADE80;
+  --accent-gold: #FFE500;
+
   /* Text */
   --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.65);
-  --text-tertiary: rgba(255, 255, 255, 0.4);
-  --text-accent: #39FF14;
-  
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-tertiary: rgba(255, 255, 255, 0.35);
+  --text-accent: #FFE500;
+
   /* Borders */
   --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.1);
-  --border-accent: rgba(57, 255, 20, 0.3);
-  
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-accent: rgba(255, 229, 0, 0.25);
+
   /* Glassmorphism */
   --glass-bg: rgba(22, 22, 22, 0.8);
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-blur: 20px;
-  
+
   /* Shadows */
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 20px rgba(57, 255, 20, 0.15);
-  --shadow-glow-strong: 0 0 40px rgba(57, 255, 20, 0.25);
+  --shadow-glow: 0 0 20px rgba(255, 229, 0, 0.1);
+  --shadow-glow-strong: 0 0 40px rgba(255, 229, 0, 0.2);
   
   /* Spacing */
   --space-xs: 4px;
@@ -226,7 +226,7 @@ a { color: inherit; text-decoration: none; }
   font-size: 64px;
   font-weight: 900;
   color: var(--accent-primary);
-  text-shadow: 0 0 40px rgba(57, 255, 20, 0.4);
+  text-shadow: 0 0 40px rgba(255, 229, 0, 0.4);
   animation: loadPulse 1.5s ease-in-out infinite;
 }
 
@@ -403,9 +403,9 @@ a { color: inherit; text-decoration: none; }
 }
 
 .badge-green {
-  background: rgba(57, 255, 20, 0.12);
+  background: rgba(255, 229, 0, 0.12);
   color: var(--accent-primary);
-  border: 1px solid rgba(57, 255, 20, 0.2);
+  border: 1px solid rgba(255, 229, 0, 0.2);
 }
 
 .badge-blue {
@@ -448,7 +448,7 @@ a { color: inherit; text-decoration: none; }
 .phase-base { background: rgba(0, 212, 255, 0.12); color: #00D4FF; border: 1px solid rgba(0, 212, 255, 0.25); }
 .phase-build { background: rgba(255, 165, 0, 0.12); color: #FFA500; border: 1px solid rgba(255, 165, 0, 0.25); }
 .phase-race { background: rgba(255, 59, 92, 0.12); color: #FF3B5C; border: 1px solid rgba(255, 59, 92, 0.25); }
-.phase-peak { background: rgba(57, 255, 20, 0.12); color: #39FF14; border: 1px solid rgba(57, 255, 20, 0.25); }
+.phase-peak { background: rgba(255, 229, 0, 0.12); color: #FFE500; border: 1px solid rgba(255, 229, 0, 0.25); }
 
 /* ============ BUTTONS ============ */
 .btn {
@@ -531,8 +531,8 @@ a { color: inherit; text-decoration: none; }
 }
 
 .exercise-card.completed {
-  border-color: rgba(57, 255, 20, 0.2);
-  background: rgba(57, 255, 20, 0.03);
+  border-color: rgba(255, 229, 0, 0.2);
+  background: rgba(255, 229, 0, 0.03);
 }
 
 .exercise-card.completed .exercise-check {
@@ -607,7 +607,7 @@ a { color: inherit; text-decoration: none; }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent-primary), #00FF88);
+  background: linear-gradient(90deg, var(--accent-primary), #FFA500);
   border-radius: 3px;
   transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -653,8 +653,8 @@ a { color: inherit; text-decoration: none; }
 }
 
 .race-bar-phoenix {
-  background: linear-gradient(90deg, rgba(57, 255, 20, 0.2), rgba(57, 255, 20, 0.4));
-  border: 1px solid rgba(57, 255, 20, 0.3);
+  background: linear-gradient(90deg, rgba(255, 229, 0, 0.2), rgba(255, 229, 0, 0.4));
+  border: 1px solid rgba(255, 229, 0, 0.3);
 }
 
 .race-bar-houston {
@@ -755,11 +755,11 @@ a { color: inherit; text-decoration: none; }
 
 .calendar-day.today {
   border-color: var(--accent-primary);
-  background: rgba(57, 255, 20, 0.05);
+  background: rgba(255, 229, 0, 0.05);
 }
 
 .calendar-day.completed {
-  background: rgba(57, 255, 20, 0.08);
+  background: rgba(255, 229, 0, 0.08);
 }
 
 .calendar-day.rest {
@@ -974,7 +974,7 @@ a { color: inherit; text-decoration: none; }
 
 .type-run { background: rgba(0, 212, 255, 0.12); }
 .type-strength { background: rgba(255, 107, 53, 0.12); }
-.type-hyrox { background: rgba(57, 255, 20, 0.12); }
+.type-hyrox { background: rgba(255, 229, 0, 0.12); }
 .type-rest { background: rgba(255, 255, 255, 0.05); }
 .type-intervals { background: rgba(255, 59, 92, 0.12); }
 .type-tempo { background: rgba(255, 165, 0, 0.12); }
@@ -1020,8 +1020,8 @@ a { color: inherit; text-decoration: none; }
 }
 
 @keyframes glowPulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(57, 255, 20, 0.1); }
-  50% { box-shadow: 0 0 30px rgba(57, 255, 20, 0.25); }
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 229, 0, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(255, 229, 0, 0.25); }
 }
 
 @keyframes barGrow {
@@ -1527,7 +1527,7 @@ const PHASES = [
   { id: 'base',  name: 'Base Build',     weeks: [1, 10],  color: '#00D4FF', emoji: '🏗️' },
   { id: 'build', name: 'Build',          weeks: [11, 20], color: '#FFA500', emoji: '📈' },
   { id: 'race',  name: 'Race Specific',  weeks: [21, 30], color: '#FF3B5C', emoji: '🎯' },
-  { id: 'peak',  name: 'Peak & Taper',   weeks: [31, 34], color: '#39FF14', emoji: '⚡' }
+  { id: 'peak',  name: 'Peak & Taper',   weeks: [31, 34], color: '#FFE500', emoji: '⚡' }
 ];
 
 function getPhase(weekNum) {
@@ -2545,7 +2545,7 @@ const Charts = {
       const y = padding.top + chartH - barH;
       
       // Bar
-      ctx.fillStyle = d.color || '#39FF14';
+      ctx.fillStyle = d.color || '#FFE500';
       ctx.beginPath();
       ctx.roundRect(x, y, barWidth, barH, [4, 4, 0, 0]);
       ctx.fill();
@@ -2583,7 +2583,7 @@ const Charts = {
       
       // Bar 1 (Phoenix)
       const h1 = (p.val1 / maxVal) * chartH;
-      ctx.fillStyle = 'rgba(57, 255, 20, 0.5)';
+      ctx.fillStyle = 'rgba(255, 229, 0, 0.5)';
       ctx.beginPath();
       ctx.roundRect(groupX + groupWidth * 0.1, padding.top + chartH - h1, barWidth, h1, [3, 3, 0, 0]);
       ctx.fill();
@@ -2642,7 +2642,7 @@ const Charts = {
     }
     
     // Line
-    const color = options.color || '#39FF14';
+    const color = options.color || '#FFE500';
     ctx.strokeStyle = color;
     ctx.lineWidth = 2.5;
     ctx.lineJoin = 'round';
@@ -2934,7 +2934,7 @@ function initDashboardCharts() {
     label: Dates.formatDateShort(p.date)
   }));
   
-  Charts.lineChart(canvas, points, { color: '#39FF14' });
+  Charts.lineChart(canvas, points, { color: '#FFE500' });
 }
 
 // =============================================
@@ -3018,7 +3018,7 @@ function renderWorkout(dateStr) {
       </div>
       
       <!-- Focus Note -->
-      <div class="card mb-lg" style="border-color:var(--border-accent);background:rgba(57,255,20,0.03)">
+      <div class="card mb-lg" style="border-color:var(--border-accent);background:rgba(255,229,0,0.03)">
         <div class="text-xs text-accent font-bold mb-sm" style="text-transform:uppercase;letter-spacing:1px">Focus</div>
         <p class="text-sm" style="line-height:1.6">${workout.focus}</p>
       </div>
@@ -3085,7 +3085,7 @@ function renderWorkout(dateStr) {
         </button>
       </div>
       ` : `
-      <div class="card mb-lg" style="text-align:center;border-color:rgba(57,255,20,0.3)">
+      <div class="card mb-lg" style="text-align:center;border-color:rgba(255,229,0,0.3)">
         <div style="font-size:48px;margin-bottom:8px">✅</div>
         <div class="text-lg font-bold text-accent">Workout Complete!</div>
         <div class="text-sm text-secondary">Great work. Recovery starts now.</div>
@@ -3181,7 +3181,7 @@ function renderCalendar() {
           
           return `
             <div class="card tap-scale" onclick="App.showWorkoutForDate('${day.dateStr}')" 
-                 style="padding:14px 16px;cursor:pointer;${isToday ? 'border-color:var(--border-accent);' : ''}${isDone ? 'border-color:rgba(57,255,20,0.15);background:rgba(57,255,20,0.02);' : ''}${isPast && !isDone ? 'opacity:0.5;' : ''}">
+                 style="padding:14px 16px;cursor:pointer;${isToday ? 'border-color:var(--border-accent);' : ''}${isDone ? 'border-color:rgba(255,229,0,0.15);background:rgba(255,229,0,0.02);' : ''}${isPast && !isDone ? 'opacity:0.5;' : ''}">
               <div style="display:flex;align-items:center;gap:12px">
                 <div class="workout-type-icon type-${day.type}" style="width:36px;height:36px;min-width:36px;font-size:16px">
                   ${isDone ? '✅' : day.icon}
@@ -3248,7 +3248,7 @@ function renderRaceComparison(phoenix, houston) {
   return `
     <!-- Race Cards -->
     <div class="grid-2 mb-lg">
-      <div class="card" style="border-color:rgba(57,255,20,0.2)">
+      <div class="card" style="border-color:rgba(255,229,0,0.2)">
         <div class="text-xs text-accent font-bold mb-sm" style="letter-spacing:1px">🏆 PR — PHOENIX</div>
         <div class="text-2xl font-black text-accent" style="letter-spacing:-1px">${phoenix.totalTime}</div>
         <div class="text-xs text-secondary mt-md">Season ${phoenix.season}</div>
@@ -3310,7 +3310,7 @@ function renderRaceComparison(phoenix, houston) {
       <canvas id="run-pacing-chart" style="width:100%;height:180px"></canvas>
       <div style="display:flex;gap:16px;justify-content:center;margin-top:12px">
         <div style="display:flex;align-items:center;gap:6px">
-          <div style="width:12px;height:3px;background:rgba(57,255,20,0.6);border-radius:2px"></div>
+          <div style="width:12px;height:3px;background:rgba(255,229,0,0.6);border-radius:2px"></div>
           <span class="text-xs text-secondary">Phoenix</span>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
@@ -3344,7 +3344,7 @@ function renderRaceStations(phoenix, houston) {
       <canvas id="station-compare-chart" style="width:100%;height:200px"></canvas>
       <div style="display:flex;gap:16px;justify-content:center;margin-top:12px">
         <div style="display:flex;align-items:center;gap:6px">
-          <div style="width:12px;height:8px;background:rgba(57,255,20,0.5);border-radius:2px"></div>
+          <div style="width:12px;height:8px;background:rgba(255,229,0,0.5);border-radius:2px"></div>
           <span class="text-xs text-secondary">Phoenix (PR)</span>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
@@ -3442,7 +3442,7 @@ function renderRaceGoals(phoenix) {
       }).join('')}
     </div>
     
-    <div class="card mb-lg" style="text-align:center;border-color:rgba(57,255,20,0.15)">
+    <div class="card mb-lg" style="text-align:center;border-color:rgba(255,229,0,0.15)">
       <div class="text-sm text-secondary mb-sm">Biggest Gains Available In:</div>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
         <span class="badge badge-green">🏃 Running (-4:22)</span>
@@ -3629,7 +3629,7 @@ function renderProfileZones() {
       `).join('')}
     </div>
     
-    <div class="card mb-lg" style="border-color:rgba(57,255,20,0.15)">
+    <div class="card mb-lg" style="border-color:rgba(255,229,0,0.15)">
       <div class="text-xs text-accent font-bold mb-sm">💡 The 80/20 Rule</div>
       <p class="text-sm text-secondary" style="line-height:1.6">
         80% of your running should be in Zone 1-2 (easy, conversational). Only 20% should be Zone 3+. 
