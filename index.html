@@ -2122,8 +2122,7 @@ function renderFuel() {
     <div class="card mb-20" style="padding:14px 16px">
       <div class="metric"><span class="t-sm t-muted">Daily Water</span><span class="t-sm fw-7">3.5 - 4+ liters</span></div>
       <div class="metric"><span class="t-sm t-muted">Sodium/hr (training)</span><span class="t-sm fw-7">500 - 1000mg</span></div>
-      <div class="metric"><span class="t-sm t-muted">Use</span><span class="t-sm fw-7">LMNT or SaltStick</span></div>
-      <div class="metric"><span class="t-sm t-muted">Gatorade enough?</span><span class="t-sm fw-7" style="color:var(--red)">No — too low sodium</span></div>
+      <div class="metric"><span class="t-sm t-muted">Use</span><span class="t-sm fw-7">High-sodium electrolyte mix</span></div>
     </div>
 
     <div class="label">Supplements</div>
@@ -2138,33 +2137,53 @@ function renderFuel() {
     ` : ''}
 
     ${fuelTab === 'meals' ? `
-    <div class="label">Portion Guide (No Scale Needed)</div>
-    <div class="card mb-20" style="padding:14px 16px">
-      <div class="metric"><span class="t-sm t-muted">Protein/meal</span><span class="t-sm fw-7">Palm-sized (~35g)</span></div>
-      <div class="metric"><span class="t-sm t-muted">Carbs/meal</span><span class="t-sm fw-7">2 fists rice/pasta (~70g)</span></div>
-      <div class="metric"><span class="t-sm t-muted">Veggies</span><span class="t-sm fw-7">1 fist-sized portion</span></div>
-      <div class="metric"><span class="t-sm t-muted">Fats</span><span class="t-sm fw-7">Thumb-sized or 2 tbsp PB</span></div>
-    </div>
-
     <div class="label">Pre-Run (60-90 min before)</div>
     <div class="card mb-16" style="padding:14px 16px">
-      <div class="ex-row" style="border:none;padding:10px 0"><div class="t-sm fw-6">Oatmeal + Banana + Honey</div><div class="t-xs t-muted mt-4">~65g carbs. The go-to.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Toast + PB + Banana</div><div class="t-xs t-muted mt-4">~55g carbs. Quick option.</div></div>
-      <div class="ex-row" style="padding:10px 0;border:none"><div class="t-sm fw-6">Rice Cakes + Honey</div><div class="t-xs t-muted mt-4">~45g carbs. Light option.</div></div>
+      <div class="ex-row" style="border:none;padding:10px 0"><div class="t-sm fw-6">Oatmeal + Banana + Honey</div><div class="t-xs t-muted mt-4">The gold standard pre-run meal. Easy to digest, slow-release energy.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Toast + PB + Banana</div><div class="t-xs t-muted mt-4">Quick, balanced. Good for early morning runs.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Rice Cakes + Honey + Pinch of Salt</div><div class="t-xs t-muted mt-4">Light option when you don't want a full meal.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">White Rice + Eggs + Soy Sauce</div><div class="t-xs t-muted mt-4">Savory option. Great before long runs.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Overnight Oats + Berries + Protein Powder</div><div class="t-xs t-muted mt-4">Make the night before. Grab and eat.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Bagel + Cream Cheese + Honey</div><div class="t-xs t-muted mt-4">Dense carbs, easy on the stomach.</div></div>
+      <div class="ex-row" style="padding:10px 0;border:none"><div class="t-sm fw-6">Dates + Banana (30 min before)</div><div class="t-xs t-muted mt-4">Quick top-up. 4-5 dates = fast energy.</div></div>
     </div>
 
     <div class="label">Post-Run (within 30 min)</div>
     <div class="card mb-16" style="padding:14px 16px">
-      <div class="ex-row" style="border:none;padding:10px 0"><div class="t-sm fw-6">Smoothie: Greek yogurt + banana + berries + protein</div><div class="t-xs t-muted mt-4">~70g carbs, 40g protein. Best option.</div></div>
-      <div class="ex-row" style="padding:10px 0;border:none"><div class="t-sm fw-6">Chocolate milk (16 oz)</div><div class="t-xs t-muted mt-4">Quick + effective. Legit recovery drink.</div></div>
+      <div class="ex-row" style="border:none;padding:10px 0"><div class="t-sm fw-6">Smoothie: Greek Yogurt + Banana + Berries + Protein</div><div class="t-xs t-muted mt-4">Best option. Liquid absorbs fast. Add honey for extra carbs.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Chocolate Milk (16 oz)</div><div class="t-xs t-muted mt-4">Legit recovery drink — perfect carb-to-protein ratio.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Protein Shake + Banana + PB</div><div class="t-xs t-muted mt-4">Quick blender shake. Add oats for more carbs.</div></div>
+      <div class="ex-row" style="padding:10px 0;border:none"><div class="t-sm fw-6">Greek Yogurt + Granola + Honey + Berries</div><div class="t-xs t-muted mt-4">No blender needed. Grab and go.</div></div>
     </div>
 
-    <div class="label">Easy Meals</div>
+    <div class="label">Breakfast Ideas</div>
+    <div class="card mb-16" style="padding:14px 16px">
+      <div class="ex-row" style="border:none;padding:10px 0"><div class="t-sm fw-6">4 Eggs Scrambled + Toast + OJ</div><div class="t-xs t-muted mt-4">Classic. ~650 cal.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Egg + Cheese Breakfast Burrito</div><div class="t-xs t-muted mt-4">Flour tortilla, scrambled eggs, cheese, salsa. ~550 cal.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Protein Pancakes</div><div class="t-xs t-muted mt-4">Mix: 1 banana + 2 eggs + scoop protein + oats. Top with honey.</div></div>
+      <div class="ex-row" style="padding:10px 0;border:none"><div class="t-sm fw-6">Açai Bowl</div><div class="t-xs t-muted mt-4">Frozen açai + banana + berries blended. Top with granola + honey.</div></div>
+    </div>
+
+    <div class="label">Lunch / Dinner Ideas</div>
+    <div class="card mb-16" style="padding:14px 16px">
+      <div class="ex-row" style="border:none;padding:10px 0"><div class="t-sm fw-6">Burrito Bowl</div><div class="t-xs t-muted mt-4">Rice + black beans + chicken + salsa + avocado + cheese. ~900 cal.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Stir Fry</div><div class="t-xs t-muted mt-4">Rice + steak or chicken + mixed veggies + soy sauce + sesame oil. ~800 cal.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Pasta + Meat Sauce + Side Salad</div><div class="t-xs t-muted mt-4">Pasta + ground beef or turkey + marinara + bread. ~850 cal.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Salmon + Sweet Potato + Veggies</div><div class="t-xs t-muted mt-4">Baked salmon, roasted sweet potato, broccoli with olive oil. ~750 cal.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Chicken Thighs + Rice + Roasted Veggies</div><div class="t-xs t-muted mt-4">The staple. Meal prep this on Sunday. ~800 cal.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Turkey Sandwich + Chips + Fruit</div><div class="t-xs t-muted mt-4">Sub roll or thick bread, turkey, avocado, cheese. ~750 cal.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Quesadilla + Chicken + Guac</div><div class="t-xs t-muted mt-4">Flour tortilla, cheese, chicken, guac on the side. ~700 cal.</div></div>
+      <div class="ex-row" style="padding:10px 0;border:none"><div class="t-sm fw-6">Ground Beef Tacos</div><div class="t-xs t-muted mt-4">Corn or flour tortillas + seasoned beef + toppings + rice. ~800 cal.</div></div>
+    </div>
+
+    <div class="label">Snacks</div>
     <div class="card" style="padding:14px 16px">
-      <div class="ex-row" style="border:none;padding:10px 0"><div class="t-sm fw-6">Burrito Bowl</div><div class="t-xs t-muted mt-4">2 cups rice + black beans + chicken + salsa + avocado. ~900 cal.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Stir Fry</div><div class="t-xs t-muted mt-4">2 cups rice + steak/chicken + veggies + soy sauce. ~800 cal.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Pasta + Meat Sauce</div><div class="t-xs t-muted mt-4">3-4 oz pasta + ground beef + marinara + bread. ~850 cal.</div></div>
-      <div class="ex-row" style="padding:10px 0;border:none"><div class="t-sm fw-6">Eggs + Toast + Fruit</div><div class="t-xs t-muted mt-4">4 eggs scrambled + 2 toast + OJ. Quick breakfast. ~650 cal.</div></div>
+      <div class="ex-row" style="border:none;padding:10px 0"><div class="t-sm fw-6">Trail Mix</div><div class="t-xs t-muted mt-4">Nuts + dried fruit + dark chocolate. Handful = ~300 cal.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Apple + Almond Butter</div><div class="t-xs t-muted mt-4">~250 cal. Good pre-lift snack.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Rice Cakes + PB + Honey</div><div class="t-xs t-muted mt-4">Quick carbs + fat. ~350 cal.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">String Cheese + Banana</div><div class="t-xs t-muted mt-4">Easy grab-and-go. ~200 cal.</div></div>
+      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Cottage Cheese + Berries + Honey</div><div class="t-xs t-muted mt-4">High protein snack. ~250 cal.</div></div>
+      <div class="ex-row" style="padding:10px 0;border:none"><div class="t-sm fw-6">Cereal + Milk</div><div class="t-xs t-muted mt-4">Underrated. Quick carbs + protein. ~350 cal.</div></div>
     </div>
     ` : ''}
 
@@ -2189,7 +2208,7 @@ function renderFuel() {
 
     <div class="label" style="color:var(--accent)">Hydration + Supplements</div>
     <div class="card" style="padding:14px 16px">
-      <div class="t-sm" style="line-height:2">LMNT or SaltStick electrolytes<br>Creatine monohydrate<br>Magnesium glycinate<br>Vitamin D<br>Fish oil (omega-3)<br>Orange juice</div>
+      <div class="t-sm" style="line-height:2">Electrolyte mix (high sodium)<br>Creatine monohydrate<br>Magnesium glycinate<br>Vitamin D<br>Fish oil (omega-3)<br>Orange juice</div>
     </div>
     ` : ''}
 
