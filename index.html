@@ -1064,25 +1064,17 @@ a { color: inherit; text-decoration: none; }
     </div>
 
     <nav id="bottom-nav" class="bottom-nav" style="display:none;">
-        <button class="nav-btn active" data-view="dashboard" id="nav-dashboard">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span>Home</span>
-        </button>
-        <button class="nav-btn" data-view="workout" id="nav-workout">
+        <button class="nav-btn active" data-view="today" id="nav-today">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11M6.5 17.5h11M2 12h2M20 12h2M6 6.5V4M6 20v-2.5M18 6.5V4M18 20v-2.5M6 12h12"/></svg>
-            <span>Workout</span>
+            <span>Today</span>
         </button>
-        <button class="nav-btn" data-view="calendar" id="nav-calendar">
+        <button class="nav-btn" data-view="plan" id="nav-plan">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             <span>Plan</span>
         </button>
-        <button class="nav-btn" data-view="races" id="nav-races">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            <span>Races</span>
-        </button>
-        <button class="nav-btn" data-view="profile" id="nav-profile">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>Profile</span>
+        <button class="nav-btn" data-view="stats" id="nav-stats">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+            <span>Stats</span>
         </button>
     </nav>
 
@@ -1134,12 +1126,12 @@ const ATHLETE = {
   
   // Goals
   goalRace: 'Dallas',
-  goalDate: '2025-11-22',
+  goalDate: '2026-11-21',
   goalTimeA: '1:05:00',    // A goal
   goalTimeStretch: '0:59:59', // Stretch goal
   prTime: '1:15:09',
-  
-  trainingStart: '2025-04-07',
+
+  trainingStart: '2026-04-06',
   totalWeeks: 34,
   restDay: 'Sunday' // 0 = Sunday
 };
@@ -2007,7 +1999,7 @@ function getPeakWeek(weekNum) {
 
 function generateTrainingPlan() {
   const plan = [];
-  const startDate = new Date('2025-04-07');
+  const startDate = new Date('2026-04-06');
   
   for (let week = 1; week <= 34; week++) {
     const phase = getPhase(week);
@@ -2329,6 +2321,22 @@ const Storage = {
   
   getLastView() {
     return this._load().lastView;
+  },
+
+  // Exercise logging (weight/reps/sets)
+  saveExerciseLog(dateStr, exerciseIndex, logData) {
+    const data = this._load();
+    if (!data.completedWorkouts[dateStr]) {
+      data.completedWorkouts[dateStr] = { completed: false, exercises: {}, logs: {} };
+    }
+    if (!data.completedWorkouts[dateStr].logs) data.completedWorkouts[dateStr].logs = {};
+    data.completedWorkouts[dateStr].logs[exerciseIndex] = logData;
+    this._save();
+  },
+
+  getExerciseLog(dateStr, exerciseIndex) {
+    const data = this._load();
+    return data.completedWorkouts[dateStr]?.logs?.[exerciseIndex] || {};
   }
 };
 
@@ -2383,7 +2391,7 @@ const Dates = {
   },
   
   getCurrentWeek() {
-    const start = new Date('2025-04-07T00:00:00');
+    const start = new Date('2026-04-06T00:00:00');
     const now = new Date();
     now.setHours(0, 0, 0, 0);
     const diff = now - start;
@@ -2668,161 +2676,149 @@ const Charts = {
 };
 
 // =============================================
-// DASHBOARD VIEW
+// TODAY VIEW — Workout front and center
 // =============================================
 
-function renderDashboard() {
-  const today = Dates.todayStr();
-  const todayWorkout = Dates.getTodayWorkout();
-  const currentWeek = Dates.getCurrentWeek();
-  const phase = getPhase(currentWeek);
-  const countdown = Dates.countdownTo(ATHLETE.goalDate);
-  const streak = Storage.getStreak();
-  const weekStats = Storage.getWeeklyCompleted(currentWeek);
-  const totalCompleted = Storage.getCompletedCount();
-  const daysLeft = countdown.days;
-  const totalDays = Math.round((new Date(ATHLETE.goalDate) - new Date(ATHLETE.trainingStart)) / (1000*60*60*24));
-  const progressPct = Math.min(100, Math.round(((totalDays - daysLeft) / totalDays) * 100));
+let currentWorkoutDate = null;
 
-  let workoutCard = '';
-  if (todayWorkout) {
-    const isComplete = Storage.isWorkoutComplete(today);
-    workoutCard = `
-      <div class="card mb-lg" onclick="App.navigate('workout')" style="cursor:pointer;padding:20px">
-        <div style="display:flex;align-items:center;gap:14px">
-          <div class="workout-type-icon type-${todayWorkout.type}">
-            ${todayWorkout.icon}
+function renderToday(overrideDate) {
+  const dateStr = overrideDate || Dates.todayStr();
+  currentWorkoutDate = dateStr;
+  const isToday = Dates.isToday(dateStr);
+
+  let workout = null;
+  let weekNum = 0;
+  for (const week of TRAINING_PLAN) {
+    for (const day of week.days) {
+      if (day.dateStr === dateStr) { workout = day; weekNum = week.week; break; }
+    }
+    if (workout) break;
+  }
+
+  // Header with date navigation
+  const headerDate = isToday ? 'Today' : Dates.getDayName(dateStr);
+  const phase = weekNum ? getPhase(weekNum) : null;
+  const isComplete = workout ? Storage.isWorkoutComplete(dateStr) : false;
+  const countdown = Dates.countdownTo(ATHLETE.goalDate);
+
+  if (!workout) {
+    return `
+      <div class="view active">
+        <div class="flex-between mb-lg">
+          <button class="btn btn-ghost" onclick="App.prevDay('${dateStr}')" style="padding:8px">←</button>
+          <div style="text-align:center">
+            <div style="font-size:16px;font-weight:700">${headerDate}</div>
+            <div class="text-xs text-secondary">${Dates.formatDate(dateStr)}</div>
           </div>
-          <div style="flex:1;min-width:0">
-            <div class="text-sm font-bold">${todayWorkout.title}</div>
-            <div class="text-xs text-secondary">${todayWorkout.duration} · ${todayWorkout.exercises.length} exercises${todayWorkout.zone ? ' · Z' + todayWorkout.zone : ''}</div>
-          </div>
-          ${isComplete ? '<span style="color:var(--accent-success);font-size:20px">✓</span>' : '<span style="color:var(--text-tertiary);font-size:16px">›</span>'}
+          <button class="btn btn-ghost" onclick="App.nextDay('${dateStr}')" style="padding:8px">→</button>
         </div>
-      </div>
-    `;
-  } else {
-    workoutCard = `
-      <div class="card mb-lg" style="padding:20px;text-align:center">
-        <div class="text-sm text-secondary">No workout today</div>
+        <div class="empty-state" style="margin-top:40px">
+          <div style="font-size:40px;margin-bottom:12px">📋</div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:6px">No Workout</div>
+          <div class="text-sm text-secondary">Training starts ${Dates.formatDate(ATHLETE.trainingStart)}</div>
+        </div>
       </div>
     `;
   }
 
   return `
-    <div class="view active" id="view-dashboard">
-      <!-- Header -->
-      <div style="margin-bottom:28px">
-        <div class="text-xs text-secondary" style="margin-bottom:2px">${Dates.formatDateFull(new Date())}</div>
-        <h1 style="font-size:24px;font-weight:800;letter-spacing:-0.5px">Hey, Aidan</h1>
+    <div class="view active">
+      <!-- Date Nav -->
+      <div class="flex-between" style="margin-bottom:20px">
+        <button class="btn btn-ghost" onclick="App.prevDay('${dateStr}')" style="padding:8px">←</button>
+        <div style="text-align:center">
+          <div style="font-size:16px;font-weight:700">${headerDate}</div>
+          <div class="text-xs text-secondary">${Dates.formatDate(dateStr)}${phase ? ' · Week ' + weekNum : ''}</div>
+        </div>
+        <button class="btn btn-ghost" onclick="App.nextDay('${dateStr}')" style="padding:8px">→</button>
       </div>
 
-      <!-- Big Circle — Days to Dallas -->
-      <div style="text-align:center;margin-bottom:28px">
-        <div style="position:relative;width:180px;height:180px;margin:0 auto">
-          <svg viewBox="0 0 180 180" style="transform:rotate(-90deg)">
-            <circle cx="90" cy="90" r="80" fill="none" stroke="var(--bg-card)" stroke-width="10"/>
-            <circle cx="90" cy="90" r="80" fill="none" stroke="var(--accent-primary)" stroke-width="10"
-              stroke-dasharray="${2 * Math.PI * 80}"
-              stroke-dashoffset="${2 * Math.PI * 80 * (1 - progressPct / 100)}"
-              stroke-linecap="round"/>
-          </svg>
-          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-            <div style="font-size:42px;font-weight:900;color:var(--accent-primary);line-height:1">${daysLeft}</div>
-            <div style="font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-top:4px">Days to Dallas</div>
+      <!-- Workout Title -->
+      <div style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+          <div class="workout-type-icon type-${workout.type}">${workout.icon}</div>
+          <div>
+            <div style="font-size:20px;font-weight:800">${workout.title}</div>
+            <div class="text-xs text-secondary">${workout.duration}${workout.zone ? ' · Zone ' + workout.zone : ''}</div>
           </div>
         </div>
-        <div style="display:flex;justify-content:center;gap:24px;margin-top:16px">
-          <div style="text-align:center">
-            <div style="font-size:18px;font-weight:700">${currentWeek}<span style="font-size:12px;color:var(--text-tertiary);font-weight:500">/34</span></div>
-            <div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1px">Week</div>
-          </div>
-          <div style="width:1px;background:var(--border-subtle);height:32px"></div>
-          <div style="text-align:center">
-            <div style="font-size:18px;font-weight:700">${streak}<span style="font-size:12px;color:var(--text-tertiary);font-weight:500"> 🔥</span></div>
-            <div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1px">Streak</div>
-          </div>
-          <div style="width:1px;background:var(--border-subtle);height:32px"></div>
-          <div style="text-align:center">
-            <div style="font-size:18px;font-weight:700">${totalCompleted}</div>
-            <div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1px">Done</div>
-          </div>
-        </div>
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.5;padding-left:52px">${workout.focus}</div>
       </div>
 
-      <!-- Today's Workout -->
-      <div style="font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Today's Workout</div>
-      ${workoutCard}
-
-      <!-- This Week -->
-      <div class="flex-between" style="margin-bottom:10px">
-        <div style="font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px">This Week</div>
-        <span class="text-sm font-bold" style="color:var(--accent-primary)">${weekStats.completed}/${weekStats.total}</span>
+      ${workout.zone && workout.zone >= 2 ? `
+      <!-- Zone Info Bar -->
+      <div class="card" style="padding:12px 16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <span class="exercise-zone zone-${workout.zone}" style="margin-right:8px">Z${workout.zone}</span>
+          <span class="text-sm">${ZONES[workout.zone - 1].name}</span>
+        </div>
+        <div class="text-sm text-secondary">${ZONES[workout.zone - 1].paceRange}/km · ${ZONES[workout.zone - 1].hrRange} bpm</div>
       </div>
-      <div class="card mb-lg" style="padding:16px">
-        <div class="progress-bar mb-md" style="height:6px">
-          <div class="progress-fill" style="width:${Fmt.percent(weekStats.completed, weekStats.total)}%"></div>
-        </div>
-        ${renderWeekPreview(currentWeek)}
+      ` : ''}
+
+      <!-- Exercise Checklist -->
+      <div style="margin-bottom:20px">
+        ${workout.exercises.map((ex, i) => {
+          const isDone = Storage.isExerciseComplete(dateStr, i);
+          const log = Storage.getExerciseLog(dateStr, i);
+          const isStrength = !ex.zone || ex.zone === 0;
+          return `
+            <div style="border-bottom:1px solid var(--border-subtle);padding:14px 0">
+              <div style="display:flex;align-items:center;gap:12px" onclick="App.toggleExercise('${dateStr}', ${i}, this.parentElement.parentElement)">
+                <div class="exercise-check ${isDone ? 'completed' : ''}" style="${isDone ? 'background:var(--accent-primary);border-color:var(--accent-primary)' : ''}">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${isDone ? '#000' : 'currentColor'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="opacity:${isDone ? 1 : 0}"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div style="flex:1">
+                  <div style="font-size:15px;font-weight:600;${isDone ? 'text-decoration:line-through;opacity:0.5' : ''}">${ex.name}</div>
+                  <div style="font-size:12px;color:var(--text-secondary);margin-top:2px">${ex.detail}</div>
+                </div>
+                ${ex.zone ? `<span class="exercise-zone zone-${ex.zone}">Z${ex.zone}</span>` : ''}
+              </div>
+              ${isStrength && ex.name !== 'Full Rest' && ex.name !== 'Optional' && ex.name !== 'Rest & Prep' && ex.name !== 'Rest' && ex.name !== 'Celebrate' ? `
+              <div style="display:flex;gap:8px;margin-top:8px;padding-left:44px">
+                <input type="text" id="log-weight-${i}" placeholder="Weight" value="${log.weight || ''}"
+                  onchange="App.saveExerciseLog('${dateStr}',${i})"
+                  style="width:70px;background:var(--bg-input);border:1px solid var(--border-subtle);border-radius:6px;padding:6px 8px;color:var(--text-primary);font-size:12px;outline:none">
+                <input type="text" id="log-reps-${i}" placeholder="Reps" value="${log.reps || ''}"
+                  onchange="App.saveExerciseLog('${dateStr}',${i})"
+                  style="width:60px;background:var(--bg-input);border:1px solid var(--border-subtle);border-radius:6px;padding:6px 8px;color:var(--text-primary);font-size:12px;outline:none">
+                <input type="text" id="log-sets-${i}" placeholder="Sets" value="${log.sets || ''}"
+                  onchange="App.saveExerciseLog('${dateStr}',${i})"
+                  style="width:60px;background:var(--bg-input);border:1px solid var(--border-subtle);border-radius:6px;padding:6px 8px;color:var(--text-primary);font-size:12px;outline:none">
+              </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('')}
       </div>
 
-      <!-- Quick Stats -->
-      <div style="font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Stats</div>
-      <div class="card mb-lg" style="padding:0">
-        <div class="metric-row" style="padding:14px 20px">
-          <span class="metric-label">VO2 Max</span>
-          <span class="metric-value" style="color:var(--accent-primary)">${ATHLETE.vo2max}</span>
+      <!-- Complete Section -->
+      ${!isComplete ? `
+      <div style="margin-bottom:24px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px">How hard was it? (RPE)</div>
+        <div style="display:flex;gap:6px;margin-bottom:16px">
+          ${[1,2,3,4,5,6,7,8,9,10].map(n => `
+            <button class="rpe-btn" data-rpe="${n}" onclick="App.selectRPE(${n})"
+              style="flex:1;padding:10px 0;background:var(--bg-card);border:none;border-radius:8px;color:var(--text-secondary);font-size:13px;font-weight:700;cursor:pointer">${n}</button>
+          `).join('')}
         </div>
-        <div class="metric-row" style="padding:14px 20px">
-          <span class="metric-label">PR Time</span>
-          <span class="metric-value">${ATHLETE.prTime}</span>
-        </div>
-        <div class="metric-row" style="padding:14px 20px">
-          <span class="metric-label">Goal</span>
-          <span class="metric-value" style="color:var(--accent-primary)">Sub ${ATHLETE.goalTimeA}</span>
-        </div>
-        <div class="metric-row" style="padding:14px 20px">
-          <span class="metric-label">Time to Find</span>
-          <span class="metric-value">10:09</span>
-        </div>
+        <textarea id="workout-notes" placeholder="Notes (optional)..."
+          style="width:100%;background:var(--bg-card);border:none;border-radius:10px;padding:12px;color:var(--text-primary);font-size:14px;resize:none;min-height:50px;outline:none;margin-bottom:12px"></textarea>
+        <button class="btn btn-primary btn-block" onclick="App.completeWorkout('${dateStr}')" style="padding:14px;border-radius:12px;font-size:15px">
+          Complete Workout ✓
+        </button>
       </div>
-
-      <!-- VO2 Max Trend -->
-      <div style="font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">VO2 Max Trend</div>
-      <div class="card mb-lg" style="padding:16px">
-        <canvas id="vo2-chart" style="width:100%;height:140px"></canvas>
+      ` : `
+      <div style="text-align:center;padding:20px;margin-bottom:24px">
+        <div style="font-size:36px;margin-bottom:6px">✅</div>
+        <div style="font-size:16px;font-weight:700;color:var(--accent-primary)">Done!</div>
       </div>
-    </div>
-  `;
-}
+      `}
 
-function renderWeekPreview(weekNum) {
-  const days = Dates.getWeekWorkouts(weekNum);
-  if (!days.length) return '<p class="text-sm text-tertiary">Plan hasn\'t started yet</p>';
-  
-  const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  
-  return `
-    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center">
-      ${days.map((day, i) => {
-        const isToday = Dates.isToday(day.dateStr);
-        const isDone = Storage.isWorkoutComplete(day.dateStr);
-        const dotClass = day.type === 'rest' ? 'dot-rest' : 
-                         day.type === 'run' ? 'dot-run' :
-                         day.type === 'hyrox' ? 'dot-hyrox' :
-                         day.type === 'strength' ? 'dot-strength' : 'dot-run';
-        
-        return `
-          <div class="calendar-day ${isToday ? 'today' : ''} ${isDone ? 'completed' : ''} ${day.type === 'rest' ? 'rest' : ''}"
-               onclick="App.showWorkoutForDate('${day.dateStr}')"
-               style="aspect-ratio:auto;padding:8px 4px;border-radius:8px">
-            <div style="font-size:10px;color:var(--text-tertiary);margin-bottom:4px">${dayLabels[i]}</div>
-            <div style="font-size:16px;margin-bottom:4px">${day.icon}</div>
-            ${isDone ? '<div class="calendar-day-dot dot-complete" style="margin:0 auto"></div>' : 
-              `<div class="calendar-day-dot ${dotClass}" style="margin:0 auto"></div>`}
-          </div>
-        `;
-      }).join('')}
+      <!-- Mini countdown -->
+      <div style="text-align:center;padding:12px;margin-bottom:20px">
+        <div class="text-xs text-tertiary">${countdown.days} days to Dallas · Week ${weekNum} of 34</div>
+      </div>
     </div>
   `;
 }
@@ -2830,177 +2826,8 @@ function renderWeekPreview(weekNum) {
 function initDashboardCharts() {
   const canvas = document.getElementById('vo2-chart');
   if (!canvas) return;
-  
-  const points = ATHLETE.vo2maxHistory.map(p => ({
-    value: p.value,
-    label: Dates.formatDateShort(p.date)
-  }));
-  
+  const points = ATHLETE.vo2maxHistory.map(p => ({ value: p.value, label: Dates.formatDateShort(p.date) }));
   Charts.lineChart(canvas, points, { color: '#FFE500' });
-}
-
-// =============================================
-// WORKOUT VIEW
-// =============================================
-
-let currentWorkoutDate = null;
-
-function renderWorkout(dateStr) {
-  dateStr = dateStr || Dates.todayStr();
-  currentWorkoutDate = dateStr;
-  
-  let workout = null;
-  let weekNum = 0;
-  
-  for (const week of TRAINING_PLAN) {
-    for (const day of week.days) {
-      if (day.dateStr === dateStr) {
-        workout = day;
-        weekNum = week.week;
-        break;
-      }
-    }
-    if (workout) break;
-  }
-  
-  if (!workout) {
-    return `
-      <div class="view active" id="view-workout">
-        <div class="empty-state" style="margin-top:60px">
-          <div class="empty-state-icon">📋</div>
-          <div class="empty-state-title">No Workout Found</div>
-          <div class="empty-state-text">Training runs from ${Dates.formatDate(ATHLETE.trainingStart)} to ${Dates.formatDate(ATHLETE.goalDate)}</div>
-        </div>
-      </div>
-    `;
-  }
-  
-  const phase = getPhase(weekNum);
-  const isComplete = Storage.isWorkoutComplete(dateStr);
-  const isToday = Dates.isToday(dateStr);
-  
-  return `
-    <div class="view active" id="view-workout">
-      <!-- Header -->
-      <div class="mb-lg">
-        <div class="flex-between mb-sm">
-          <div class="text-xs text-secondary" style="text-transform:uppercase;letter-spacing:1px">
-            Week ${weekNum} • ${phase.name}
-          </div>
-          <div class="phase-badge phase-${phase.id}" style="padding:4px 10px;font-size:10px">
-            ${phase.emoji} ${phase.name}
-          </div>
-        </div>
-        <div class="flex-between">
-          <div>
-            <h1 class="text-2xl font-black" style="letter-spacing:-0.5px;margin-bottom:4px">
-              ${workout.icon} ${workout.title}
-            </h1>
-            <div class="text-sm text-secondary">
-              ${isToday ? 'Today' : Dates.getDayName(dateStr)} — ${Dates.formatDate(dateStr)}
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Workout Meta -->
-      <div class="grid-3 mb-lg">
-        <div class="stat-card">
-          <div class="stat-value" style="font-size:18px">${workout.duration}</div>
-          <div class="stat-label">Duration</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" style="font-size:18px">${workout.type.toUpperCase()}</div>
-          <div class="stat-label">Type</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" style="font-size:18px">${workout.zone ? 'Z' + workout.zone : '—'}</div>
-          <div class="stat-label">Zone</div>
-        </div>
-      </div>
-      
-      <!-- Focus Note -->
-      <div class="card mb-lg" style="border-color:var(--border-accent);background:rgba(255,229,0,0.03)">
-        <div class="text-xs text-accent font-bold mb-sm" style="text-transform:uppercase;letter-spacing:1px">Focus</div>
-        <p class="text-sm" style="line-height:1.6">${workout.focus}</p>
-      </div>
-      
-      <!-- Exercises -->
-      <div class="section-header">
-        <div class="section-title">Exercises</div>
-      </div>
-      <div class="stagger-in mb-lg" style="display:flex;flex-direction:column;gap:8px">
-        ${workout.exercises.map((ex, i) => {
-          const isDone = Storage.isExerciseComplete(dateStr, i);
-          return `
-            <div class="exercise-card ${isDone ? 'completed' : ''}" onclick="App.toggleExercise('${dateStr}', ${i}, this)">
-              <div class="exercise-check">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              </div>
-              <div class="exercise-info">
-                <div class="exercise-name">${ex.name}</div>
-                <div class="exercise-detail">${ex.detail}</div>
-              </div>
-              ${ex.zone ? `<span class="exercise-zone zone-${ex.zone}">Z${ex.zone}</span>` : ''}
-            </div>
-          `;
-        }).join('')}
-      </div>
-      
-      ${workout.zone && workout.zone >= 2 ? `
-      <!-- Zone Guide -->
-      <div class="card mb-lg">
-        <div class="text-xs text-tertiary font-bold mb-sm" style="text-transform:uppercase;letter-spacing:1px">Zone ${workout.zone} Guide</div>
-        <div class="metric-row">
-          <span class="metric-label">Pace</span>
-          <span class="metric-value">${ZONES[workout.zone - 1].paceRange}/km</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-label">Heart Rate</span>
-          <span class="metric-value">${ZONES[workout.zone - 1].hrRange} bpm</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-label">Feel</span>
-          <span class="metric-value" style="font-weight:500;color:var(--text-secondary)">${ZONES[workout.zone - 1].feel}</span>
-        </div>
-      </div>
-      ` : ''}
-      
-      <!-- Complete Workout -->
-      ${!isComplete ? `
-      <div class="mb-lg">
-        <div class="card mb-md">
-          <div class="text-sm font-bold mb-sm">Rate this workout (RPE)</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap" id="rpe-selector">
-            ${[1,2,3,4,5,6,7,8,9,10].map(n => `
-              <button class="btn btn-secondary btn-sm rpe-btn" data-rpe="${n}" onclick="App.selectRPE(${n})" style="min-width:36px;padding:8px">${n}</button>
-            `).join('')}
-          </div>
-        </div>
-        <div class="card mb-md">
-          <div class="text-sm font-bold mb-sm">Notes (optional)</div>
-          <textarea id="workout-notes" placeholder="How did it feel? Anything to remember..." 
-            style="width:100%;background:var(--bg-input);border:1px solid var(--border-subtle);border-radius:8px;padding:12px;color:var(--text-primary);font-size:14px;resize:vertical;min-height:60px;outline:none"></textarea>
-        </div>
-        <button class="btn btn-primary btn-block" onclick="App.completeWorkout('${dateStr}')" id="complete-btn">
-          ✓ Mark Workout Complete
-        </button>
-      </div>
-      ` : `
-      <div class="card mb-lg" style="text-align:center;border-color:rgba(255,229,0,0.3)">
-        <div style="font-size:48px;margin-bottom:8px">✅</div>
-        <div class="text-lg font-bold text-accent">Workout Complete!</div>
-        <div class="text-sm text-secondary">Great work. Recovery starts now.</div>
-      </div>
-      `}
-      
-      <!-- Day Navigation -->
-      <div class="flex-between mb-lg">
-        <button class="btn btn-ghost" onclick="App.prevDay('${dateStr}')">← Previous Day</button>
-        <button class="btn btn-ghost" onclick="App.nextDay('${dateStr}')">Next Day →</button>
-      </div>
-    </div>
-  `;
 }
 
 // =============================================
@@ -3118,6 +2945,129 @@ function renderCalendar() {
 // =============================================
 // RACES VIEW
 // =============================================
+
+let statsTab = 'overview';
+
+function renderStats() {
+  const countdown = Dates.countdownTo(ATHLETE.goalDate);
+  const currentWeek = Dates.getCurrentWeek();
+  const totalCompleted = Storage.getCompletedCount();
+  const streak = Storage.getStreak();
+  const daysLeft = countdown.days;
+  const totalDays = Math.round((new Date(ATHLETE.goalDate) - new Date(ATHLETE.trainingStart)) / (1000*60*60*24));
+  const progressPct = Math.min(100, Math.round(((totalDays - daysLeft) / totalDays) * 100));
+
+  return `
+    <div class="view active">
+      <div style="margin-bottom:24px">
+        <h1 style="font-size:24px;font-weight:800">Stats</h1>
+      </div>
+
+      <!-- Countdown Circle -->
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="position:relative;width:150px;height:150px;margin:0 auto">
+          <svg viewBox="0 0 150 150" style="transform:rotate(-90deg)">
+            <circle cx="75" cy="75" r="65" fill="none" stroke="var(--bg-card)" stroke-width="8"/>
+            <circle cx="75" cy="75" r="65" fill="none" stroke="var(--accent-primary)" stroke-width="8"
+              stroke-dasharray="${2 * Math.PI * 65}"
+              stroke-dashoffset="${2 * Math.PI * 65 * (1 - progressPct / 100)}"
+              stroke-linecap="round"/>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div style="font-size:32px;font-weight:900;color:var(--accent-primary);line-height:1">${daysLeft}</div>
+            <div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-top:4px">Days to Dallas</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:center;gap:20px;margin-top:14px">
+          <div style="text-align:center">
+            <div style="font-size:16px;font-weight:700">${currentWeek}/34</div>
+            <div style="font-size:10px;color:var(--text-tertiary)">Week</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:16px;font-weight:700">${streak} 🔥</div>
+            <div style="font-size:10px;color:var(--text-tertiary)">Streak</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:16px;font-weight:700">${totalCompleted}</div>
+            <div style="font-size:10px;color:var(--text-tertiary)">Workouts</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs" style="margin-bottom:20px">
+        <button class="tab ${statsTab === 'overview' ? 'active' : ''}" onclick="App.setStatsTab('overview')">Profile</button>
+        <button class="tab ${statsTab === 'races' ? 'active' : ''}" onclick="App.setStatsTab('races')">Races</button>
+        <button class="tab ${statsTab === 'goals' ? 'active' : ''}" onclick="App.setStatsTab('goals')">Goals</button>
+      </div>
+
+      ${statsTab === 'overview' ? renderStatsOverview() : ''}
+      ${statsTab === 'races' ? renderStatsRaces() : ''}
+      ${statsTab === 'goals' ? renderRaceGoals(RACES[0]) : ''}
+    </div>
+  `;
+}
+
+function renderStatsOverview() {
+  return `
+    <div class="card mb-lg" style="padding:0">
+      <div class="metric-row" style="padding:14px 20px"><span class="metric-label">VO2 Max</span><span class="metric-value" style="color:var(--accent-primary)">${ATHLETE.vo2max}</span></div>
+      <div class="metric-row" style="padding:14px 20px"><span class="metric-label">Weight</span><span class="metric-value">${ATHLETE.weight} lbs</span></div>
+      <div class="metric-row" style="padding:14px 20px"><span class="metric-label">LT Pace</span><span class="metric-value">${ATHLETE.ltPacePerKm}/km @ ${ATHLETE.ltHeartRate}bpm</span></div>
+      <div class="metric-row" style="padding:14px 20px"><span class="metric-label">Easy Pace</span><span class="metric-value">${ATHLETE.easyPacePerKm}/km</span></div>
+      <div class="metric-row" style="padding:14px 20px"><span class="metric-label">Bench 1RM</span><span class="metric-value">${ATHLETE.benchPress1RM} lbs</span></div>
+      <div class="metric-row" style="padding:14px 20px"><span class="metric-label">PR</span><span class="metric-value">${ATHLETE.prTime}</span></div>
+      <div class="metric-row" style="padding:14px 20px"><span class="metric-label">A Goal</span><span class="metric-value" style="color:var(--accent-primary)">Sub ${ATHLETE.goalTimeA}</span></div>
+    </div>
+
+    <div style="font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">VO2 Max Trend</div>
+    <div class="card mb-lg" style="padding:16px">
+      <canvas id="vo2-chart" style="width:100%;height:140px"></canvas>
+    </div>
+  `;
+}
+
+function renderStatsRaces() {
+  const phoenix = RACES[0];
+  const houston = RACES[1];
+  return `
+    <div class="grid-2 mb-lg">
+      <div class="card" style="text-align:center">
+        <div class="text-xs text-accent font-bold" style="margin-bottom:4px">PR — PHOENIX</div>
+        <div style="font-size:24px;font-weight:900;color:var(--accent-primary)">${phoenix.totalTime}</div>
+      </div>
+      <div class="card" style="text-align:center">
+        <div class="text-xs font-bold" style="color:var(--accent-warning);margin-bottom:4px">HOUSTON</div>
+        <div style="font-size:24px;font-weight:900;color:var(--accent-warning)">${houston.totalTime}</div>
+      </div>
+    </div>
+
+    <div class="card mb-lg" style="padding:16px">
+      <div class="text-xs text-tertiary font-bold mb-md" style="text-transform:uppercase;letter-spacing:1px">Run Pacing</div>
+      <canvas id="run-pacing-chart" style="width:100%;height:160px"></canvas>
+    </div>
+
+    <div class="card mb-lg" style="padding:0">
+      ${phoenix.stations.filter(s => s.type === 'station').map((ps, i) => {
+        const hs = houston.stations.filter(s => s.type === 'station')[i];
+        const diff = hs.seconds - ps.seconds;
+        return `
+          <div class="metric-row" style="padding:12px 20px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span>${ps.icon}</span>
+              <span class="metric-label">${ps.name}</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <span class="text-xs text-accent">${ps.time}</span>
+              <span class="text-xs" style="color:var(--accent-warning)">${hs.time}</span>
+              <span class="text-xs font-bold ${diff > 0 ? 'text-danger' : 'text-accent'}">${Fmt.timeDiff(diff)}</span>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
 
 let racesTab = 'comparison';
 
@@ -3648,11 +3598,11 @@ function renderProfileNutrition() {
 // =============================================
 
 const App = {
-  currentView: 'dashboard',
+  currentView: 'today',
   selectedRPE: null,
-  
+  detailDate: null, // for viewing a specific day from Plan
+
   init() {
-    // Remove loading screen
     setTimeout(() => {
       const loading = document.getElementById('loading-screen');
       if (loading) {
@@ -3660,169 +3610,113 @@ const App = {
         loading.style.transition = 'opacity 0.4s ease';
         setTimeout(() => loading.remove(), 400);
       }
-      
-      // Show nav
       document.getElementById('bottom-nav').style.display = 'flex';
-      
-      // Navigate to dashboard
-      this.navigate('dashboard');
-      
-      // Register service worker
+      this.navigate('today');
       this.registerSW();
-    }, 800);
-    
-    // Nav event listeners
+    }, 600);
+
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        const view = btn.dataset.view;
-        this.navigate(view);
+        this.detailDate = null;
+        this.navigate(btn.dataset.view);
       });
     });
   },
-  
+
   navigate(view) {
     this.currentView = view;
-    Storage.setLastView(view);
-    
-    // Update nav
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.view === view);
     });
-    
-    // Render view
+
     const app = document.getElementById('app');
-    
     switch (view) {
-      case 'dashboard':
-        app.innerHTML = renderDashboard();
-        // Init charts after DOM update
-        requestAnimationFrame(() => initDashboardCharts());
+      case 'today':
+        app.innerHTML = renderToday(this.detailDate);
         break;
-      case 'workout':
-        app.innerHTML = renderWorkout(currentWorkoutDate);
-        break;
-      case 'calendar':
+      case 'plan':
         app.innerHTML = renderCalendar();
         break;
-      case 'races':
-        app.innerHTML = renderRaces();
-        requestAnimationFrame(() => initRaceCharts());
-        break;
-      case 'profile':
-        app.innerHTML = renderProfile();
+      case 'stats':
+        app.innerHTML = renderStats();
+        requestAnimationFrame(() => { initDashboardCharts(); initRaceCharts(); });
         break;
     }
-    
-    // Scroll to top
-    app.scrollTop = 0;
+    if (!this.detailDate) app.scrollTop = 0;
   },
-  
-  // Workout actions
+
   showWorkoutForDate(dateStr) {
-    currentWorkoutDate = dateStr;
-    this.navigate('workout');
+    this.detailDate = dateStr;
+    this.navigate('today');
   },
-  
+
   toggleExercise(dateStr, index, el) {
     const isComplete = Storage.toggleExercise(dateStr, index);
-    
     if (isComplete) {
       el.classList.add('completed');
     } else {
       el.classList.remove('completed');
     }
   },
-  
+
+  saveExerciseLog(dateStr, index) {
+    const weight = document.getElementById('log-weight-' + index)?.value || '';
+    const reps = document.getElementById('log-reps-' + index)?.value || '';
+    const sets = document.getElementById('log-sets-' + index)?.value || '';
+    Storage.saveExerciseLog(dateStr, index, { weight, reps, sets });
+  },
+
   selectRPE(value) {
     this.selectedRPE = value;
     document.querySelectorAll('.rpe-btn').forEach(btn => {
       const rpe = parseInt(btn.dataset.rpe);
-      if (rpe === value) {
-        btn.style.background = 'var(--accent-primary)';
-        btn.style.color = '#000';
-        btn.style.borderColor = 'var(--accent-primary)';
-      } else {
-        btn.style.background = '';
-        btn.style.color = '';
-        btn.style.borderColor = '';
-      }
+      btn.style.background = rpe === value ? 'var(--accent-primary)' : '';
+      btn.style.color = rpe === value ? '#000' : '';
     });
   },
-  
+
   completeWorkout(dateStr) {
     const notes = document.getElementById('workout-notes')?.value || '';
     const rpe = this.selectedRPE || 0;
-    
     Storage.markWorkoutComplete(dateStr, rpe, notes);
     this.selectedRPE = null;
-    
-    // Re-render
-    const app = document.getElementById('app');
-    app.innerHTML = renderWorkout(dateStr);
-    app.scrollTop = 0;
+    this.navigate('today');
   },
-  
+
   prevDay(dateStr) {
     const date = new Date(dateStr + 'T00:00:00');
     date.setDate(date.getDate() - 1);
-    const newDateStr = date.toISOString().split('T')[0];
-    this.showWorkoutForDate(newDateStr);
+    this.showWorkoutForDate(date.toISOString().split('T')[0]);
   },
-  
+
   nextDay(dateStr) {
     const date = new Date(dateStr + 'T00:00:00');
     date.setDate(date.getDate() + 1);
-    const newDateStr = date.toISOString().split('T')[0];
-    this.showWorkoutForDate(newDateStr);
+    this.showWorkoutForDate(date.toISOString().split('T')[0]);
   },
-  
-  // Calendar
+
   calendarPrevWeek() {
-    if (calendarCurrentWeek > 1) {
-      calendarCurrentWeek--;
-      this.navigate('calendar');
-    }
+    if (calendarCurrentWeek > 1) { calendarCurrentWeek--; this.navigate('plan'); }
   },
-  
+
   calendarNextWeek() {
-    if (calendarCurrentWeek < 34) {
-      calendarCurrentWeek++;
-      this.navigate('calendar');
-    }
+    if (calendarCurrentWeek < 34) { calendarCurrentWeek++; this.navigate('plan'); }
   },
-  
-  // Races
-  setRacesTab(tab) {
-    racesTab = tab;
-    this.navigate('races');
+
+  setStatsTab(tab) {
+    statsTab = tab;
+    this.navigate('stats');
   },
-  
-  // Profile
-  setProfileTab(tab) {
-    profileTab = tab;
-    this.navigate('profile');
-  },
-  
-  // PWA
+
   registerSW() {
     if ('serviceWorker' in navigator) {
-      // Clean up any broken service workers from previous deployments
-      navigator.serviceWorker.getRegistrations().then(registrations => {
-        registrations.forEach(reg => reg.unregister());
-      });
-      // Also clear old caches
-      if ('caches' in window) {
-        caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
-      }
-      // Register sw.js if it exists alongside this file
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('SW registered:', reg.scope))
-        .catch(() => {}); // Silently fail if no sw.js — app works fine without it
+      navigator.serviceWorker.getRegistrations().then(r => r.forEach(reg => reg.unregister()));
+      if ('caches' in window) caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
   }
 };
 
-// Start app
 document.addEventListener('DOMContentLoaded', () => App.init());
 
     </script>
