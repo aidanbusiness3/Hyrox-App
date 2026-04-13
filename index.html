@@ -79,6 +79,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px}
 .loading-h{font-size:56px;font-weight:900;color:var(--accent);animation:pulse 1.5s ease infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:flex-end;animation:fadeIn .2s ease}
+.modal{background:var(--bg2);width:100%;border-radius:20px 20px 0 0;padding:24px 20px;padding-bottom:calc(20px + var(--safe-b));max-height:80vh;overflow-y:auto}
+.modal-day{display:flex;justify-content:space-between;align-items:center;padding:14px 12px;border-radius:10px;cursor:pointer;transition:background .15s}
+.modal-day:active{background:var(--bg3)}
     </style>
 </head>
 <body>
@@ -1321,6 +1325,31 @@ const Storage = {
     return null;
   },
 
+  // Day swaps — swap workouts between days
+  swapDays(date1, date2) {
+    const data = this._load();
+    if (!data.swaps) data.swaps = {};
+    // Resolve current swaps so we get the original underlying workouts
+    const orig1 = data.swaps[date1] || date1;
+    const orig2 = data.swaps[date2] || date2;
+    // Set new mappings
+    if (orig1 === date2) delete data.swaps[date2]; else data.swaps[date2] = orig1;
+    if (orig2 === date1) delete data.swaps[date1]; else data.swaps[date1] = orig2;
+    this._save();
+  },
+
+  getWorkoutDate(dateStr) {
+    // Returns the underlying workout date for a given calendar date (handles swaps)
+    const data = this._load();
+    return (data.swaps && data.swaps[dateStr]) || dateStr;
+  },
+
+  resetSwaps() {
+    const data = this._load();
+    data.swaps = {};
+    this._save();
+  },
+
   // Get all run stats for chart (HR over time at easy pace)
   getAllRunStats() {
     const data = this._load();
@@ -1683,10 +1712,14 @@ function renderToday(overrideDate) {
   currentWorkoutDate = dateStr;
   const isToday = Dates.isToday(dateStr);
 
+  // Resolve swapped workout date
+  const workoutDateStr = Storage.getWorkoutDate(dateStr);
+  const isSwapped = workoutDateStr !== dateStr;
+
   let workout = null, weekNum = 0;
   for (const week of TRAINING_PLAN) {
     for (const day of week.days) {
-      if (day.dateStr === dateStr) { workout = day; weekNum = week.week; break; }
+      if (day.dateStr === workoutDateStr) { workout = day; weekNum = week.week; break; }
     }
     if (workout) break;
   }
@@ -1735,14 +1768,16 @@ function renderToday(overrideDate) {
     </div>
 
     <!-- Title -->
-    <div class="mb-4">
+    <div class="row-between mb-4">
       <div class="t-xl fw-9">${workout.title}</div>
+      <button onclick="App.openSwap('${dateStr}')" style="padding:6px 10px;color:var(--text2);background:var(--bg2);border-radius:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">⇄ Swap</button>
     </div>
-    <div class="row mb-16" style="gap:8px">
+    <div class="row mb-16" style="gap:8px;flex-wrap:wrap">
       <span class="t-sm t-muted">${workout.duration}</span>
       ${workout.zone ? `<span class="pill z${workout.zone}">Z${workout.zone}</span>` : ''}
       ${phase ? `<span class="pill pill-accent">${phase.name}</span>` : ''}
       ${isComplete ? '<span class="pill pill-green">Done</span>' : ''}
+      ${isSwapped ? '<span class="pill" style="background:rgba(255,229,0,.15);color:var(--accent)">Swapped</span>' : ''}
     </div>
 
     <!-- Focus -->
@@ -1919,20 +1954,30 @@ function renderCalendar() {
       const today = Dates.isToday(day.dateStr);
       const done = Storage.isWorkoutComplete(day.dateStr);
       const past = Dates.isPast(day.dateStr) && !today;
+      // Resolve swap to show the actual workout for this day
+      const wDate = Storage.getWorkoutDate(day.dateStr);
+      const swapped = wDate !== day.dateStr;
+      let displayDay = day;
+      if (swapped) {
+        for (const w of TRAINING_PLAN) {
+          for (const d of w.days) if (d.dateStr === wDate) { displayDay = d; break; }
+        }
+      }
       return `
         <div onclick="App.showWorkoutForDate('${day.dateStr}')" style="padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;${past && !done ? 'opacity:.4' : ''}">
           <div class="row">
-            <div style="width:36px;text-align:center;font-size:18px">${done ? '✅' : day.icon}</div>
+            <div style="width:36px;text-align:center;font-size:18px">${done ? '✅' : displayDay.icon}</div>
             <div style="flex:1">
               <div class="row-between">
                 <div>
                   <span class="t-xs t-faint fw-6" style="margin-right:6px">${day.day.substring(0,3).toUpperCase()}</span>
                   <span class="t-xs t-muted">${Dates.formatDate(day.dateStr)}</span>
                   ${today ? '<span class="pill pill-accent" style="margin-left:6px;font-size:9px;padding:1px 6px">TODAY</span>' : ''}
+                  ${swapped ? '<span class="pill" style="margin-left:6px;font-size:9px;padding:1px 6px;background:rgba(255,229,0,.15);color:var(--accent)">SWAP</span>' : ''}
                 </div>
-                <div class="t-xs t-muted">${day.duration}</div>
+                <div class="t-xs t-muted">${displayDay.duration}</div>
               </div>
-              <div class="t-sm fw-6 mt-4">${day.title}</div>
+              <div class="t-sm fw-6 mt-4">${displayDay.title}</div>
             </div>
           </div>
         </div>`;
@@ -2331,7 +2376,59 @@ const App = {
   calendarNextWeek() { if(calendarCurrentWeek<34){calendarCurrentWeek++;this.navigate('plan')} },
   jumpToWeek(w) { calendarCurrentWeek = w; this.navigate('plan'); },
   setStatsTab(t) { statsTab=t; this.navigate('stats'); },
-  setFuelTab(t) { fuelTab=t; this.navigate('fuel'); }
+  setFuelTab(t) { fuelTab=t; this.navigate('fuel'); },
+
+  openSwap(dateStr) {
+    // Get the current week's 7 days (Mon-Sun starting from this week's Monday)
+    const date = new Date(dateStr + 'T00:00:00');
+    const day = date.getDay(); // 0=Sun, 1=Mon...
+    const diff = day === 0 ? -6 : 1 - day; // shift to Monday
+    const monday = new Date(date);
+    monday.setDate(date.getDate() + diff);
+
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      const ds = d.toISOString().split('T')[0];
+      const wDate = Storage.getWorkoutDate(ds);
+      let wo = null;
+      for (const week of TRAINING_PLAN) {
+        for (const dy of week.days) if (dy.dateStr === wDate) { wo = dy; break; }
+        if (wo) break;
+      }
+      days.push({ dateStr: ds, dayName: d.toLocaleDateString('en-US',{weekday:'long'}), shortDate: d.toLocaleDateString('en-US',{month:'short',day:'numeric'}), workout: wo, isCurrent: ds === dateStr });
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `<div class="modal">
+      <div class="row-between mb-16">
+        <div>
+          <div class="t-lg fw-8">Swap Workout</div>
+          <div class="t-xs t-muted mt-4">Pick a day to swap with</div>
+        </div>
+        <button onclick="this.closest('.modal-overlay').remove()" style="padding:4px 10px;color:var(--text2);font-size:20px">×</button>
+      </div>
+      ${days.map(d => `
+        <div class="modal-day" ${d.isCurrent ? 'style="opacity:.4;pointer-events:none"' : `onclick="App.doSwap('${dateStr}','${d.dateStr}')"`}>
+          <div>
+            <div class="t-sm fw-7">${d.dayName} ${d.isCurrent ? '<span class="t-faint" style="font-weight:400">(current)</span>' : ''}</div>
+            <div class="t-xs t-muted mt-4">${d.shortDate} · ${d.workout ? d.workout.title : 'No workout'}</div>
+          </div>
+          ${d.workout && !d.isCurrent ? `<div style="font-size:18px">${d.workout.icon}</div>` : ''}
+        </div>
+      `).join('')}
+    </div>`;
+    document.body.appendChild(overlay);
+  },
+
+  doSwap(date1, date2) {
+    Storage.swapDays(date1, date2);
+    document.querySelector('.modal-overlay')?.remove();
+    this.navigate('today');
+  }
 };
 
 document.addEventListener('DOMContentLoaded', () => App.init());
