@@ -527,7 +527,9 @@ function getPhase(weekNum) {
 }
 
 function isDeloadWeek(weekNum) {
-  // Deload every 4th week: weeks 4, 8, 12, 16, 20, 24, 28
+  // Every 3rd week in phases 1-2 (transition period): weeks 3, 6, 9, 12, 15
+  if (weekNum <= 16) return weekNum % 3 === 0;
+  // Every 4th week in phases 3-4: weeks 20, 24, 28
   if (weekNum <= 30) return weekNum % 4 === 0;
   return false;
 }
@@ -626,7 +628,7 @@ function getBaseWeek(weekNum, deload) {
         {name:'Easy Run',detail:`${easyMin} min @ 6:15-6:45/km — HR under 145bpm`,zone:2},
         {name:'Cooldown Stretch',detail:'5 min — hip flexors, calves, hamstrings',zone:0}],
       duration:`${easyMin + 5} min`,
-      focus:'📍 South / Outdoor — Aerobic base. Nose breathing. If you can\'t hold a conversation, you\'re going too fast. This builds the engine you never built as a lifter.' },
+      focus:'📍 South / Outdoor — Aerobic base. FASTED OPTIONAL (carb periodization — boosts mitochondrial adaptation). HR under 145. Cadence target: 170-180 spm.' },
 
     // Tuesday — Upper Strength + SkiErg/Row (South)
     { day:'Tuesday', type:'strength', title:'Upper Strength + Cardio Stations', icon:'💪', zone:0,
@@ -647,7 +649,7 @@ function getBaseWeek(weekNum, deload) {
         {name:'Strides',detail:'6 × 20 sec fast & relaxed / walk back — not sprints, just smooth speed',zone:4},
         {name:'Cooldown',detail:'5 min easy jog',zone:1}],
       duration:`${easyMin + 10} min`,
-      focus:'📍 Outdoor — Easy + strides for neuromuscular activation. The strides teach your legs to turn over fast without the fatigue cost of intervals.' },
+      focus:'📍 Outdoor — FASTED OPTIONAL. Easy + strides for neuromuscular activation. Cadence target: 170-180 spm. Strides teach your legs to turn over fast.' },
 
     // Thursday — Tempo Run + Posterior Chain (South)
     { day:'Thursday', type:'tempo', title: deload ? 'Easy Run + Light Posterior' : 'Tempo Run + Posterior Chain', icon:'🏃‍♂️', zone: deload ? 2 : 3,
@@ -662,9 +664,11 @@ function getBaseWeek(weekNum, deload) {
         {name:'Romanian Deadlift',detail:'4 × 8 — YOUR WEAK POINT. Full stretch, squeeze glutes at top.',zone:0},
         {name:'Hip Thrusts',detail:'3 × 12 heavy — glutes are your other weak point. Build them.',zone:0},
         {name:'Bulgarian Split Squat',detail:'3 × 10 each leg — single leg stability for running',zone:0},
-        {name:'Nordic Hamstring Curls',detail:'3 × 6 (or eccentric negatives) — injury prevention + hamstring strength',zone:0}],
-      duration: deload ? '45 min' : '70 min',
-      focus: deload ? '📍 South Gym — Deload. Light movement only.' : '📍 South Gym — Tempo builds lactate clearance. Then posterior chain — this is the session that fixes your hamstring/glute weak point AND makes you faster. RDLs + hip thrusts = sled push power + running speed.' },
+        {name:'Nordic Hamstring Curls',detail:'3 × 6 (or eccentric negatives) — injury prevention + hamstring strength',zone:0},
+        {name:'Single-Leg Hops',detail:'3 × 8 each leg — short ground contact, stiff ankles. Builds running economy.',zone:0},
+        {name:'Broad Jumps',detail:'3 × 4 — explosive horizontal power for sled + running',zone:0}],
+      duration: deload ? '45 min' : '75 min',
+      focus: deload ? '📍 South Gym — Deload. Light movement only.' : '📍 South Gym — Tempo builds lactate clearance. Then posterior chain + plyometrics. Research: heavy lifting + plyos combined have a 1.34 effect size on running economy — either alone is much weaker.' },
 
     // Friday — Hyrox Station Practice (Round Rock)
     { day:'Friday', type:'hyrox', title: deload ? 'Light Station Technique' : 'Hyrox Station Practice', icon:'🟢', zone: deload ? 2 : 3,
@@ -715,7 +719,7 @@ function getBuildWeek(weekNum, deload) {
         {name:'Plank Series',detail:'3 × 45s (front + each side)',zone:0},
         {name:'Dead Bug',detail:'3 × 10 each side — anti-extension',zone:0}],
       duration:`${easyMin + 12} min`,
-      focus:'📍 Outdoor — Easy aerobic. Core work for running posture. Remember: easy means EASY.' },
+      focus:'📍 Outdoor — FASTED OPTIONAL. Easy aerobic + core. HR under 145. Cadence: 170-180 spm.' },
 
     // Tuesday — Upper Strength + SkiErg/Row Intervals (South)
     { day:'Tuesday', type:'strength', title:'Upper Strength + Cardio Intervals', icon:'💪', zone:0,
@@ -736,7 +740,7 @@ function getBuildWeek(weekNum, deload) {
         {name:'Strides',detail:'6 × 20 sec fast / walk back',zone:4},
         {name:'Cooldown',detail:'5 min easy',zone:1}],
       duration:`${easyMin + 10} min`,
-      focus:'📍 Outdoor — Easy + strides.' },
+      focus:'📍 Outdoor — FASTED OPTIONAL. Easy + strides. Cadence: 170-180 spm.' },
 
     // Thursday — VO2 Max Intervals + Posterior Chain (South)
     { day:'Thursday', type:'intervals', title: deload ? 'Easy Run + Light Posterior' : 'VO2 Max Intervals + Posterior Chain', icon:'⚡', zone: deload ? 2 : 5,
@@ -752,9 +756,11 @@ function getBuildWeek(weekNum, deload) {
         {name:'Romanian Deadlift',detail:'4 × 8 — keep building those hamstrings',zone:0},
         {name:'Hip Thrusts',detail:'3 × 12 heavy — glute power = sled push power',zone:0},
         {name:'Bulgarian Split Squat',detail:'3 × 10 each — single leg running stability',zone:0},
-        {name:'Nordic Hamstring Curls',detail:'3 × 6 — injury prevention',zone:0}],
-      duration: deload ? '50 min' : '80 min',
-      focus: deload ? '📍 South Gym — Deload. Light everything.' : '📍 South Gym — THE HARDEST DAY. Norwegian 4×4 builds your VO2 max (51→55+). Then posterior chain. Eat big today — 3500 cal minimum.' },
+        {name:'Nordic Hamstring Curls',detail:'3 × 6 — injury prevention',zone:0},
+        {name:'Single-Leg Hops',detail:'3 × 8 each leg — reactive stiffness for running economy',zone:0},
+        {name:'Broad Jumps',detail:'3 × 4 — horizontal power',zone:0}],
+      duration: deload ? '50 min' : '85 min',
+      focus: deload ? '📍 South Gym — Deload. Light everything.' : '📍 South Gym — THE HARDEST DAY. Norwegian 4×4 builds your VO2 max (51→55+). Then posterior chain + plyos. Eat big today — 3500 cal minimum.' },
 
     // Friday — Compromised Running (Round Rock)
     { day:'Friday', type:'hyrox', title: deload ? 'Easy Station Touch' : 'Compromised Running', icon:'😤', zone: deload ? 2 : 4,
@@ -805,7 +811,7 @@ function getRaceWeek(weekNum, deload) {
       exercises:[
         {name:'Easy Run',detail:`${Math.round(45 * v)} min @ 6:15-6:45/km`,zone:2}],
       duration:`${Math.round(45 * v)} min`,
-      focus:'📍 Outdoor — Recovery from weekend. Easy.' },
+      focus:'📍 Outdoor — FASTED OPTIONAL. Recovery from weekend. HR under 145. Cadence: 170-180 spm.' },
 
     // Tuesday — Upper Strength + Race-Effort Stations (South)
     { day:'Tuesday', type:'strength', title:'Upper Strength + Station Intervals', icon:'💪', zone:0,
@@ -859,8 +865,9 @@ function getRaceWeek(weekNum, deload) {
         {name:'Cool Down',detail:'10 min easy',zone:1},
         {name:'Romanian Deadlift',detail:'3 × 8 — maintain posterior strength',zone:0},
         {name:'Hip Thrusts',detail:'3 × 12',zone:0},
-        {name:'Nordic Hamstring Curls',detail:'3 × 6',zone:0}],
-      duration: deload ? '45 min' : '75 min',
+        {name:'Nordic Hamstring Curls',detail:'3 × 6',zone:0},
+        {name:'Single-Leg Hops',detail:'3 × 8 each — maintain reactive stiffness',zone:0}],
+      duration: deload ? '45 min' : '80 min',
       focus: deload ? '📍 South Gym — Deload.' : '📍 South Gym — Dial in race pace. Should feel controlled, not all-out. Then posterior chain maintenance.' },
 
     // Friday — Compromised Running (Round Rock)
@@ -1826,6 +1833,8 @@ function renderToday(overrideDate) {
             coolDown.push({name:'Foam Roll',detail:'Quads, glutes, upper back — 60 sec each',zone:0,isCoolDown:true});
             coolDown.push({name:'Stretch: Hip Flexor',detail:'Half-kneeling lunge stretch — 60 sec each side',zone:0,isCoolDown:true});
           }
+          // Post-training breathing on every session
+          coolDown.push({name:'Breathing',detail:'5 min — 4-count inhale, 6-count exhale. Parasympathetic recovery shift.',zone:0,isCoolDown:true});
         }
         const allExercises = [...warmUp, ...workout.exercises, ...coolDown];
         return allExercises.map((ex, i) => {
