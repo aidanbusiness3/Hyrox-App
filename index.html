@@ -542,6 +542,8 @@ function getSpeedFoundationWeek(weekNum, deload) {
   // PHASE 1: SPEED FOUNDATION (Weeks 1-10)
   // Hard intervals from week 1. Compromised running every week.
   // Athletic strength, not bodybuilding.
+  // LA MODE: Weeks 2-7 (May 4 - June 14) — running-focused, Round Rock removed
+  const isLA = weekNum >= 2 && weekNum <= 7;
   const v = deload ? 0.7 : 1.0;
   const easyMin = Math.round((40 + Math.min(weekNum * 1.5, 12)) * v);
   const longMin = Math.round((60 + weekNum * 1.5) * v);
@@ -553,10 +555,19 @@ function getSpeedFoundationWeek(weekNum, deload) {
         {name:'Easy Run',detail:`${easyMin} min @ 6:15-6:45/km — HR under 145bpm`,zone:2}
       ],
       duration:`${easyMin} min`,
-      focus:'📍 Outdoor — FASTED OPTIONAL. This is the 80%. Truly easy. Cadence 170-180 spm.' },
+      focus: isLA ? '📍 Irvine — FASTED OPTIONAL. Mason Park or local greenbelt path. Truly easy. Cadence 170-180 spm.' : '📍 Outdoor — FASTED OPTIONAL. This is the 80%. Truly easy. Cadence 170-180 spm.' },
 
     { day:'Tuesday', type:'strength', title:'Movement & Power', icon:'⚡', zone:0,
-      exercises:[
+      exercises: isLA ? [
+        {name:'Athletic Warm-Up',detail:'A-skips, B-skips, carioca, lateral bounds — 8 min',zone:0},
+        {name:'Bulgarian Split Squat',detail:'3 × 10 each — DBs or bodyweight',zone:0},
+        {name:'Single-Leg Glute Bridge',detail:'3 × 12 each leg',zone:0},
+        {name:'Box Jumps or Step-Ups',detail:'4 × 5 — bench/box',zone:0},
+        {name:'Broad Jumps',detail:'4 × 4',zone:0},
+        {name:'Push-Ups',detail:'3 × max',zone:0},
+        {name:'Pull-Ups',detail:'3 × max — find a bar',zone:0},
+        {name:'Plank',detail:'3 × 45 sec',zone:0}
+      ] : [
         {name:'Athletic Warm-Up',detail:'A-skips, B-skips, carioca, lateral bounds — 8 min',zone:0},
         {name:'Box Jumps',detail:'4 × 5 — explosive up, soft landing',zone:0},
         {name:'Broad Jumps',detail:'4 × 4 — max horizontal distance',zone:0},
@@ -566,8 +577,8 @@ function getSpeedFoundationWeek(weekNum, deload) {
         {name:'Pull-Ups',detail:'3 × max',zone:0},
         {name:'Farmers Carry',detail:'3 × 40m heavy — Hyrox station + core',zone:0}
       ],
-      duration:'55 min',
-      focus:'📍 South Gym — Athletic power day. Plyos = explosive force. Carries = core + grip. Light upper maintenance only.' },
+      duration: isLA ? '40 min' : '55 min',
+      focus: isLA ? '📍 Hotel gym OR bodyweight — Whatever you can access. If you have a local gym membership, lift heavier. If not, bodyweight version above.' : '📍 South Gym — Athletic power day. Plyos = explosive force. Carries = core + grip. Light upper maintenance only.' },
 
     { day:'Wednesday', type:'intervals', title: deload ? 'Easy Run' : 'VO2 Max Intervals', icon:'🔥', zone: deload ? 2 : 5,
       exercises: deload ? [
@@ -581,7 +592,14 @@ function getSpeedFoundationWeek(weekNum, deload) {
       focus: deload ? 'Deload week. Easy only.' : '📍 Outdoor — VO2 max ceiling raiser. You should NOT be able to talk during work intervals.' },
 
     { day:'Thursday', type:'strength', title:'Easy Run + Posterior Chain', icon:'💪', zone:2,
-      exercises:[
+      exercises: isLA ? [
+        {name:'Easy Run',detail:`${Math.round(35 * v)} min @ Z2`,zone:2},
+        {name:'Romanian Deadlift',detail:'4 × 8 — DBs if available, single-leg if not',zone:0},
+        {name:'Hip Thrust',detail:'3 × 12 — bench or floor with weight',zone:0},
+        {name:'Bulgarian Split Squat',detail:'3 × 10 each leg',zone:0},
+        {name:'Nordic Hamstring Negatives',detail:'3 × 6 — find a partner or hook feet',zone:0},
+        {name:'Single-Leg Hops',detail:'3 × 8 each',zone:0}
+      ] : [
         {name:'Easy Run',detail:`${Math.round(35 * v)} min @ Z2`,zone:2},
         {name:'Romanian Deadlift',detail:'4 × 8 heavy — hamstring development',zone:0},
         {name:'Hip Thrust',detail:'3 × 12 heavy — glute power = sled push power',zone:0},
@@ -590,11 +608,17 @@ function getSpeedFoundationWeek(weekNum, deload) {
         {name:'Single-Leg Hops',detail:'3 × 8 each — reactive stiffness for running',zone:0},
         {name:'Broad Jumps',detail:'3 × 4 — horizontal power',zone:0}
       ],
-      duration:'80 min',
-      focus:'📍 South Gym — Hamstrings + glutes are your weak link. Build them. Plyos turn strength into running speed.' },
+      duration: isLA ? '70 min' : '80 min',
+      focus: isLA ? '📍 Hotel gym / UGP / local gym — Build posterior chain with whatever you have. Single-leg work is non-negotiable.' : '📍 South Gym — Hamstrings + glutes are your weak link. Build them. Plyos turn strength into running speed.' },
 
-    { day:'Friday', type:'hyrox', title: deload ? 'Light Station Practice' : 'Compromised Running', icon:'😤', zone: deload ? 2 : 4,
-      exercises: deload ? [
+    { day:'Friday', type: isLA ? 'intervals' : 'hyrox', title: deload ? (isLA ? 'Easy Run' : 'Light Station Practice') : (isLA ? 'Race Pace 1km Repeats' : 'Compromised Running'), icon: isLA ? '🎯' : '😤', zone: deload ? 2 : 4,
+      exercises: isLA && !deload ? [
+        {name:'Warm Up',detail:'15 min progressive jog',zone:2},
+        {name:'Race Pace Repeats',detail:'6 × 1km @ 4:00-4:10/km / 60 sec standing rest',zone:4},
+        {name:'Cool Down',detail:'10 min easy',zone:1}
+      ] : isLA && deload ? [
+        {name:'Easy Run',detail:'30 min @ Z2',zone:2}
+      ] : deload ? [
         {name:'Easy Run',detail:'20 min @ Z2',zone:2},
         {name:'Sled Push',detail:'2 × 50m easy',zone:0},
         {name:'Wall Balls',detail:'50 reps',zone:0}
@@ -607,8 +631,8 @@ function getSpeedFoundationWeek(weekNum, deload) {
         {name:'Wall Balls',detail:'75 reps — sets of 25',zone:0},
         {name:'1km Run',detail:'@ 4:15-4:25/km — final',zone:4}
       ],
-      duration: deload ? '40 min' : '70 min',
-      focus: deload ? 'Light station touch.' : '📍 Round Rock — THE KEY SESSION. Run pace after stations IS Hyrox. Track every split. Goal: <20 sec variance.' },
+      duration: isLA && !deload ? '60 min' : (isLA && deload ? '30 min' : (deload ? '40 min' : '70 min')),
+      focus: isLA && !deload ? '📍 Outdoor (Mason Park, William Mason Loop) — REPLACES compromised running while in LA. Dial in race pace. Should feel controlled.' : isLA && deload ? '📍 Outdoor — Easy. Deload.' : deload ? 'Light station touch.' : '📍 Round Rock — THE KEY SESSION. Run pace after stations IS Hyrox. Track every split. Goal: <20 sec variance.' },
 
     { day:'Saturday', type:'long', title:'Long Run + Surges', icon:'🛣️', zone:2,
       exercises: deload ? [
