@@ -19,7 +19,7 @@ html{height:100%;overflow:hidden;-webkit-text-size-adjust:100%}
 button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
 input,textarea{font-family:inherit;color:inherit}
 :root{
-  --bg:#F5EFE6;--bg2:#EBE4D7;--bg3:#DFD6C4;
+  --bg:#F5EFE6;--bg2:#EBE4D7;--bg3:#DFD6C4;--surface:#FFFFFF;
   --text:#1E1A16;--text2:rgba(30,26,22,.6);--text3:rgba(30,26,22,.38);
   --accent:#E8552E;--accent-dim:rgba(232,85,46,.1);
   --border:rgba(30,26,22,.08);
@@ -83,6 +83,38 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .modal{background:var(--bg);width:100%;border-radius:20px 20px 0 0;padding:24px 20px;padding-bottom:calc(20px + var(--safe-b));max-height:80vh;overflow-y:auto}
 .modal-day{display:flex;justify-content:space-between;align-items:center;padding:14px 12px;border-radius:10px;cursor:pointer;transition:background .15s}
 .modal-day:active{background:var(--bg3)}
+
+/* === MACRO/MEAL TRACKING === */
+.pill-muted{background:var(--bg3);color:var(--text2)}
+.prog-fill.over{background:var(--red)}
+.prog-fill.good{background:var(--green)}
+.kcal-big{display:flex;align-items:baseline;gap:8px}
+.macro-row{display:grid;grid-template-columns:62px 1fr 86px;gap:10px;align-items:center;padding:6px 0}
+.macro-row .macro-label{font-size:12px;font-weight:700;color:var(--text2)}
+.macro-row .macro-nums{font-size:12px;font-weight:700;color:var(--text2);text-align:right;font-variant-numeric:tabular-nums}
+.meal-row{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:center;cursor:pointer}
+.meal-row:active{opacity:.7}
+.meal-row:last-child{border-bottom:none}
+.meal-thumb{width:48px;height:48px;border-radius:8px;background:var(--bg3);object-fit:cover;flex-shrink:0}
+.meal-info{flex:1;min-width:0}
+.meal-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meal-macros{font-size:11px;color:var(--text2);margin-top:2px;font-variant-numeric:tabular-nums}
+.meal-del{padding:6px 10px;border-radius:6px;background:transparent;color:var(--text3);font-size:11px;font-weight:700;flex-shrink:0;border:none;cursor:pointer}
+.meal-del:active{background:var(--bg2)}
+.capture-preview{width:100%;max-height:240px;border-radius:12px;object-fit:cover;background:var(--bg3);display:block}
+.spinner{width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.field{margin-bottom:14px}
+.field-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block}
+.input-text{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:15px;font-weight:600;width:100%;outline:none;text-align:left;font-variant-numeric:tabular-nums}
+.input-text:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-dim)}
+.macro-grid-input{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.radio-row{display:flex;gap:6px;background:var(--bg2);border-radius:10px;padding:3px}
+.radio-row button{flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:700;color:var(--text2);background:transparent;border:none;cursor:pointer}
+.radio-row button.sel{background:var(--accent);color:#FFF}
+.btn-ghost{background:var(--bg2);color:var(--text);padding:14px 24px;border-radius:12px;font-size:15px;font-weight:700;width:100%}
+.btn-ghost:active{opacity:.8}
+.card-bg{background:var(--bg2);border-radius:14px}
     </style>
 </head>
 <body>
@@ -1116,7 +1148,10 @@ const Storage = {
     return {
       completedWorkouts: {},  // { '2025-04-07': { completed: true, exercises: [...], rpe: 7, notes: '' } }
       vo2maxUpdates: [],      // Additional VO2 max entries user adds
-      weightUpdates: [],      // Weight tracking
+      weightUpdates: [],      // Weight tracking (legacy)
+      meals: [],              // [{ id, dateStr, loggedAt, name, calories, protein, carbs, fat, thumbnail, source, confidence }]
+      weights: [],            // [{ id, dateStr, loggedAt, lbs }]
+      fuelGoals: null,        // { calories, protein, carbs, fat, bodyweight, goalType, pace, goalLbs }
       lastView: 'dashboard',
       preferences: {
         notifications: true
@@ -1323,6 +1358,113 @@ const Storage = {
       }
     }
     return stats.sort((a, b) => a.date.localeCompare(b.date));
+  },
+
+  // --- meals ---
+  addMeal(meal) {
+    const data = this._load();
+    if (!data.meals) data.meals = [];
+    const m = {
+      id: 'meal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      loggedAt: new Date().toISOString(),
+      dateStr: localDateStr(new Date()),
+      ...meal
+    };
+    data.meals.unshift(m);
+    this._save();
+    return m;
+  },
+
+  updateMeal(id, patch) {
+    const data = this._load();
+    if (!data.meals) data.meals = [];
+    const m = data.meals.find(x => x.id === id);
+    if (m) Object.assign(m, patch);
+    this._save();
+  },
+
+  deleteMeal(id) {
+    const data = this._load();
+    if (!data.meals) data.meals = [];
+    data.meals = data.meals.filter(x => x.id !== id);
+    this._save();
+  },
+
+  getMealsForDate(dateStr) {
+    const data = this._load();
+    return (data.meals || []).filter(m => m.dateStr === dateStr);
+  },
+
+  getDailyTotals(dateStr) {
+    return this.getMealsForDate(dateStr).reduce((acc, m) => ({
+      calories: acc.calories + (Number(m.calories) || 0),
+      protein: acc.protein + (Number(m.protein) || 0),
+      carbs: acc.carbs + (Number(m.carbs) || 0),
+      fat: acc.fat + (Number(m.fat) || 0)
+    }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
+  },
+
+  // --- fuel goals ---
+  getFuelGoals() {
+    return this._load().fuelGoals || null;
+  },
+
+  setFuelGoals(goals) {
+    const data = this._load();
+    data.fuelGoals = { ...goals };
+    this._save();
+  },
+
+  // --- bodyweight tracking ---
+  addWeight(lbs, dateStr) {
+    const data = this._load();
+    if (!data.weights) data.weights = [];
+    const ds = dateStr || localDateStr(new Date());
+    data.weights = data.weights.filter(w => w.dateStr !== ds); // dedupe per day
+    data.weights.push({
+      id: 'w_' + Date.now(),
+      dateStr: ds,
+      loggedAt: new Date().toISOString(),
+      lbs: Number(lbs) || 0
+    });
+    data.weights.sort((a, b) => a.dateStr.localeCompare(b.dateStr));
+    this._save();
+  },
+
+  deleteWeight(id) {
+    const data = this._load();
+    if (!data.weights) data.weights = [];
+    data.weights = data.weights.filter(w => w.id !== id);
+    this._save();
+  },
+
+  getWeights() {
+    return this._load().weights || [];
+  },
+
+  getLatestWeight() {
+    const ws = this.getWeights();
+    return ws.length ? ws[ws.length - 1] : null;
+  },
+
+  getWeightTrend(daysAgo) {
+    const ws = this.getWeights();
+    if (ws.length < 2) return null;
+    const latest = ws[ws.length - 1];
+    const cutoffStr = localDateStr(new Date(Date.now() - daysAgo * 86400000));
+    let from = null;
+    for (const w of ws) {
+      if (w.dateStr <= cutoffStr) from = w;
+      else break;
+    }
+    if (!from) from = ws[0];
+    if (from.id === latest.id) return null;
+    return {
+      delta: +(latest.lbs - from.lbs).toFixed(1),
+      days: Math.max(1, Math.round((new Date(latest.dateStr) - new Date(from.dateStr)) / 86400000)),
+      fromLbs: from.lbs,
+      fromDate: from.dateStr
+    };
   }
 };
 
@@ -1475,6 +1617,81 @@ const Fmt = {
     return n + (s[(v - 20) % 10] || s[v] || s[0]);
   }
 };
+
+// =============================================
+// HELPERS (meal/weight tracking)
+// =============================================
+
+function localDateStr(d) {
+  const dt = (d instanceof Date) ? d : new Date(d);
+  const y = dt.getFullYear();
+  const m = String(dt.getMonth() + 1).padStart(2, '0');
+  const day = String(dt.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function todayStr() {
+  return localDateStr(new Date());
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function fmtDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+}
+
+async function fileToCompressedDataUrl(file, maxDim, quality = 0.85) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = () => reject(new Error('Could not load image'));
+      i.src = url;
+    });
+    let w = img.width, h = img.height;
+    if (w > h && w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; }
+    else if (h >= w && h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; }
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    return canvas.toDataURL('image/jpeg', quality);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+function dataUrlToBase64(dataUrl) {
+  return dataUrl.replace(/^data:image\/\w+;base64,/, '');
+}
+
+// Suggested calorie/macro targets from bodyweight + goal type + pace (lbs/week)
+function suggestGoals(bodyweightLb, goalType, paceLbWeek) {
+  const maintenance = Math.round(bodyweightLb * 15);
+  let pace = paceLbWeek;
+  if (pace == null) pace = goalType === 'gain' ? 0.5 : (goalType === 'cut' ? -0.75 : 0);
+  const calories = Math.round(maintenance + (pace * 3500 / 7));
+  const protein = Math.round(bodyweightLb * (goalType === 'cut' ? 1.1 : 1.0));
+  const fat = Math.max(40, Math.round(calories * 0.25 / 9));
+  const carbs = Math.max(0, Math.round((calories - protein * 4 - fat * 9) / 4));
+  return { calories, protein, carbs, fat, maintenance, pace };
+}
+
+function openOverlay(html) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = html;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.remove();
+  });
+  return overlay;
+}
 
 // =============================================
 // SIMPLE CHARTS (Canvas-based, no dependencies)
@@ -2089,171 +2306,527 @@ function initRaceCharts() {
 }
 
 // =============================================
-// FUEL VIEW
+// FUEL VIEW — Daily macro tracking with photo logging
 // =============================================
-let fuelTab = 'macros';
 
 function renderFuel() {
+  const goals = Storage.getFuelGoals();
+
+  if (!goals) {
+    return `<div class="view">
+      <div class="t-xs t-faint fw-7 mb-4" style="letter-spacing:1.5px">FUEL</div>
+      <div class="t-2xl fw-9 mb-12">Set Daily Goals</div>
+      <div class="t-sm t-muted mb-20">Pick a target weight and pace, and we'll suggest your daily calories and macros. Everything is editable.</div>
+      <button class="btn btn-accent" onclick="openGoalsModal()">Set Daily Goals</button>
+      <div class="spacer"></div>
+      <button class="btn btn-ghost" onclick="openFuelReference()">View Nutrition Reference</button>
+    </div>`;
+  }
+
+  const date = todayStr();
+  const totals = Storage.getDailyTotals(date);
+  const meals = Storage.getMealsForDate(date);
+  const latestW = Storage.getLatestWeight();
+  const trend7 = Storage.getWeightTrend(7);
+  const trend30 = Storage.getWeightTrend(30);
+
+  const kcalPct = goals.calories ? Math.round(totals.calories / goals.calories * 100) : 0;
+  const kcalCls = kcalPct > 110 ? 'over' : (kcalPct >= 90 ? 'good' : '');
+
   return `<div class="view">
-    <div class="t-xl fw-9 mb-4">Fuel</div>
-    <div class="t-sm t-muted mb-20">Eat for performance, not aesthetics.</div>
-
-    <div class="tabs">
-      <button class="tab ${fuelTab==='macros'?'active':''}" onclick="App.setFuelTab('macros')">Macros</button>
-      <button class="tab ${fuelTab==='meals'?'active':''}" onclick="App.setFuelTab('meals')">Meals</button>
-      <button class="tab ${fuelTab==='grocery'?'active':''}" onclick="App.setFuelTab('grocery')">Grocery</button>
-      <button class="tab ${fuelTab==='raceday'?'active':''}" onclick="App.setFuelTab('raceday')">Race Day</button>
-    </div>
-
-    ${fuelTab === 'macros' ? `
-    <div class="label">Training Days</div>
-    <div class="card mb-20" style="padding:14px 16px">
-      <div style="text-align:center;margin-bottom:16px">
-        <div class="t-2xl fw-9 t-accent">3,200 - 3,500</div>
-        <div class="t-xs t-faint mt-4">CALORIES PER DAY</div>
+    <div class="row-between mb-4">
+      <div>
+        <div class="t-xs t-faint fw-7" style="letter-spacing:1.5px">FUEL</div>
+        <div class="t-2xl fw-9 mt-4">Today</div>
       </div>
-      <div class="metric"><span class="t-sm t-muted">Protein</span><span class="t-sm fw-7">150g <span class="t-faint">(1.8 g/kg)</span></span></div>
-      <div class="metric"><span class="t-sm t-muted">Carbs</span><span class="t-sm fw-7 t-accent">450 - 550g <span class="t-faint">(5-7 g/kg)</span></span></div>
-      <div class="metric"><span class="t-sm t-muted">Fat</span><span class="t-sm fw-7">80 - 100g</span></div>
-    </div>
-
-    <div class="label">Rest Days</div>
-    <div class="card mb-20" style="padding:14px 16px">
-      <div style="text-align:center;margin-bottom:16px">
-        <div class="t-2xl fw-9">2,600 - 2,800</div>
-        <div class="t-xs t-faint mt-4">CALORIES PER DAY</div>
+      <div style="display:flex;gap:6px">
+        <button class="pill pill-muted" onclick="openFuelReference()" style="padding:6px 10px;font-size:11px;cursor:pointer">Info</button>
+        <button class="pill pill-muted" onclick="openGoalsModal()" style="padding:6px 10px;font-size:11px;cursor:pointer">Goals</button>
       </div>
-      <div class="metric"><span class="t-sm t-muted">Protein</span><span class="t-sm fw-7">140g</span></div>
-      <div class="metric"><span class="t-sm t-muted">Carbs</span><span class="t-sm fw-7">200 - 250g</span></div>
-      <div class="metric"><span class="t-sm t-muted">Fat</span><span class="t-sm fw-7">100 - 115g</span></div>
+    </div>
+    <div class="t-sm t-muted mb-20">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</div>
+
+    <div class="card mb-12" style="padding:14px 16px">
+      <div class="kcal-big">
+        <div class="t-2xl fw-9 tabular">${totals.calories}</div>
+        <div class="t-md t-muted tabular">/ ${goals.calories} kcal</div>
+        <div class="t-sm t-faint tabular" style="margin-left:auto">${Math.max(0, goals.calories - totals.calories)} left</div>
+      </div>
+      <div class="prog mt-8"><div class="prog-fill ${kcalCls}" style="width:${Math.min(100, kcalPct)}%"></div></div>
+      <div class="mt-16">
+        ${macroRowHtml('Protein', totals.protein, goals.protein)}
+        ${macroRowHtml('Carbs', totals.carbs, goals.carbs)}
+        ${macroRowHtml('Fat', totals.fat, goals.fat)}
+      </div>
     </div>
 
-    <div class="label">Hydration (Austin Heat)</div>
     <div class="card mb-20" style="padding:14px 16px">
-      <div class="metric"><span class="t-sm t-muted">Daily Water</span><span class="t-sm fw-7">3.5 - 4+ liters</span></div>
-      <div class="metric"><span class="t-sm t-muted">Sodium/hr (training)</span><span class="t-sm fw-7">500 - 1000mg</span></div>
-      <div class="metric"><span class="t-sm t-muted">Use</span><span class="t-sm fw-7">Electrolytes every run</span></div>
+      <div class="row-between">
+        <div>
+          <div class="label" style="margin-bottom:4px">Weight</div>
+          <div class="row" style="gap:8px;align-items:baseline">
+            <div class="t-xl fw-9 tabular">${latestW ? latestW.lbs : '—'}</div>
+            <div class="t-sm t-muted">${latestW ? 'lbs' : 'no entries'}</div>
+          </div>
+          ${trend7 ? `<div class="t-xs t-muted mt-4 tabular">${formatTrend(trend7)} · 7d</div>` : ''}
+          ${trend30 ? `<div class="t-xs t-faint mt-4 tabular">${formatTrend(trend30)} · 30d</div>` : ''}
+          ${goals.goalLbs ? `<div class="t-xs t-faint mt-4 tabular">Goal: ${goals.goalLbs} lbs${latestW ? ` · ${(goals.goalLbs - latestW.lbs).toFixed(1)} to go` : ''}</div>` : ''}
+        </div>
+        <button class="pill pill-accent" onclick="openWeightModal()" style="padding:8px 14px;font-size:12px;cursor:pointer">+ Log Weight</button>
+      </div>
     </div>
 
-    <div class="label">Supplements</div>
-    <div class="card" style="padding:14px 16px">
-      <div class="metric"><span class="t-sm t-muted">Creatine</span><span class="t-sm fw-7">5g daily</span></div>
-      <div class="metric"><span class="t-sm t-muted">Vitamin D</span><span class="t-sm fw-7">2,000-5,000 IU daily</span></div>
-      <div class="metric"><span class="t-sm t-muted">Magnesium</span><span class="t-sm fw-7">300-400mg glycinate (bedtime)</span></div>
-      <div class="metric"><span class="t-sm t-muted">Omega-3</span><span class="t-sm fw-7">2-3g EPA/DHA daily</span></div>
-      <div class="metric"><span class="t-sm t-muted">Caffeine (race day)</span><span class="t-sm fw-7">200-400mg</span></div>
-      <div class="metric"><span class="t-sm t-muted">Electrolytes</span><span class="t-sm fw-7">Every run in heat</span></div>
-    </div>
-    ` : ''}
+    <button class="btn btn-accent mb-8" onclick="document.getElementById('mealFileInput').click()">📷  Log Meal with Photo</button>
+    <button class="btn btn-ghost mb-20" onclick="openMealConfirm(null, null)">Add Manually</button>
+    <input type="file" accept="image/*" capture="environment" style="display:none" id="mealFileInput" onchange="handleMealFileChange(event)">
 
-    ${fuelTab === 'meals' ? `
-    <div class="label">Pre-Run (60-90 min before)</div>
-    <div class="card mb-16" style="padding:14px 16px">
-      <div class="ex-row" style="border:none;padding:10px 0"><div class="t-sm fw-6">Oatmeal + Banana + Honey</div><div class="t-xs t-muted mt-4">The gold standard pre-run meal. Easy to digest, slow-release energy.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Toast + PB + Banana</div><div class="t-xs t-muted mt-4">Quick, balanced. Good for early morning runs.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Rice Cakes + Honey + Pinch of Salt</div><div class="t-xs t-muted mt-4">Light option when you don't want a full meal.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">White Rice + Eggs + Soy Sauce</div><div class="t-xs t-muted mt-4">Savory option. Great before long runs.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Overnight Oats + Berries + Protein Powder</div><div class="t-xs t-muted mt-4">Make the night before. Grab and eat.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Bagel + Cream Cheese + Honey</div><div class="t-xs t-muted mt-4">Dense carbs, easy on the stomach.</div></div>
-      <div class="ex-row" style="padding:10px 0;border:none"><div class="t-sm fw-6">Dates + Banana (30 min before)</div><div class="t-xs t-muted mt-4">Quick top-up. 4-5 dates = fast energy.</div></div>
-    </div>
-
-    <div class="label">Post-Run (within 30 min)</div>
-    <div class="card mb-16" style="padding:14px 16px">
-      <div class="ex-row" style="border:none;padding:10px 0"><div class="t-sm fw-6">Smoothie: Greek Yogurt + Banana + Berries + Protein</div><div class="t-xs t-muted mt-4">Best option. Liquid absorbs fast. Add honey for extra carbs.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Chocolate Milk (16 oz)</div><div class="t-xs t-muted mt-4">Legit recovery drink — perfect carb-to-protein ratio.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Protein Shake + Banana + PB</div><div class="t-xs t-muted mt-4">Quick blender shake. Add oats for more carbs.</div></div>
-      <div class="ex-row" style="padding:10px 0;border:none"><div class="t-sm fw-6">Greek Yogurt + Granola + Honey + Berries</div><div class="t-xs t-muted mt-4">No blender needed. Grab and go.</div></div>
-    </div>
-
-    <div class="label">Breakfast Ideas</div>
-    <div class="card mb-16" style="padding:14px 16px">
-      <div class="ex-row" style="border:none;padding:10px 0"><div class="t-sm fw-6">4 Eggs Scrambled + Toast + OJ</div><div class="t-xs t-muted mt-4">Classic. ~650 cal.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Egg + Cheese Breakfast Burrito</div><div class="t-xs t-muted mt-4">Flour tortilla, scrambled eggs, cheese, salsa. ~550 cal.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Protein Pancakes</div><div class="t-xs t-muted mt-4">Mix: 1 banana + 2 eggs + scoop protein + oats. Top with honey.</div></div>
-      <div class="ex-row" style="padding:10px 0;border:none"><div class="t-sm fw-6">Açai Bowl</div><div class="t-xs t-muted mt-4">Frozen açai + banana + berries blended. Top with granola + honey.</div></div>
-    </div>
-
-    <div class="label">Lunch / Dinner Ideas</div>
-    <div class="card mb-16" style="padding:14px 16px">
-      <div class="ex-row" style="border:none;padding:10px 0"><div class="t-sm fw-6">Burrito Bowl</div><div class="t-xs t-muted mt-4">Rice + black beans + chicken + salsa + avocado + cheese. ~900 cal.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Stir Fry</div><div class="t-xs t-muted mt-4">Rice + steak or chicken + mixed veggies + soy sauce + sesame oil. ~800 cal.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Pasta + Meat Sauce + Side Salad</div><div class="t-xs t-muted mt-4">Pasta + ground beef or turkey + marinara + bread. ~850 cal.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Salmon + Sweet Potato + Veggies</div><div class="t-xs t-muted mt-4">Baked salmon, roasted sweet potato, broccoli with olive oil. ~750 cal.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Chicken Thighs + Rice + Roasted Veggies</div><div class="t-xs t-muted mt-4">The staple. Meal prep this on Sunday. ~800 cal.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Turkey Sandwich + Chips + Fruit</div><div class="t-xs t-muted mt-4">Sub roll or thick bread, turkey, avocado, cheese. ~750 cal.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Quesadilla + Chicken + Guac</div><div class="t-xs t-muted mt-4">Flour tortilla, cheese, chicken, guac on the side. ~700 cal.</div></div>
-      <div class="ex-row" style="padding:10px 0;border:none"><div class="t-sm fw-6">Ground Beef Tacos</div><div class="t-xs t-muted mt-4">Corn or flour tortillas + seasoned beef + toppings + rice. ~800 cal.</div></div>
-    </div>
-
-    <div class="label">Snacks</div>
-    <div class="card" style="padding:14px 16px">
-      <div class="ex-row" style="border:none;padding:10px 0"><div class="t-sm fw-6">Trail Mix</div><div class="t-xs t-muted mt-4">Nuts + dried fruit + dark chocolate. Handful = ~300 cal.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Apple + Almond Butter</div><div class="t-xs t-muted mt-4">~250 cal. Good pre-lift snack.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Rice Cakes + PB + Honey</div><div class="t-xs t-muted mt-4">Quick carbs + fat. ~350 cal.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">String Cheese + Banana</div><div class="t-xs t-muted mt-4">Easy grab-and-go. ~200 cal.</div></div>
-      <div class="ex-row" style="padding:10px 0"><div class="t-sm fw-6">Cottage Cheese + Berries + Honey</div><div class="t-xs t-muted mt-4">High protein snack. ~250 cal.</div></div>
-      <div class="ex-row" style="padding:10px 0;border:none"><div class="t-sm fw-6">Cereal + Milk</div><div class="t-xs t-muted mt-4">Underrated. Quick carbs + protein. ~350 cal.</div></div>
-    </div>
-    ` : ''}
-
-    ${fuelTab === 'grocery' ? `
-    <div class="label">Weekly Grocery List</div>
-    <div class="t-xs t-muted mb-16">Sunday meal prep: cook rice, grill protein, roast veggies. ~90 min.</div>
-
-    <div class="label" style="color:var(--accent)">Carbs (the engine fuel)</div>
-    <div class="card mb-16" style="padding:14px 16px">
-      <div class="t-sm" style="line-height:2">White rice (5 lb bag)<br>Oats (large canister)<br>Pasta (2-3 boxes)<br>Bread (sourdough or whole wheat)<br>Bananas (bunch of 6-8)<br>Sweet potatoes (4-5)<br>Rice cakes<br>Honey<br>Tortillas</div>
-    </div>
-
-    <div class="label" style="color:var(--accent)">Protein</div>
-    <div class="card mb-16" style="padding:14px 16px">
-      <div class="t-sm" style="line-height:2">Chicken thighs (3-4 lbs)<br>Ground beef 85/15 (1-2 lbs)<br>Eggs (18 ct)<br>Greek yogurt (large tub)<br>Whey protein powder<br>Salmon or fish (2 fillets/week)</div>
-    </div>
-
-    <div class="label" style="color:var(--accent)">Fats + Extras</div>
-    <div class="card mb-16" style="padding:14px 16px">
-      <div class="t-sm" style="line-height:2">Peanut butter or almond butter<br>Avocados (3-4)<br>Olive oil<br>Cheese (shredded + string)<br>Trail mix<br>Frozen berries<br>Mixed vegetables (fresh or frozen)<br>Salsa + hot sauce<br>Soy sauce<br>Marinara sauce<br>Coffee</div>
-    </div>
-
-    <div class="label" style="color:var(--accent)">Hydration + Supplements</div>
-    <div class="card" style="padding:14px 16px">
-      <div class="t-sm" style="line-height:2">Electrolytes<br>Creatine monohydrate<br>Magnesium glycinate<br>Vitamin D<br>Fish oil (omega-3)<br>Orange juice</div>
-    </div>
-    ` : ''}
-
-    ${fuelTab === 'raceday' ? `
-    <div class="label">Race Day Protocol — Dallas</div>
-
-    <div class="label" style="margin-top:20px">3 Days Before</div>
-    <div class="card mb-16" style="padding:14px 16px">
-      <div class="t-sm" style="line-height:1.8">Carb load: 8-10 g/kg (650-820g carbs/day)<br>Switch to white rice, pasta, bread — low fiber<br>Reduce training volume (already tapering)<br>Hydrate well, add extra electrolytes</div>
-    </div>
-
-    <div class="label">Night Before</div>
-    <div class="card mb-16" style="padding:14px 16px">
-      <div class="t-sm" style="line-height:1.8">Large pasta or rice dinner — nothing new<br>No alcohol<br>Bed by 9pm<br>Lay out all gear tonight</div>
-    </div>
-
-    <div class="label">Race Morning</div>
-    <div class="card mb-16" style="padding:14px 16px">
-      <div class="metric"><span class="t-sm t-muted">3-4 hrs before</span><span class="t-sm fw-6">Oatmeal + banana + honey + coffee (600-800 cal)</span></div>
-      <div class="metric"><span class="t-sm t-muted">90 min before</span><span class="t-sm fw-6">Small banana or energy bar</span></div>
-      <div class="metric"><span class="t-sm t-muted">30 min before</span><span class="t-sm fw-6">Gel + water. Caffeine 200-400mg.</span></div>
-    </div>
-
-    <div class="label">During Race</div>
-    <div class="card mb-16" style="padding:14px 16px">
-      <div class="t-sm" style="line-height:1.8">Sip sports drink at Roxzones<br>Gel at station 4 transition if energy dipping<br>Target: 30-60g carbs/hour<br>Practice this in training simulations first</div>
-    </div>
-
-    <div class="label">After Race</div>
-    <div class="card" style="padding:14px 16px">
-      <div class="t-sm" style="line-height:1.8">Immediately: sports drink + protein shake<br>Within 2 hours: large meal — whatever sounds good<br>You earned it.</div>
-    </div>
-    ` : ''}
+    <div class="label">Today's Meals</div>
+    ${meals.length === 0 ? `
+      <div class="card-bg" style="text-align:center;padding:30px 20px;border-radius:14px">
+        <div class="t-md t-muted">No meals logged yet.</div>
+      </div>
+    ` : `
+      <div class="card" style="padding:14px 16px">
+        ${meals.map(m => mealRowHtml(m)).join('')}
+      </div>
+    `}
   </div>`;
 }
+
+function macroRowHtml(label, current, target) {
+  const pct = target ? Math.round(current / target * 100) : 0;
+  const cls = pct > 110 ? 'over' : (pct >= 90 ? 'good' : '');
+  return `
+    <div class="macro-row">
+      <div class="macro-label">${label}</div>
+      <div class="prog"><div class="prog-fill ${cls}" style="width:${Math.min(100, pct)}%"></div></div>
+      <div class="macro-nums">${current} / ${target}g</div>
+    </div>
+  `;
+}
+
+function mealRowHtml(m) {
+  const time = new Date(m.loggedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  return `
+    <div class="meal-row" onclick="editMealById('${m.id}')">
+      ${m.thumbnail
+        ? `<img class="meal-thumb" src="${m.thumbnail}" alt="">`
+        : `<div class="meal-thumb"></div>`}
+      <div class="meal-info">
+        <div class="meal-name">${escapeHtml(m.name)}</div>
+        <div class="meal-macros">${m.calories} kcal · ${m.protein}P · ${m.carbs}C · ${m.fat}F · ${time}</div>
+      </div>
+      <button class="meal-del" onclick="event.stopPropagation();deleteMealById('${m.id}')">Delete</button>
+    </div>
+  `;
+}
+
+function formatTrend(t) {
+  if (!t) return '—';
+  const sign = t.delta > 0 ? '+' : (t.delta < 0 ? '' : '±');
+  return `${sign}${t.delta.toFixed(1)} lb`;
+}
+
+function deleteMealById(id) {
+  if (confirm('Delete this meal?')) {
+    Storage.deleteMeal(id);
+    App.navigate('fuel');
+  }
+}
+
+function editMealById(id) {
+  const meal = Storage.getMealsForDate(todayStr()).find(m => m.id === id);
+  if (meal) openMealConfirm(meal.thumbnail || null, meal, true);
+}
+
+function handleMealFileChange(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  e.target.value = '';
+  handleMealPhoto(file);
+}
+
+// ---------- MEAL CAPTURE / CONFIRM ----------
+async function handleMealPhoto(file) {
+  let dataUrl = null, thumb = null;
+  const overlay = openOverlay(`
+    <div class="modal">
+      <div class="t-xl fw-9 mb-4">Analyzing your meal</div>
+      <div class="t-sm t-muted mb-16">Estimating macros from your photo...</div>
+      <img id="capPreview" class="capture-preview" style="margin-bottom:16px">
+      <div style="display:flex;justify-content:center;padding:16px"><div class="spinner"></div></div>
+    </div>
+  `);
+
+  try {
+    [dataUrl, thumb] = await Promise.all([
+      fileToCompressedDataUrl(file, 800, 0.85),
+      fileToCompressedDataUrl(file, 200, 0.6)
+    ]);
+    overlay.querySelector('#capPreview').src = dataUrl;
+
+    const r = await fetch('/api/analyze-meal', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ imageBase64: dataUrlToBase64(dataUrl), mediaType: 'image/jpeg' })
+    });
+    const result = await r.json();
+    overlay.remove();
+    if (!r.ok) {
+      openMealConfirm(thumb, null, false, result.error || `AI failed (${r.status})`);
+    } else {
+      openMealConfirm(thumb, { ...result, source: 'ai' });
+    }
+  } catch (e) {
+    overlay.remove();
+    openMealConfirm(thumb, null, false, e.message || 'Failed to process image');
+  }
+}
+
+function openMealConfirm(thumbnail, meal, isEdit, errorMsg) {
+  isEdit = isEdit || false;
+  errorMsg = errorMsg || null;
+  const m = meal || { name: '', calories: '', protein: '', carbs: '', fat: '', confidence: '', source: 'manual' };
+  const overlay = openOverlay(`
+    <div class="modal">
+      <div class="t-xl fw-9 mb-4">${isEdit ? 'Edit Meal' : (errorMsg ? 'Manual Entry' : 'Confirm Meal')}</div>
+      <div class="t-sm t-muted mb-16">
+        ${errorMsg
+          ? '⚠ ' + escapeHtml(errorMsg) + '. Enter macros below.'
+          : (m.confidence ? `AI estimate · confidence: <span class="t-accent fw-7">${escapeHtml(m.confidence)}</span> · adjust if needed` : 'Enter macros below.')}
+      </div>
+      ${thumbnail ? `<img class="capture-preview" src="${thumbnail}" style="margin-bottom:16px">` : ''}
+
+      <div class="field">
+        <label class="field-label">Meal name</label>
+        <input class="input-text" id="f_name" value="${escapeHtml(String(m.name))}" placeholder="What did you eat?">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Calories</label>
+        <input class="input-text" id="f_cal" type="number" inputmode="numeric" value="${m.calories}" placeholder="0">
+      </div>
+
+      <div class="macro-grid-input">
+        <div class="field">
+          <label class="field-label">Protein (g)</label>
+          <input class="input-text" id="f_p" type="number" inputmode="numeric" value="${m.protein}" placeholder="0">
+        </div>
+        <div class="field">
+          <label class="field-label">Carbs (g)</label>
+          <input class="input-text" id="f_c" type="number" inputmode="numeric" value="${m.carbs}" placeholder="0">
+        </div>
+        <div class="field">
+          <label class="field-label">Fat (g)</label>
+          <input class="input-text" id="f_f" type="number" inputmode="numeric" value="${m.fat}" placeholder="0">
+        </div>
+      </div>
+
+      <button class="btn btn-accent mb-8" id="saveMeal">${isEdit ? 'Save Changes' : 'Save Meal'}</button>
+      <button class="btn btn-ghost" id="cancelMeal">Cancel</button>
+    </div>
+  `);
+
+  overlay.querySelector('#cancelMeal').addEventListener('click', () => overlay.remove());
+  overlay.querySelector('#saveMeal').addEventListener('click', () => {
+    const data = {
+      name: overlay.querySelector('#f_name').value.trim() || 'Meal',
+      calories: parseInt(overlay.querySelector('#f_cal').value, 10) || 0,
+      protein: parseInt(overlay.querySelector('#f_p').value, 10) || 0,
+      carbs: parseInt(overlay.querySelector('#f_c').value, 10) || 0,
+      fat: parseInt(overlay.querySelector('#f_f').value, 10) || 0
+    };
+    if (isEdit) {
+      Storage.updateMeal(m.id, data);
+    } else {
+      Storage.addMeal({
+        ...data,
+        thumbnail: thumbnail || null,
+        source: m.source || 'manual',
+        confidence: m.confidence || null
+      });
+    }
+    overlay.remove();
+    App.navigate('fuel');
+  });
+}
+
+// ---------- WEIGHT MODAL ----------
+function openWeightModal() {
+  const latest = Storage.getLatestWeight();
+  const weights = Storage.getWeights().slice().reverse();
+  const overlay = openOverlay(`
+    <div class="modal">
+      <div class="t-xl fw-9 mb-4">Log Weight</div>
+      <div class="t-sm t-muted mb-16">Today's bodyweight in pounds.</div>
+
+      <div class="field">
+        <label class="field-label">Weight (lbs)</label>
+        <input class="input-text" id="w_lbs" type="number" inputmode="decimal" step="0.1" value="${latest ? latest.lbs : ''}" placeholder="180.0">
+      </div>
+
+      <button class="btn btn-accent mb-12" id="saveWeight">Save</button>
+      <button class="btn btn-ghost mb-20" id="cancelWeight">Cancel</button>
+
+      ${weights.length ? `
+        <div class="label">Recent Entries</div>
+        <div class="card" style="padding:8px 16px">
+          ${weights.slice(0, 10).map(w => `
+            <div class="row-between" style="padding:10px 0;border-bottom:1px solid var(--border)" data-wid="${w.id}">
+              <div>
+                <div class="t-sm fw-7 tabular">${w.lbs} lbs</div>
+                <div class="t-xs t-faint mt-4">${fmtDate(w.loggedAt)}</div>
+              </div>
+              <button class="meal-del weight-del" data-wid="${w.id}">Delete</button>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+    </div>
+  `);
+
+  overlay.querySelector('#cancelWeight').addEventListener('click', () => overlay.remove());
+  overlay.querySelector('#saveWeight').addEventListener('click', () => {
+    const lbs = parseFloat(overlay.querySelector('#w_lbs').value);
+    if (!lbs || lbs <= 0) { alert('Enter a valid weight'); return; }
+    Storage.addWeight(lbs);
+    overlay.remove();
+    App.navigate('fuel');
+  });
+  overlay.querySelectorAll('.weight-del').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      Storage.deleteWeight(btn.dataset.wid);
+      overlay.remove();
+      openWeightModal();
+    });
+  });
+}
+
+// ---------- GOALS MODAL ----------
+function openGoalsModal() {
+  const existing = Storage.getFuelGoals() || {};
+  const latestW = Storage.getLatestWeight();
+  const defaultBw = existing.bodyweight || (latestW ? latestW.lbs : 180);
+  let goalType = existing.goalType || 'gain';
+  let pace = existing.pace != null ? existing.pace : 0.5;
+
+  const overlay = openOverlay(`
+    <div class="modal">
+      <div class="t-xl fw-9 mb-4">Daily Macro Goals</div>
+      <div class="t-sm t-muted mb-16">Targets are estimated from bodyweight + pace. Tap Recalculate after changes, or override any number.</div>
+
+      <div class="field">
+        <label class="field-label">Bodyweight (lbs)</label>
+        <input class="input-text" id="g_bw" type="number" inputmode="decimal" step="0.1" value="${defaultBw}">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Goal</label>
+        <div class="radio-row" id="g_type">
+          <button data-type="gain" class="${goalType === 'gain' ? 'sel' : ''}">Gain</button>
+          <button data-type="maintain" class="${goalType === 'maintain' ? 'sel' : ''}">Maintain</button>
+          <button data-type="cut" class="${goalType === 'cut' ? 'sel' : ''}">Cut</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Pace (lbs / week)</label>
+        <input class="input-text" id="g_pace" type="number" inputmode="decimal" step="0.1" value="${pace}">
+        <div class="t-xs t-faint mt-4">Positive = gain (try 0.3-0.7), negative = cut (try -0.5 to -1.0)</div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Goal Weight (lbs, optional)</label>
+        <input class="input-text" id="g_target" type="number" inputmode="decimal" step="0.1" value="${existing.goalLbs || ''}" placeholder="e.g. 195">
+      </div>
+
+      <button class="btn btn-ghost mb-16" id="g_recalc">↻ Recalculate Suggested Targets</button>
+
+      <div class="field">
+        <label class="field-label">Calories</label>
+        <input class="input-text" id="g_cal" type="number" inputmode="numeric" value="${existing.calories || ''}">
+      </div>
+
+      <div class="macro-grid-input">
+        <div class="field">
+          <label class="field-label">Protein (g)</label>
+          <input class="input-text" id="g_p" type="number" inputmode="numeric" value="${existing.protein || ''}">
+        </div>
+        <div class="field">
+          <label class="field-label">Carbs (g)</label>
+          <input class="input-text" id="g_c" type="number" inputmode="numeric" value="${existing.carbs || ''}">
+        </div>
+        <div class="field">
+          <label class="field-label">Fat (g)</label>
+          <input class="input-text" id="g_f" type="number" inputmode="numeric" value="${existing.fat || ''}">
+        </div>
+      </div>
+
+      <button class="btn btn-accent mb-8" id="saveGoals">Save Goals</button>
+      <button class="btn btn-ghost" id="cancelGoals">Cancel</button>
+    </div>
+  `);
+
+  if (!existing.calories) {
+    const sug = suggestGoals(defaultBw, goalType, pace);
+    overlay.querySelector('#g_cal').value = sug.calories;
+    overlay.querySelector('#g_p').value = sug.protein;
+    overlay.querySelector('#g_c').value = sug.carbs;
+    overlay.querySelector('#g_f').value = sug.fat;
+  }
+
+  overlay.querySelector('#g_type').addEventListener('click', e => {
+    const btn = e.target.closest('button[data-type]');
+    if (!btn) return;
+    goalType = btn.dataset.type;
+    overlay.querySelectorAll('#g_type button').forEach(b => b.classList.toggle('sel', b.dataset.type === goalType));
+    if (goalType === 'gain') overlay.querySelector('#g_pace').value = 0.5;
+    else if (goalType === 'cut') overlay.querySelector('#g_pace').value = -0.75;
+    else overlay.querySelector('#g_pace').value = 0;
+  });
+
+  overlay.querySelector('#g_recalc').addEventListener('click', () => {
+    const bw = parseFloat(overlay.querySelector('#g_bw').value) || defaultBw;
+    const p = parseFloat(overlay.querySelector('#g_pace').value);
+    const sug = suggestGoals(bw, goalType, isNaN(p) ? null : p);
+    overlay.querySelector('#g_cal').value = sug.calories;
+    overlay.querySelector('#g_p').value = sug.protein;
+    overlay.querySelector('#g_c').value = sug.carbs;
+    overlay.querySelector('#g_f').value = sug.fat;
+  });
+
+  overlay.querySelector('#cancelGoals').addEventListener('click', () => overlay.remove());
+  overlay.querySelector('#saveGoals').addEventListener('click', () => {
+    const bw = parseFloat(overlay.querySelector('#g_bw').value) || defaultBw;
+    const p = parseFloat(overlay.querySelector('#g_pace').value);
+    const goalLbs = parseFloat(overlay.querySelector('#g_target').value);
+    Storage.setFuelGoals({
+      calories: parseInt(overlay.querySelector('#g_cal').value, 10) || 0,
+      protein: parseInt(overlay.querySelector('#g_p').value, 10) || 0,
+      carbs: parseInt(overlay.querySelector('#g_c').value, 10) || 0,
+      fat: parseInt(overlay.querySelector('#g_f').value, 10) || 0,
+      bodyweight: bw,
+      goalType,
+      pace: isNaN(p) ? 0 : p,
+      goalLbs: isNaN(goalLbs) ? null : goalLbs
+    });
+    overlay.remove();
+    App.navigate('fuel');
+  });
+}
+
+// ---------- FUEL REFERENCE (existing macros/meals/grocery/race day content) ----------
+function openFuelReference() {
+  let refTab = 'macros';
+  const overlay = openOverlay(`<div class="modal" id="fuelRefModal"></div>`);
+  function render() {
+    const modal = overlay.querySelector('#fuelRefModal');
+    modal.innerHTML = `
+      <div class="row-between mb-12">
+        <div class="t-xl fw-9">Nutrition Reference</div>
+        <button class="meal-del" id="closeRef">Close</button>
+      </div>
+      <div class="tabs" style="display:flex;gap:4px;background:var(--bg2);border-radius:10px;padding:3px;margin-bottom:16px">
+        <button class="tab ${refTab==='macros'?'active':''}" data-rt="macros" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;${refTab==='macros'?'background:var(--accent);color:#FFF':'background:transparent;color:var(--text2);border:none'}">Macros</button>
+        <button class="tab ${refTab==='meals'?'active':''}" data-rt="meals" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;${refTab==='meals'?'background:var(--accent);color:#FFF':'background:transparent;color:var(--text2);border:none'}">Meals</button>
+        <button class="tab ${refTab==='grocery'?'active':''}" data-rt="grocery" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;${refTab==='grocery'?'background:var(--accent);color:#FFF':'background:transparent;color:var(--text2);border:none'}">Grocery</button>
+        <button class="tab ${refTab==='raceday'?'active':''}" data-rt="raceday" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;${refTab==='raceday'?'background:var(--accent);color:#FFF':'background:transparent;color:var(--text2);border:none'}">Race Day</button>
+      </div>
+      ${getReferenceContent(refTab)}
+    `;
+    modal.querySelector('#closeRef').addEventListener('click', () => overlay.remove());
+    modal.querySelectorAll('[data-rt]').forEach(b => b.addEventListener('click', () => { refTab = b.dataset.rt; render(); }));
+  }
+  render();
+}
+
+function getReferenceContent(tab) {
+  if (tab === 'macros') {
+    return `
+      <div class="label">Training Days</div>
+      <div class="card mb-20" style="padding:14px 16px">
+        <div style="text-align:center;margin-bottom:16px">
+          <div class="t-2xl fw-9 t-accent">3,200 - 3,500</div>
+          <div class="t-xs t-faint mt-4">CALORIES PER DAY</div>
+        </div>
+        <div class="metric"><span class="t-sm t-muted">Protein</span><span class="t-sm fw-7">150g <span class="t-faint">(1.8 g/kg)</span></span></div>
+        <div class="metric"><span class="t-sm t-muted">Carbs</span><span class="t-sm fw-7 t-accent">450 - 550g <span class="t-faint">(5-7 g/kg)</span></span></div>
+        <div class="metric"><span class="t-sm t-muted">Fat</span><span class="t-sm fw-7">80 - 100g</span></div>
+      </div>
+      <div class="label">Rest Days</div>
+      <div class="card mb-20" style="padding:14px 16px">
+        <div style="text-align:center;margin-bottom:16px">
+          <div class="t-2xl fw-9">2,600 - 2,800</div>
+          <div class="t-xs t-faint mt-4">CALORIES PER DAY</div>
+        </div>
+        <div class="metric"><span class="t-sm t-muted">Protein</span><span class="t-sm fw-7">140g</span></div>
+        <div class="metric"><span class="t-sm t-muted">Carbs</span><span class="t-sm fw-7">200 - 250g</span></div>
+        <div class="metric"><span class="t-sm t-muted">Fat</span><span class="t-sm fw-7">100 - 115g</span></div>
+      </div>
+      <div class="label">Hydration (Austin Heat)</div>
+      <div class="card mb-20" style="padding:14px 16px">
+        <div class="metric"><span class="t-sm t-muted">Daily Water</span><span class="t-sm fw-7">3.5 - 4+ liters</span></div>
+        <div class="metric"><span class="t-sm t-muted">Sodium/hr (training)</span><span class="t-sm fw-7">500 - 1000mg</span></div>
+        <div class="metric"><span class="t-sm t-muted">Use</span><span class="t-sm fw-7">Electrolytes every run</span></div>
+      </div>
+      <div class="label">Supplements</div>
+      <div class="card" style="padding:14px 16px">
+        <div class="metric"><span class="t-sm t-muted">Creatine</span><span class="t-sm fw-7">5g daily</span></div>
+        <div class="metric"><span class="t-sm t-muted">Vitamin D</span><span class="t-sm fw-7">2,000-5,000 IU daily</span></div>
+        <div class="metric"><span class="t-sm t-muted">Magnesium</span><span class="t-sm fw-7">300-400mg glycinate (bedtime)</span></div>
+        <div class="metric"><span class="t-sm t-muted">Omega-3</span><span class="t-sm fw-7">2-3g EPA/DHA daily</span></div>
+        <div class="metric"><span class="t-sm t-muted">Caffeine (race day)</span><span class="t-sm fw-7">200-400mg</span></div>
+      </div>`;
+  }
+  if (tab === 'meals') {
+    return `
+      <div class="label">Pre-Run (60-90 min before)</div>
+      <div class="card mb-16" style="padding:14px 16px">
+        <div style="padding:8px 0;border-bottom:1px solid var(--border)"><div class="t-sm fw-6">Oatmeal + Banana + Honey</div><div class="t-xs t-muted mt-4">Gold standard pre-run.</div></div>
+        <div style="padding:8px 0;border-bottom:1px solid var(--border)"><div class="t-sm fw-6">Toast + PB + Banana</div><div class="t-xs t-muted mt-4">Quick balanced.</div></div>
+        <div style="padding:8px 0;border-bottom:1px solid var(--border)"><div class="t-sm fw-6">Rice Cakes + Honey + Salt</div><div class="t-xs t-muted mt-4">Light option.</div></div>
+        <div style="padding:8px 0"><div class="t-sm fw-6">Dates + Banana (30 min before)</div><div class="t-xs t-muted mt-4">Quick top-up.</div></div>
+      </div>
+      <div class="label">Post-Run (within 30 min)</div>
+      <div class="card mb-16" style="padding:14px 16px">
+        <div style="padding:8px 0;border-bottom:1px solid var(--border)"><div class="t-sm fw-6">Smoothie: Yogurt + banana + berries + protein</div><div class="t-xs t-muted mt-4">Best option.</div></div>
+        <div style="padding:8px 0"><div class="t-sm fw-6">Chocolate Milk (16 oz)</div><div class="t-xs t-muted mt-4">Legit recovery drink.</div></div>
+      </div>
+      <div class="label">Lunch / Dinner</div>
+      <div class="card" style="padding:14px 16px">
+        <div style="padding:8px 0;border-bottom:1px solid var(--border)"><div class="t-sm fw-6">Burrito Bowl</div><div class="t-xs t-muted mt-4">Rice + beans + chicken + avocado. ~900 cal.</div></div>
+        <div style="padding:8px 0;border-bottom:1px solid var(--border)"><div class="t-sm fw-6">Stir Fry</div><div class="t-xs t-muted mt-4">Rice + protein + veggies. ~800 cal.</div></div>
+        <div style="padding:8px 0;border-bottom:1px solid var(--border)"><div class="t-sm fw-6">Pasta + Meat Sauce</div><div class="t-xs t-muted mt-4">~850 cal.</div></div>
+        <div style="padding:8px 0"><div class="t-sm fw-6">Salmon + Sweet Potato + Veggies</div><div class="t-xs t-muted mt-4">~750 cal.</div></div>
+      </div>`;
+  }
+  if (tab === 'grocery') {
+    return `
+      <div class="label" style="color:var(--accent)">Carbs</div>
+      <div class="card mb-16" style="padding:14px 16px"><div class="t-sm" style="line-height:2">White rice<br>Oats<br>Pasta<br>Bread<br>Bananas<br>Sweet potatoes<br>Honey<br>Tortillas</div></div>
+      <div class="label" style="color:var(--accent)">Protein</div>
+      <div class="card mb-16" style="padding:14px 16px"><div class="t-sm" style="line-height:2">Chicken thighs<br>Ground beef 85/15<br>Eggs<br>Greek yogurt<br>Whey protein<br>Salmon</div></div>
+      <div class="label" style="color:var(--accent)">Fats + Extras</div>
+      <div class="card mb-16" style="padding:14px 16px"><div class="t-sm" style="line-height:2">Peanut butter<br>Avocados<br>Olive oil<br>Cheese<br>Trail mix<br>Frozen berries<br>Vegetables</div></div>
+      <div class="label" style="color:var(--accent)">Supplements</div>
+      <div class="card" style="padding:14px 16px"><div class="t-sm" style="line-height:2">Electrolytes<br>Creatine monohydrate<br>Magnesium glycinate<br>Vitamin D<br>Fish oil<br>Tart cherry juice</div></div>`;
+  }
+  if (tab === 'raceday') {
+    return `
+      <div class="label">3 Days Before</div>
+      <div class="card mb-16" style="padding:14px 16px"><div class="t-sm" style="line-height:1.8">Carb load: 8-10 g/kg<br>Switch to white rice, pasta, bread<br>Reduce training (taper)</div></div>
+      <div class="label">Race Morning</div>
+      <div class="card mb-16" style="padding:14px 16px">
+        <div class="metric"><span class="t-sm t-muted">3-4 hrs before</span><span class="t-sm fw-6">Oats + banana + honey + coffee</span></div>
+        <div class="metric"><span class="t-sm t-muted">90 min before</span><span class="t-sm fw-6">Banana or energy bar</span></div>
+        <div class="metric"><span class="t-sm t-muted">30 min before</span><span class="t-sm fw-6">Gel + water. Caffeine 200-400mg.</span></div>
+      </div>
+      <div class="label">During Race</div>
+      <div class="card" style="padding:14px 16px"><div class="t-sm" style="line-height:1.8">Sip sports drink at Roxzones<br>Gel at station 4 if energy dipping<br>Target: 30-60g carbs/hour</div></div>`;
+  }
+}
+
 
 // =============================================
 // APP CONTROLLER
@@ -2341,7 +2914,6 @@ const App = {
   calendarNextWeek() { if(calendarCurrentWeek<30){calendarCurrentWeek++;this.navigate('plan')} },
   jumpToWeek(w) { calendarCurrentWeek = w; this.navigate('plan'); },
   setStatsTab(t) { statsTab=t; this.navigate('stats'); },
-  setFuelTab(t) { fuelTab=t; this.navigate('fuel'); },
 
   openSwap(dateStr) {
     // Get the current week's 7 days (Mon-Sun starting from this week's Monday)

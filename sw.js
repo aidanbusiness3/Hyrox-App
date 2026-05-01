@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hyrox-v2';
+const CACHE_NAME = 'hyrox-v3';
 
 self.addEventListener('install', e => {
   e.waitUntil(
@@ -17,6 +17,10 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // Don't touch API requests — let the network handle them
+  const url = new URL(e.request.url);
+  if (url.pathname.startsWith('/api/')) return;
+
   e.respondWith(
     fetch(e.request)
       .then(response => {
