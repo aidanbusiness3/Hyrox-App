@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hyrox-v4';
+const CACHE_NAME = 'hyrox-v5';
 
 self.addEventListener('install', e => {
   e.waitUntil(
@@ -17,14 +17,9 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Don't touch API requests — let the network handle them
-  const url = new URL(e.request.url);
-  if (url.pathname.startsWith('/api/')) return;
-
   e.respondWith(
     fetch(e.request)
       .then(response => {
-        // Cache successful responses
         if (response.ok) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));

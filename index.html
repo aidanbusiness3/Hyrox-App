@@ -84,37 +84,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .modal-day{display:flex;justify-content:space-between;align-items:center;padding:14px 12px;border-radius:10px;cursor:pointer;transition:background .15s}
 .modal-day:active{background:var(--bg3)}
 
-/* === MACRO/MEAL TRACKING === */
-.pill-muted{background:var(--bg3);color:var(--text2)}
-.prog-fill.over{background:var(--red)}
-.prog-fill.good{background:var(--green)}
-.kcal-big{display:flex;align-items:baseline;gap:8px}
-.macro-row{display:grid;grid-template-columns:62px 1fr 86px;gap:10px;align-items:center;padding:6px 0}
-.macro-row .macro-label{font-size:12px;font-weight:700;color:var(--text2)}
-.macro-row .macro-nums{font-size:12px;font-weight:700;color:var(--text2);text-align:right;font-variant-numeric:tabular-nums}
-.meal-row{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:center;cursor:pointer}
-.meal-row:active{opacity:.7}
-.meal-row:last-child{border-bottom:none}
-.meal-thumb{width:48px;height:48px;border-radius:8px;background:var(--bg3);object-fit:cover;flex-shrink:0}
-.meal-info{flex:1;min-width:0}
-.meal-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.meal-macros{font-size:11px;color:var(--text2);margin-top:2px;font-variant-numeric:tabular-nums}
-.meal-del{padding:6px 10px;border-radius:6px;background:transparent;color:var(--text3);font-size:11px;font-weight:700;flex-shrink:0;border:none;cursor:pointer}
-.meal-del:active{background:var(--bg2)}
-.capture-preview{width:100%;max-height:240px;border-radius:12px;object-fit:cover;background:var(--bg3);display:block}
-.spinner{width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto}
-@keyframes spin{to{transform:rotate(360deg)}}
-.field{margin-bottom:14px}
-.field-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block}
-.input-text{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:15px;font-weight:600;width:100%;outline:none;text-align:left;font-variant-numeric:tabular-nums}
-.input-text:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-dim)}
-.macro-grid-input{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.radio-row{display:flex;gap:6px;background:var(--bg2);border-radius:10px;padding:3px}
-.radio-row button{flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:700;color:var(--text2);background:transparent;border:none;cursor:pointer}
-.radio-row button.sel{background:var(--accent);color:#FFF}
-.btn-ghost{background:var(--bg2);color:var(--text);padding:14px 24px;border-radius:12px;font-size:15px;font-weight:700;width:100%}
-.btn-ghost:active{opacity:.8}
-.card-bg{background:var(--bg2);border-radius:14px}
     </style>
 </head>
 <body>
@@ -132,10 +101,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
         <button class="nav-btn" data-view="plan">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             <span>Plan</span>
-        </button>
-        <button class="nav-btn" data-view="fuel">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
-            <span>Fuel</span>
         </button>
         <button class="nav-btn" data-view="stats">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
@@ -188,16 +153,23 @@ const ATHLETE = {
   farmersCarryWeight: '2 × 16 kg',
   sandbagLungeWeight: '10 kg',
   
-  // Goals
+  // Goals — TWO races
+  // Race 1: Tampa Mixed Doubles w/ girlfriend (Oct 23)
+  // Race 2: Dallas Solo (Nov 20)  ← A-race
+  doublesRace: 'Tampa',
+  doublesDate: '2026-10-23',
+  doublesGoal: '1:07:00',       // Joint goal w/ gf
+  doublesPartnerPR: '1:15:00',  // Her doubles PR
+
   goalRace: 'Dallas',
-  goalDate: '2026-11-21',
-  goalTimeA: '1:05:00',    // A goal
-  goalTimeStretch: '0:59:59', // Stretch goal
+  goalDate: '2026-11-20',
+  goalTimeA: '1:05:00',
+  goalTimeStretch: '0:59:59',
   prTime: '1:15:09',
 
-  trainingStart: '2026-04-27',
-  totalWeeks: 30,
-  restDay: 'Sunday' // 0 = Sunday
+  trainingStart: '2026-06-08',
+  totalWeeks: 24,
+  restDay: 'Sunday'
 };
 
 // =============================================
@@ -542,16 +514,20 @@ const WORKOUT_DETAILS = {
 };
 
 // =============================================
-// 34-WEEK TRAINING PLAN GENERATOR
-// Dallas November 22, 2025
-// Start: April 7, 2025
+// 24-WEEK TRAINING PLAN GENERATOR
+// Start: June 8, 2026 (Mon)
+// Race 1: Tampa Mixed Doubles  — Fri Oct 23, 2026 (Week 20)
+// Race 2: Dallas Solo (A-race) — Fri Nov 20, 2026 (Week 24)
 // =============================================
 
 const PHASES = [
-  { id: 'speed',  name: 'Speed Foundation', weeks: [1, 10],  color: '#3B82F6', emoji: '⚡' },
-  { id: 'race',   name: 'Race Pace',         weeks: [11, 20], color: '#FF8C00', emoji: '🎯' },
-  { id: 'exec',   name: 'Race Execution',    weeks: [21, 26], color: '#FF4D4D', emoji: '🏁' },
-  { id: 'peak',   name: 'Peak & Taper',      weeks: [27, 30], color: '#FFE500', emoji: '🔥' }
+  { id: 'foundation', name: 'Foundation',       weeks: [1, 6],   color: '#3B82F6', emoji: '⚡' },
+  { id: 'build',      name: 'Race Pace Build',  weeks: [7, 12],  color: '#FF8C00', emoji: '🎯' },
+  { id: 'doubles',    name: 'Doubles Specific', weeks: [13, 18], color: '#9333EA', emoji: '👥' },
+  { id: 'tampa',      name: 'Tampa Taper',      weeks: [19, 20], color: '#FF4D4D', emoji: '🏁' },
+  { id: 'reset',      name: 'Recovery & Reset', weeks: [21, 21], color: '#64748B', emoji: '🌱' },
+  { id: 'sharpen',    name: 'Solo Sharpening',  weeks: [22, 23], color: '#E8552E', emoji: '⚔️' },
+  { id: 'dallas',     name: 'Dallas Taper',     weeks: [24, 24], color: '#FFE500', emoji: '🔥' }
 ];
 
 function getPhase(weekNum) {
@@ -559,8 +535,10 @@ function getPhase(weekNum) {
 }
 
 function isDeloadWeek(weekNum) {
-  // Every 4th week, except race week (30)
-  return weekNum % 4 === 0 && weekNum < 30;
+  // Deloads at weeks 4 (mid-Foundation) and 8 (mid-Build).
+  // Week 12 = full-sim benchmark before doubles phase (NOT a deload).
+  // After that, phase structure handles recovery.
+  return [4, 8].includes(weekNum);
 }
 
 // ===== 5-PHASE TRAINING PROTOCOL =====
@@ -568,19 +546,21 @@ function isDeloadWeek(weekNum) {
 // compromised running, 80/20 polarized training, elite protocols
 
 // ===== ATHLETIC HYROX PROTOCOL =====
-// 30 weeks, race date Nov 21, 2026
+// 24 weeks, two races: Tampa Doubles (Oct 23) + Dallas Solo (Nov 20)
 // You already have a base from 2 races. This plan attacks SPEED.
 
-function getSpeedFoundationWeek(weekNum, deload) {
-  // PHASE 1: SPEED FOUNDATION (Weeks 1-10)
-  // Hard intervals from week 1. Compromised running every week.
-  // Athletic strength, not bodybuilding.
-  // LA MODE: Weeks 2-7 (May 4 - June 14) — running-focused, Round Rock removed
-  const isLA = weekNum >= 2 && weekNum <= 7;
+function getFoundationWeek(weekNum, deload) {
+  // PHASE 1: SPEED FOUNDATION (Weeks 1-6)
+  // Your engine is built. Your TOP-END is not.
+  // Foundation phase = pure neuromuscular speed first, threshold/VO2 in Build phase.
+  // Aim: develop leg turnover & power BEFORE asking you to hold race pace for long.
   const v = deload ? 0.7 : 1.0;
   const easyMin = Math.round((40 + Math.min(weekNum * 1.5, 12)) * v);
   const longMin = Math.round((60 + weekNum * 1.5) * v);
-  const intervals = deload ? 3 : Math.min(4 + Math.floor(weekNum / 3), 5);
+  // Wednesday alternates: odd weeks = HILL SPRINTS, even weeks = 200m REPEATS
+  const isHillWeek = weekNum % 2 === 1;
+  const hillReps = deload ? 5 : Math.min(6 + weekNum, 10);
+  const twoHundreds = deload ? 6 : Math.min(8 + weekNum, 12);
 
   return [
     { day:'Monday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
@@ -588,20 +568,12 @@ function getSpeedFoundationWeek(weekNum, deload) {
         {name:'Easy Run',detail:`${easyMin} min @ 6:15-6:45/km — HR under 145bpm`,zone:2}
       ],
       duration:`${easyMin} min`,
-      focus: isLA ? '📍 Irvine — FASTED OPTIONAL. Mason Park or local greenbelt path. Truly easy. Cadence 170-180 spm.' : '📍 Outdoor — FASTED OPTIONAL. This is the 80%. Truly easy. Cadence 170-180 spm.' },
+      focus: '📍 Outdoor — FASTED OPTIONAL. This is the 80%. Truly easy. Cadence 170-180 spm.' },
 
-    { day:'Tuesday', type:'strength', title:'Movement & Power', icon:'⚡', zone:0,
-      exercises: isLA ? [
+    { day:'Tuesday', type:'strength', title:'Speed Primer + Power', icon:'⚡', zone:0,
+      exercises:[
         {name:'Athletic Warm-Up',detail:'A-skips, B-skips, carioca, lateral bounds — 8 min',zone:0},
-        {name:'Bulgarian Split Squat',detail:'3 × 10 each — DBs or bodyweight',zone:0},
-        {name:'Single-Leg Glute Bridge',detail:'3 × 12 each leg',zone:0},
-        {name:'Box Jumps or Step-Ups',detail:'4 × 5 — bench/box',zone:0},
-        {name:'Broad Jumps',detail:'4 × 4',zone:0},
-        {name:'Push-Ups',detail:'3 × max',zone:0},
-        {name:'Pull-Ups',detail:'3 × max — find a bar',zone:0},
-        {name:'Plank',detail:'3 × 45 sec',zone:0}
-      ] : [
-        {name:'Athletic Warm-Up',detail:'A-skips, B-skips, carioca, lateral bounds — 8 min',zone:0},
+        {name:'Flying 30s',detail:'6 × 30m flying sprints — 20m build-up, 30m all-out, walk back. NEW: wakes up fast-twitch.',zone:5},
         {name:'Box Jumps',detail:'4 × 5 — explosive up, soft landing',zone:0},
         {name:'Broad Jumps',detail:'4 × 4 — max horizontal distance',zone:0},
         {name:'Single-Leg Bounds',detail:'3 × 6 each leg — running-specific power',zone:0},
@@ -610,36 +582,26 @@ function getSpeedFoundationWeek(weekNum, deload) {
         {name:'Pull-Ups',detail:'3 × max',zone:0},
         {name:'Farmers Carry',detail:'3 × 40m heavy — Hyrox station + core',zone:0}
       ],
-      duration: isLA ? '40 min' : '55 min',
-      focus: isLA ? '📍 Hotel gym OR bodyweight — Whatever you can access. If you have a local gym membership, lift heavier. If not, bodyweight version above.' : '📍 South Gym — Athletic power day. Plyos = explosive force. Carries = core + grip. Light upper maintenance only.' },
+      duration:'60 min',
+      focus:'📍 South Gym — SPEED day. Flying 30s teach your legs to move fast with no lactate cost. Then plyos + power.' },
 
-    { day:'Wednesday', type:'intervals', title: deload ? 'Easy Run' : (weekNum % 2 === 0 ? 'Threshold 2×10 (Jack Driscoll)' : 'VO2 Max Intervals'), icon:'🔥', zone: deload ? 2 : 5,
+    { day:'Wednesday', type:'intervals', title: deload ? 'Easy Run' : (isHillWeek ? 'Hill Sprints' : '200m Speed Repeats'), icon: isHillWeek ? '⛰️' : '⚡', zone: deload ? 2 : 5,
       exercises: deload ? [
         {name:'Easy Run',detail:'40 min @ Z2',zone:2}
-      ] : (weekNum % 2 === 0 ? [
-        {name:'Warm Up',detail:'10 min easy jog',zone:2},
-        {name:'Strides',detail:'5 × 20 sec on / 40 sec off — open up hips',zone:4},
-        {name:'Threshold #1',detail:'10 min @ 3:55-4:00/km — feel like you\'re in a race',zone:4},
-        {name:'Float',detail:'90 sec easy',zone:2},
-        {name:'Threshold #2',detail:'10 min @ 3:55-4:00/km — same effort, no fading',zone:4},
-        {name:'Cool Down',detail:'10 min easy',zone:1}
+      ] : (isHillWeek ? [
+        {name:'Warm Up',detail:'15 min easy jog + 4 strides',zone:2},
+        {name:'Hill Sprints',detail:`${hillReps} × 10-15 sec ALL-OUT uphill (find a steep hill, 6-8% grade). FULL 3 min walk-down recovery between. Quality, not quantity. Stop if any rep slows.`,zone:5},
+        {name:'Cool Down',detail:'15 min easy',zone:1}
       ] : [
-        {name:'Warm Up',detail:'15 min progressive jog',zone:2},
-        {name:'Norwegian 4×4',detail:`${intervals} × 4 min @ HR 173-182 (3:50-4:10/km). 3 min easy jog between.`,zone:5},
+        {name:'Warm Up',detail:'15 min easy jog + 4 strides',zone:2},
+        {name:'200m Repeats',detail:`${twoHundreds} × 200m @ all-out (about 32-36 sec each). 200m WALK recovery between. Track preferred. This is leg turnover at speed.`,zone:5},
         {name:'Cool Down',detail:'10 min easy',zone:1}
       ]),
-      duration: deload ? '40 min' : (weekNum % 2 === 0 ? '55 min' : '55 min'),
-      focus: deload ? 'Deload week. Easy only.' : (weekNum % 2 === 0 ? '📍 Outdoor — Jack Driscoll\'s signature threshold. Feel like race effort the entire time. Strides first to open hips.' : '📍 Outdoor — VO2 max ceiling raiser. You should NOT be able to talk during work intervals.') },
+      duration: deload ? '40 min' : (isHillWeek ? '50 min' : '55 min'),
+      focus: deload ? 'Deload week. Easy only.' : (isHillWeek ? '📍 Outdoor — HILL SPRINTS = pure neuromuscular power, ZERO lactate. Full recovery is non-negotiable. Each rep should be as fast as the first.' : '📍 Track or outdoor — 200s teach your legs to TURN OVER fast. Walking recovery means real speed, not lactic suffering. Quality.') },
 
     { day:'Thursday', type:'strength', title:'Easy Run + Posterior Chain', icon:'💪', zone:2,
-      exercises: isLA ? [
-        {name:'Easy Run',detail:`${Math.round(35 * v)} min @ Z2`,zone:2},
-        {name:'Romanian Deadlift',detail:'4 × 8 — DBs if available, single-leg if not',zone:0},
-        {name:'Hip Thrust',detail:'3 × 12 — bench or floor with weight',zone:0},
-        {name:'Bulgarian Split Squat',detail:'3 × 10 each leg',zone:0},
-        {name:'Nordic Hamstring Negatives',detail:'3 × 6 — find a partner or hook feet',zone:0},
-        {name:'Single-Leg Hops',detail:'3 × 8 each',zone:0}
-      ] : [
+      exercises:[
         {name:'Easy Run',detail:`${Math.round(35 * v)} min @ Z2`,zone:2},
         {name:'Romanian Deadlift',detail:'4 × 8 heavy — hamstring development',zone:0},
         {name:'Hip Thrust',detail:'3 × 12 heavy — glute power = sled push power',zone:0},
@@ -648,42 +610,35 @@ function getSpeedFoundationWeek(weekNum, deload) {
         {name:'Single-Leg Hops',detail:'3 × 8 each — reactive stiffness for running',zone:0},
         {name:'Broad Jumps',detail:'3 × 4 — horizontal power',zone:0}
       ],
-      duration: isLA ? '70 min' : '80 min',
-      focus: isLA ? '📍 Hotel gym / UGP / local gym — Build posterior chain with whatever you have. Single-leg work is non-negotiable.' : '📍 South Gym — Hamstrings + glutes are your weak link. Build them. Plyos turn strength into running speed.' },
+      duration:'80 min',
+      focus:'📍 South Gym — Hamstrings + glutes are your weak link. Build them. Plyos turn strength into running speed.' },
 
-    { day:'Friday', type: isLA ? 'intervals' : 'hyrox', title: deload ? (isLA ? 'Easy Run' : 'Light Station Practice') : (isLA ? 'Race Pace 1km Repeats' : 'Compromised Running'), icon: isLA ? '🎯' : '😤', zone: deload ? 2 : 4,
-      exercises: isLA && !deload ? [
-        {name:'Warm Up',detail:'15 min progressive jog',zone:2},
-        {name:'Race Pace Repeats',detail:'6 × 1km @ 4:00-4:10/km / 60 sec standing rest',zone:4},
-        {name:'Cool Down',detail:'10 min easy',zone:1}
-      ] : isLA && deload ? [
-        {name:'Easy Run',detail:'30 min @ Z2',zone:2}
-      ] : deload ? [
+    { day:'Friday', type:'hyrox', title: deload ? 'Light Station Practice' : 'Compromised Running', icon:'😤', zone: deload ? 2 : 4,
+      exercises: deload ? [
         {name:'Easy Run',detail:'20 min @ Z2',zone:2},
         {name:'Sled Push',detail:'2 × 50m easy',zone:0},
         {name:'Wall Balls',detail:'50 reps',zone:0}
       ] : [
-        {name:'1km Run',detail:'@ 4:15-4:25/km — settle in',zone:4},
+        {name:'1km Run',detail:'@ 4:30-4:40/km — settle in (current realistic pace)',zone:4},
         {name:'SkiErg',detail:'1000m @ race effort',zone:4},
-        {name:'1km Run',detail:'@ 4:15-4:25/km — hold pace after SkiErg',zone:4},
+        {name:'1km Run',detail:'@ 4:30-4:40/km — hold pace after SkiErg',zone:4},
         {name:'Sled Push',detail:'50m race weight — locked arms, low angle',zone:0},
-        {name:'1km Run',detail:'@ 4:15-4:25/km — legs burn, stay upright',zone:4},
+        {name:'1km Run',detail:'@ 4:30-4:40/km — legs burn, stay upright',zone:4},
         {name:'Wall Balls',detail:'75 reps — sets of 25',zone:0},
-        {name:'1km Run',detail:'@ 4:15-4:25/km — final',zone:4}
+        {name:'1km Run',detail:'@ 4:30-4:40/km — final',zone:4}
       ],
-      duration: isLA && !deload ? '60 min' : (isLA && deload ? '30 min' : (deload ? '40 min' : '70 min')),
-      focus: isLA && !deload ? '📍 Outdoor (Mason Park, William Mason Loop) — REPLACES compromised running while in LA. Dial in race pace. Should feel controlled.' : isLA && deload ? '📍 Outdoor — Easy. Deload.' : deload ? 'Light station touch.' : '📍 Round Rock — THE KEY SESSION. Run pace after stations IS Hyrox. Track every split. Goal: <20 sec variance.' },
+      duration: deload ? '40 min' : '70 min',
+      focus: deload ? 'Light station touch.' : '📍 Round Rock — THE KEY SESSION. Goal: <20 sec variance across the 4 runs. Pace will get faster as speed work pays off.' },
 
-    { day:'Saturday', type:'long', title:'Long Run + Surges', icon:'🛣️', zone:2,
+    { day:'Saturday', type:'long', title:'Long Run + Strides', icon:'🛣️', zone:2,
       exercises: deload ? [
         {name:'Long Run',detail:`${Math.round(longMin * 0.7)} min easy @ Z2`,zone:2}
       ] : [
-        {name:'Easy Run',detail:`${longMin - 20} min @ 6:00-6:30/km`,zone:2},
-        {name:'Race Pace Surges',detail:'4 × 2 min @ 4:00/km / 3 min easy recovery',zone:4},
-        {name:'Easy Finish',detail:'10 min @ Z2',zone:2}
+        {name:'Easy Run',detail:`${longMin - 5} min @ 6:00-6:30/km`,zone:2},
+        {name:'Strides Finish',detail:'6 × 20 sec relaxed-fast / walk to recover. NOT lactic — just smooth leg speed at end of an easy run.',zone:4}
       ],
       duration:`${longMin} min`,
-      focus: deload ? '📍 Outdoor — Easy long run.' : '📍 Outdoor — Aerobic base + race pace surges on tired legs.' },
+      focus: deload ? '📍 Outdoor — Easy long run.' : '📍 Outdoor — Aerobic base + fast strides on tired legs. Teaches legs to turn over even when fatigued.' },
 
     { day:'Sunday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
       exercises:[
@@ -695,35 +650,42 @@ function getSpeedFoundationWeek(weekNum, deload) {
 }
 
 function getRacePaceWeek(weekNum, deload) {
-  // PHASE 2: RACE PACE (Weeks 11-20)
-  // Everything sharpens to race pace. Simulations every 4 weeks.
+  // PHASE 2: RACE PACE BUILD (Weeks 7-12)
+  // Speed is built. Now layer threshold + VO2 + race pace on top.
+  // Targets progress: week 7 = 4:20/km → week 12 = 4:05/km.
   const v = deload ? 0.7 : 1.0;
-  const reps = deload ? 4 : Math.min(6 + Math.floor((weekNum - 10) / 2), 8);
-  const longMin = Math.round((75 + (weekNum - 10) * 1) * v);
-  const isFullSim = !deload && (weekNum - 10) % 4 === 0;
+  const bWeek = weekNum - 6; // 1-6 within phase
+  // Progressive race pace target (in min:sec/km)
+  const paceFast = bWeek <= 2 ? '4:15' : bWeek <= 4 ? '4:10' : '4:05';
+  const paceRange = bWeek <= 2 ? '4:15-4:25/km' : bWeek <= 4 ? '4:10-4:20/km' : '4:05-4:15/km';
+  const reps = deload ? 4 : Math.min(5 + Math.floor(bWeek / 2), 8);
+  const longMin = Math.round((75 + bWeek * 2) * v);
+  // Wednesday rotation: week 7 = Half Sim, 8 = DELOAD, 9 = VO2, 10 = Half Sim, 11 = VO2, 12 = FULL SIM benchmark
+  const isFullSim = weekNum === 12;
+  const isVO2Day = !deload && !isFullSim && (weekNum === 9 || weekNum === 11);
 
   return [
     { day:'Monday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
       exercises:[
-        {name:'Easy Run',detail:`${Math.round(45 * v)} min @ 6:15-6:45/km`,zone:2}
+        {name:'Easy Run',detail:`${Math.round(45 * v)} min @ 6:00-6:30/km`,zone:2}
       ],
       duration:`${Math.round(45 * v)} min`,
       focus:'📍 Outdoor — FASTED OPTIONAL. Recovery from weekend. HR under 145.' },
 
-    { day:'Tuesday', type:'intervals', title: deload ? 'Easy + Strides' : 'Race Pace Repeats', icon:'🎯', zone: deload ? 2 : 4,
+    { day:'Tuesday', type:'intervals', title: deload ? 'Easy + Strides' : `Race Pace ${paceFast}/km`, icon:'🎯', zone: deload ? 2 : 4,
       exercises: deload ? [
         {name:'Easy Run',detail:'35 min @ Z2',zone:2},
         {name:'Strides',detail:'6 × 20 sec fast & relaxed',zone:4}
       ] : [
         {name:'Warm Up',detail:'10 min easy jog',zone:2},
         {name:'Strides',detail:'5 × 20 sec on / 40 sec off — open up hips (Jack Driscoll protocol)',zone:4},
-        {name:'Race Pace 1km Repeats',detail:`${reps} × 1km @ 4:00-4:10/km / 60 sec standing rest`,zone:4},
+        {name:'Race Pace 1km Repeats',detail:`${reps} × 1km @ ${paceRange} / 60 sec standing rest`,zone:4},
         {name:'Cool Down',detail:'10 min easy',zone:1}
       ],
       duration: deload ? '40 min' : '65 min',
-      focus: deload ? 'Deload.' : '📍 Outdoor — Strides BEFORE threshold (Jack Driscoll protocol). Open hips. Then race pace, controlled & repeatable.' },
+      focus: deload ? 'Deload.' : '📍 Outdoor — Race pace work. Pace progressing each phase as speed pays off. Controlled & repeatable.' },
 
-    { day:'Wednesday', type:'hyrox', title: deload ? 'Easy Run' : (isFullSim ? 'FULL RACE SIMULATION' : 'Half Simulation'), icon: isFullSim ? '🏁' : '🟢', zone: deload ? 2 : 4,
+    { day:'Wednesday', type: isVO2Day ? 'intervals' : 'hyrox', title: deload ? 'Easy Run' : (isFullSim ? 'FULL SIM BENCHMARK' : (isVO2Day ? 'VO2 Max — Norwegian 4×4' : 'Half Simulation')), icon: isFullSim ? '🏁' : (isVO2Day ? '🔥' : '🟢'), zone: deload ? 2 : 5,
       exercises: deload ? [
         {name:'Easy Run',detail:'40 min @ Z2',zone:2}
       ] : (isFullSim ? [
@@ -735,17 +697,21 @@ function getRacePaceWeek(weekNum, deload) {
         {name:'1km Run → Farmers 200m',detail:'',zone:4},
         {name:'1km Run → Lunges 100m',detail:'',zone:4},
         {name:'1km Run → Wall Balls 100',detail:'',zone:4}
+      ] : (isVO2Day ? [
+        {name:'Warm Up',detail:'15 min progressive jog',zone:2},
+        {name:'Norwegian 4×4',detail:'4 × 4 min @ HR 175-185 (3:55-4:15/km). 3 min easy jog between.',zone:5},
+        {name:'Cool Down',detail:'10 min easy',zone:1}
       ] : [
-        {name:'1km Run',detail:'@ 4:05-4:15/km',zone:4},
+        {name:'1km Run',detail:`@ ${paceRange}`,zone:4},
         {name:'SkiErg',detail:'1000m race effort',zone:4},
-        {name:'1km Run',detail:'@ 4:05-4:15/km',zone:4},
+        {name:'1km Run',detail:`@ ${paceRange}`,zone:4},
         {name:'Sled Push',detail:'50m race weight',zone:0},
-        {name:'1km Run',detail:'@ 4:05-4:15/km',zone:4},
+        {name:'1km Run',detail:`@ ${paceRange}`,zone:4},
         {name:'Wall Balls',detail:'100 reps — sets of 25',zone:0},
-        {name:'1km Run',detail:'@ 4:05-4:15/km — final push',zone:4}
-      ]),
-      duration: deload ? '40 min' : (isFullSim ? '65-75 min' : '55 min'),
-      focus: deload ? '📍 Outdoor — Deload.' : `📍 Round Rock — ${isFullSim ? 'Full race rehearsal. Time every split. Compare to PR. Adjust strategy.' : 'Half sim — focus on weakest stations.'}` },
+        {name:'1km Run',detail:`@ ${paceRange} — final push`,zone:4}
+      ])),
+      duration: deload ? '40 min' : (isFullSim ? '65-75 min' : (isVO2Day ? '55 min' : '55 min')),
+      focus: deload ? '📍 Outdoor — Deload.' : (isFullSim ? '📍 Round Rock — BENCHMARK. Time every split. Target: sub 1:12. Compare to PR. This sets your trajectory into doubles phase.' : (isVO2Day ? '📍 Outdoor — VO2 max ceiling raiser. CANNOT talk during work. Builds the engine that lets you sustain race pace.' : '📍 Round Rock — Half sim at current race pace. Focus on weakest stations.')) },
 
     { day:'Thursday', type:'strength', title:'Easy Run + Posterior Chain', icon:'💪', zone:2,
       exercises:[
@@ -764,13 +730,13 @@ function getRacePaceWeek(weekNum, deload) {
         {name:'Easy Run',detail:'20 min @ Z2',zone:2},
         {name:'Wall Balls',detail:'50 reps easy',zone:0}
       ] : [
-        {name:'1km Run',detail:'@ 4:05/km — race pace',zone:4},
+        {name:'1km Run',detail:`@ ${paceFast}/km — current race pace`,zone:4},
         {name:'SkiErg',detail:'1000m @ 85% — controlled',zone:4},
-        {name:'1km Run',detail:'@ 4:05/km — hold pace',zone:4},
+        {name:'1km Run',detail:`@ ${paceFast}/km — hold pace`,zone:4},
         {name:'Sled Push',detail:'50m race weight',zone:0},
-        {name:'1km Run',detail:'@ 4:05/km — legs burning',zone:4},
+        {name:'1km Run',detail:`@ ${paceFast}/km — legs burning`,zone:4},
         {name:'Wall Balls',detail:'100 reps',zone:0},
-        {name:'1km Run',detail:'@ 4:05/km — leave it all',zone:4}
+        {name:'1km Run',detail:`@ ${paceFast}/km — leave it all`,zone:4}
       ],
       duration: deload ? '30 min' : '70 min',
       focus: deload ? 'Easy.' : '📍 Round Rock — Track every split. Goal: <15 sec/km variance across all 4 runs.' },
@@ -780,7 +746,7 @@ function getRacePaceWeek(weekNum, deload) {
         {name:'Long Run',detail:'45 min @ Z2',zone:2}
       ] : [
         {name:'Easy Run',detail:`${longMin - 25} min @ 6:00-6:30/km`,zone:2},
-        {name:'Race Pace Surges',detail:'5 × 3 min @ 4:00/km / 2 min easy recovery',zone:4},
+        {name:'Race Pace Surges',detail:`5 × 3 min @ ${paceFast}/km / 2 min easy recovery`,zone:4},
         {name:'Easy Finish',detail:'10 min @ Z2',zone:2}
       ],
       duration: deload ? '45 min' : `${longMin} min`,
@@ -792,43 +758,303 @@ function getRacePaceWeek(weekNum, deload) {
   ];
 }
 
-function getExecutionWeek(weekNum, deload) {
-  // PHASE 3: RACE EXECUTION (Weeks 21-26)
-  // Multiple full sims. Sharpen pacing. Get faster than race pace.
+function getDoublesWeek(weekNum, deload) {
+  // PHASE 3: DOUBLES SPECIFIC (Weeks 13-18) — Tampa Oct 23
+  // Same run volume as solo (both partners run all 8km).
+  // Station work shifts to split-load + short-rest format = active recovery practice.
+  // Saturday is the partner sim slot (with gf if available, solo split otherwise).
   const v = deload ? 0.7 : 1.0;
-  const isFullSim = !deload && (weekNum - 20) % 2 === 1;
+  const dWeek = weekNum - 12; // 1-6 within phase
+  const longMin = Math.round((80 + dWeek * 2) * v);
+  const isPartnerSim = dWeek === 2 || dWeek === 4 || dWeek === 6;
 
   return [
     { day:'Monday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
-      exercises:[{name:'Easy Run',detail:`${Math.round(40 * v)} min @ Z2`,zone:2}],
-      duration:`${Math.round(40 * v)} min`,
-      focus:'📍 Outdoor — Recovery. Easy.' },
+      exercises:[
+        {name:'Easy Run',detail:`${Math.round(45 * v)} min @ 6:00-6:30/km — HR < 145`,zone:2}
+      ],
+      duration:`${Math.round(45 * v)} min`,
+      focus:'📍 Outdoor — Recovery from weekend. Truly easy.' },
 
-    { day:'Tuesday', type:'intervals', title: deload ? 'Easy + Strides' : 'Sharp 800s', icon:'⚡', zone: deload ? 2 : 5,
-      exercises: deload ? [
-        {name:'Easy Run',detail:'30 min',zone:2},
-        {name:'Strides',detail:'6 × 20 sec',zone:4}
-      ] : [
-        {name:'Warm Up',detail:'15 min progressive',zone:2},
-        {name:'800m Repeats',detail:'6 × 800m @ 3:45-3:55/km / 2 min recovery',zone:5},
+    { day:'Tuesday', type:'intervals', title:'Doubles Race Pace', icon:'🎯', zone:4,
+      exercises:[
+        {name:'Warm Up',detail:'10 min easy + 5 strides (20s on / 40s off)',zone:2},
+        {name:'1km Repeats',detail:'8 × 1km @ 3:55-4:05/km / 60 sec rest — 8km is the full doubles run load',zone:4},
         {name:'Cool Down',detail:'10 min easy',zone:1}
       ],
-      duration: deload ? '40 min' : '50 min',
-      focus: deload ? 'Easy.' : '📍 Outdoor — Faster than race pace. Make 4:05/km feel controlled.' },
+      duration:'75 min',
+      focus:'📍 Outdoor — Doubles target = sub 1:07. Run @ ~4:00/km. Practice cruising at speed YOU and gf can hold together.' },
 
-    { day:'Wednesday', type:'hyrox', title: deload ? 'Easy Run' : (isFullSim ? 'FULL RACE SIM' : 'Compromised Combo'), icon:'🏁', zone: deload ? 2 : 4,
-      exercises: deload ? [
-        {name:'Easy Run',detail:'35 min',zone:2}
-      ] : (isFullSim ? [
-        {name:'1km Run → SkiErg 1000m',detail:'Race pace. Track every split.',zone:4},
-        {name:'1km Run → Sled Push 50m',detail:'',zone:4},
-        {name:'1km Run → Sled Pull 50m',detail:'',zone:4},
-        {name:'1km Run → Burpee BJ 80m',detail:'',zone:4},
-        {name:'1km Run → Row 1000m',detail:'',zone:4},
-        {name:'1km Run → Farmers 200m',detail:'',zone:4},
-        {name:'1km Run → Lunges 100m',detail:'',zone:4},
-        {name:'1km Run → Wall Balls 100',detail:'',zone:4}
+    { day:'Wednesday', type:'hyrox', title:'Split-Station Drill', icon:'⚡', zone:4,
+      exercises:[
+        {name:'Warm Up',detail:'10 min jog + activation',zone:2},
+        {name:'Split-Load Block A',detail:'500m SkiErg → 25 wall balls → 40m sled push → REST 20 sec. ×3 rounds.',zone:4},
+        {name:'Split-Load Block B',detail:'500m row → 40m burpee BJ → 50m farmers → REST 20 sec. ×3 rounds.',zone:4},
+        {name:'Finisher',detail:'50 wall balls — unbroken if possible',zone:0}
+      ],
+      duration:'55 min',
+      focus:'📍 Round Rock — HALF station load, SHORT rest. Practice the doubles micro-recovery: get HR down in 15-20 sec, then explode again.' },
+
+    { day:'Thursday', type:'strength', title:'Easy Run + Posterior Maintenance', icon:'💪', zone:2,
+      exercises:[
+        {name:'Easy Run',detail:`${Math.round(35 * v)} min @ Z2`,zone:2},
+        {name:'Romanian Deadlift',detail:'4 × 6 heavy',zone:0},
+        {name:'Hip Thrust',detail:'3 × 10 heavy',zone:0},
+        {name:'Bulgarian Split Squat',detail:'3 × 8 each',zone:0},
+        {name:'Nordic Hamstring Curls',detail:'3 × 6',zone:0},
+        {name:'Single-Leg Hops',detail:'3 × 8 each',zone:0}
+      ],
+      duration:'75 min',
+      focus:'📍 South Gym — Strength stays in maintenance. Run load is taking over.' },
+
+    { day:'Friday', type:'intervals', title:'Compromised Doubles Pace', icon:'😤', zone:4,
+      exercises:[
+        {name:'1km Run',detail:'@ 4:00/km — doubles race pace',zone:4},
+        {name:'SkiErg',detail:'500m hard (your half)',zone:4},
+        {name:'1km Run',detail:'@ 4:00/km — hold',zone:4},
+        {name:'Wall Balls',detail:'50 reps unbroken (your half)',zone:0},
+        {name:'1km Run',detail:'@ 4:00/km',zone:4},
+        {name:'Sled Push',detail:'50m × 2 lengths (your half)',zone:0},
+        {name:'1km Run',detail:'@ 4:00/km — final',zone:4}
+      ],
+      duration:'60 min',
+      focus:'📍 Round Rock — Compromised running at DOUBLES pace (faster than solo target). Variance under 15 sec/km.' },
+
+    { day:'Saturday', type:'hyrox', title: isPartnerSim ? 'PARTNER SIM with GF' : 'Doubles Solo Sim', icon: isPartnerSim ? '👥' : '🏁', zone:4,
+      exercises: isPartnerSim ? [
+        {name:'Run Together',detail:'All 8 × 1km @ 4:05-4:15/km — pace TOGETHER, not your solo pace',zone:4},
+        {name:'SkiErg',detail:'1000m total — alternate every 250m',zone:4},
+        {name:'Sled Push',detail:'4 lengths — alternate by length',zone:0},
+        {name:'Sled Pull',detail:'4 lengths — alternate by length',zone:0},
+        {name:'Burpee BJ',detail:'80m — alternate every 10m',zone:0},
+        {name:'Row',detail:'1000m — alternate every 250m',zone:4},
+        {name:'Farmers',detail:'200m — alternate by length',zone:0},
+        {name:'Lunges',detail:'100m — alternate by length',zone:0},
+        {name:'Wall Balls',detail:'100 reps — alternate rep-by-rep',zone:0}
       ] : [
+        {name:'Run',detail:'8 × 1km @ doubles pace ~4:05/km',zone:4},
+        {name:'Station Half-Load',detail:'After each km: 500m ski / 50m push / 50m pull / 40m burpee / 500m row / 100m farmers / 50m lunges / 50 wall balls',zone:4},
+        {name:'Note',detail:'Half reps, very short rest between station & next run = simulates partner switch fatigue',zone:0}
+      ],
+      duration: isPartnerSim ? '~70 min' : '~80 min',
+      focus: isPartnerSim ? '📍 Round Rock — REAL doubles practice. Communicate handoffs. Time the run splits. This is the only way to learn doubles.' : '📍 Round Rock — Solo execution of doubles format. Half station load + short rest = doubles fatigue without partner.' },
+
+    { day:'Sunday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
+      exercises:[{name:'Full Rest',detail:'Sleep, eat, recover.',zone:0}],
+      duration:'—', focus:'Recovery is where adaptation happens.' }
+  ];
+}
+
+function getTampaTaperWeek(weekNum) {
+  // PHASE 4: TAMPA TAPER (Weeks 19-20) — Race Fri Oct 23
+  const isRaceWeek = weekNum === 20;
+
+  if (isRaceWeek) {
+    return [
+      { day:'Monday', type:'run', title:'Shakeout Run', icon:'🏃', zone:1,
+        exercises:[{name:'Easy Jog',detail:'25 min @ Z1 — legs loose',zone:1}],
+        duration:'25 min', focus:'📍 Outdoor — Just move. Nothing more.' },
+      { day:'Tuesday', type:'intervals', title:'Final Sharpener', icon:'⚡', zone:4,
+        exercises:[
+          {name:'Warm Up',detail:'10 min easy',zone:2},
+          {name:'Race Pace',detail:'4 × 400m @ 4:00/km feel — smooth, never strain',zone:4},
+          {name:'Strides',detail:'4 × 20 sec fast & relaxed',zone:4},
+          {name:'Cool Down',detail:'10 min easy',zone:1}
+        ],
+        duration:'30 min', focus:'📍 Outdoor — Stay sharp. Stay fresh.' },
+      { day:'Wednesday', type:'rest', title:'Active Recovery', icon:'🧘', zone:0,
+        exercises:[
+          {name:'Walk',detail:'30 min easy walk',zone:0},
+          {name:'Mobility',detail:'Hip / ankle / thoracic — 15 min',zone:0},
+          {name:'Visualize',detail:'Sit with gf, review race plan, decide handoff order for each station',zone:0}
+        ],
+        duration:'45 min', focus:'Lock in the doubles plan with gf.' },
+      { day:'Thursday', type:'rest', title:'Travel + Light Shakeout', icon:'✈️', zone:1,
+        exercises:[
+          {name:'Travel to Tampa',detail:'Hydrate constantly. Walk every 90 min on plane.',zone:0},
+          {name:'Easy Jog',detail:'15 min @ Z1 once arrived',zone:1},
+          {name:'Strides',detail:'4 × 15 sec relaxed fast',zone:4},
+          {name:'Gear Check',detail:'Lay out everything for race morning',zone:0}
+        ],
+        duration:'25 min', focus:'Carb load dinner. In bed by 9:30pm.' },
+      { day:'Friday', type:'hyrox', title:'RACE DAY — TAMPA DOUBLES', icon:'🏁', zone:5,
+        exercises:[
+          {name:'3 hrs before',detail:'Oats + banana + honey + coffee. 500ml water.',zone:0},
+          {name:'1 hr before',detail:'Small banana or half energy bar',zone:0},
+          {name:'30 min before',detail:'Gel + water. Caffeine 200mg. Light warm-up jog WITH gf.',zone:2},
+          {name:'RUN PLAN',detail:'All 8 × 1km @ 4:00-4:10/km. Run TOGETHER, talk to her, set pace.',zone:4},
+          {name:'STATION PLAN',detail:'Alternate cleanly. Faster partner takes second half of wall balls + lunges (the closers).',zone:0},
+          {name:'TARGET',detail:'Sub 1:07. Stations done, focus on transitions.',zone:0}
+        ],
+        duration:'~67 min', focus:'GO WIN IT WITH HER. 🏆' },
+      { day:'Saturday', type:'rest', title:'Recovery Day', icon:'🎉', zone:0,
+        exercises:[{name:'Recover',detail:'Full meal. Walk. Celebrate. Massage if available.',zone:0}],
+        duration:'—', focus:'You earned it. Now: 4 weeks to Dallas.' },
+      { day:'Sunday', type:'rest', title:'Travel Home + Walk', icon:'🚶', zone:0,
+        exercises:[{name:'Walk',detail:'30-45 min easy. Loosen up.',zone:0}],
+        duration:'30 min', focus:'Reset for solo mode.' }
+    ];
+  }
+
+  // Week 19 — first taper week
+  return [
+    { day:'Monday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
+      exercises:[{name:'Easy Run',detail:'35 min @ Z2',zone:2}],
+      duration:'35 min', focus:'📍 Outdoor — Volume dropping. Trust the taper.' },
+    { day:'Tuesday', type:'intervals', title:'Sharp Race Pace', icon:'⚡', zone:5,
+      exercises:[
+        {name:'Warm Up',detail:'10 min easy',zone:2},
+        {name:'Intervals',detail:'5 × 600m @ 3:50/km / 90 sec recovery',zone:5},
+        {name:'Cool Down',detail:'10 min easy',zone:1}
+      ],
+      duration:'40 min', focus:'📍 Outdoor — Keep top-end engine sharp. Fast & smooth.' },
+    { day:'Wednesday', type:'hyrox', title:'Doubles Tune-Up', icon:'👥', zone:4,
+      exercises:[
+        {name:'1km Run',detail:'@ 4:00/km',zone:4},
+        {name:'SkiErg',detail:'500m @ 1:50/500m pace',zone:4},
+        {name:'1km Run',detail:'@ 4:00/km',zone:4},
+        {name:'Wall Balls',detail:'50 reps unbroken',zone:0},
+        {name:'1km Run',detail:'@ 4:00/km',zone:4},
+        {name:'Sled Push',detail:'2 × 50m race weight',zone:0},
+        {name:'1km Run',detail:'@ 4:00/km',zone:4}
+      ],
+      duration:'45 min', focus:'📍 Round Rock — Light touch on doubles pace. Don\'t grind.' },
+    { day:'Thursday', type:'run', title:'Easy + Strides', icon:'🏃', zone:2,
+      exercises:[
+        {name:'Easy Run',detail:'30 min @ Z2',zone:2},
+        {name:'Strides',detail:'5 × 20 sec relaxed fast',zone:4}
+      ],
+      duration:'35 min', focus:'📍 Outdoor — Loose & smooth.' },
+    { day:'Friday', type:'strength', title:'Mini Posterior Maintenance', icon:'💪', zone:0,
+      exercises:[
+        {name:'Romanian Deadlift',detail:'3 × 5 moderate',zone:0},
+        {name:'Hip Thrust',detail:'3 × 8',zone:0},
+        {name:'Single-Leg Hops',detail:'2 × 6 each',zone:0}
+      ],
+      duration:'30 min', focus:'📍 South Gym — Maintain, do not fatigue.' },
+    { day:'Saturday', type:'long', title:'Moderate Long Run', icon:'🛣️', zone:2,
+      exercises:[{name:'Easy Run',detail:'50 min @ Z2',zone:2}],
+      duration:'50 min', focus:'📍 Outdoor — Last meaningful volume before Tampa.' },
+    { day:'Sunday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
+      exercises:[{name:'Full Rest',detail:'Sleep 8+ hrs.',zone:0}],
+      duration:'—', focus:'Recover. Race week starts Monday.' }
+  ];
+}
+
+function getResetWeek(weekNum) {
+  // PHASE 5: RECOVERY & RESET (Week 21) — Tampa just done, 4 weeks until Dallas
+  // Active recovery, mental reorient to solo mode, no hard sessions.
+  return [
+    { day:'Monday', type:'rest', title:'Walk + Mobility', icon:'🧘', zone:0,
+      exercises:[
+        {name:'Walk',detail:'30-45 min easy',zone:0},
+        {name:'Mobility Flow',detail:'15 min — hip, ankle, thoracic',zone:0}
+      ],
+      duration:'60 min', focus:'Body is still cashing checks from Tampa. Be patient.' },
+    { day:'Tuesday', type:'run', title:'Shakeout Run', icon:'🏃', zone:1,
+      exercises:[
+        {name:'Easy Jog',detail:'30 min @ Z1 — HR < 140',zone:1},
+        {name:'Strides',detail:'4 × 20 sec relaxed',zone:4}
+      ],
+      duration:'35 min', focus:'📍 Outdoor — Test the legs. Stop if anything is off.' },
+    { day:'Wednesday', type:'rest', title:'Active Recovery', icon:'🧘', zone:0,
+      exercises:[
+        {name:'Walk',detail:'45 min',zone:0},
+        {name:'Foam Roll',detail:'Full body — 20 min',zone:0}
+      ],
+      duration:'65 min', focus:'Mental reset day. Re-read your sub-1:05 race plan.' },
+    { day:'Thursday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
+      exercises:[{name:'Easy Run',detail:'40 min @ Z2',zone:2}],
+      duration:'40 min', focus:'📍 Outdoor — First real run back. Easy.' },
+    { day:'Friday', type:'strength', title:'Light Posterior Chain', icon:'💪', zone:0,
+      exercises:[
+        {name:'Romanian Deadlift',detail:'3 × 6 moderate',zone:0},
+        {name:'Hip Thrust',detail:'3 × 10',zone:0},
+        {name:'Bulgarian Split Squat',detail:'2 × 8 each — light',zone:0},
+        {name:'Plank',detail:'3 × 45 sec',zone:0}
+      ],
+      duration:'45 min', focus:'📍 South Gym — Wake up the chain. No new soreness.' },
+    { day:'Saturday', type:'long', title:'Easy Long Run', icon:'🛣️', zone:2,
+      exercises:[
+        {name:'Easy Run',detail:'60 min @ Z2 — fully conversational',zone:2}
+      ],
+      duration:'60 min', focus:'📍 Outdoor — Restore aerobic feel. Solo focus from here.' },
+    { day:'Sunday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
+      exercises:[{name:'Full Rest',detail:'Sleep, eat, recover.',zone:0}],
+      duration:'—', focus:'Sharpening starts Monday.' }
+  ];
+}
+
+function getSoloSharpenWeek(weekNum) {
+  // PHASE 6: SOLO SHARPENING (Weeks 22-23) — 2 weeks to recall sub-1:05 execution
+  const isWeek22 = weekNum === 22;
+
+  if (isWeek22) {
+    // Week 22 — re-introduce full station load + race pace + ONE full solo sim
+    return [
+      { day:'Monday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
+        exercises:[{name:'Easy Run',detail:'45 min @ Z2',zone:2}],
+        duration:'45 min', focus:'📍 Outdoor — Recovery from weekend.' },
+      { day:'Tuesday', type:'intervals', title:'Race Pace 1km Repeats', icon:'🎯', zone:4,
+        exercises:[
+          {name:'Warm Up',detail:'10 min easy + 5 strides',zone:2},
+          {name:'1km Repeats',detail:'6 × 1km @ 3:55-4:00/km / 60 sec rest — SUB 1:05 PACE',zone:4},
+          {name:'Cool Down',detail:'10 min easy',zone:1}
+        ],
+        duration:'55 min', focus:'📍 Outdoor — Recall solo race pace. Faster than doubles.' },
+      { day:'Wednesday', type:'hyrox', title:'FULL SOLO RACE SIM', icon:'🏁', zone:4,
+        exercises:[
+          {name:'1km Run → SkiErg 1000m',detail:'Race effort. Time every split.',zone:4},
+          {name:'1km Run → Sled Push 50m',detail:'',zone:4},
+          {name:'1km Run → Sled Pull 50m',detail:'',zone:4},
+          {name:'1km Run → Burpee BJ 80m',detail:'',zone:4},
+          {name:'1km Run → Row 1000m',detail:'',zone:4},
+          {name:'1km Run → Farmers 200m',detail:'',zone:4},
+          {name:'1km Run → Lunges 100m',detail:'',zone:4},
+          {name:'1km Run → Wall Balls 100',detail:'',zone:4}
+        ],
+        duration:'~65 min', focus:'📍 Round Rock — THE benchmark before Dallas. Target sub 1:08 (within 3 min of A goal).' },
+      { day:'Thursday', type:'run', title:'Easy Run + Mobility', icon:'🏃', zone:1,
+        exercises:[
+          {name:'Easy Run',detail:'30 min @ Z1-Z2',zone:1},
+          {name:'Mobility',detail:'15 min — hip / ankle / thoracic',zone:0}
+        ],
+        duration:'45 min', focus:'📍 Outdoor — Recover from the sim.' },
+      { day:'Friday', type:'intervals', title:'Sharp 800s', icon:'⚡', zone:5,
+        exercises:[
+          {name:'Warm Up',detail:'15 min progressive',zone:2},
+          {name:'800m Repeats',detail:'5 × 800m @ 3:45-3:55/km / 2 min rest',zone:5},
+          {name:'Cool Down',detail:'10 min easy',zone:1}
+        ],
+        duration:'45 min', focus:'📍 Outdoor — Top-end speed. Make 4:00/km feel easy.' },
+      { day:'Saturday', type:'strength', title:'Long Easy + Posterior Maintenance', icon:'💪', zone:2,
+        exercises:[
+          {name:'Easy Run',detail:'50 min @ Z2',zone:2},
+          {name:'Romanian Deadlift',detail:'3 × 5 — maintain',zone:0},
+          {name:'Hip Thrust',detail:'3 × 8',zone:0},
+          {name:'Single-Leg Hops',detail:'2 × 6 each',zone:0}
+        ],
+        duration:'85 min', focus:'📍 Mixed — Last big volume day before taper.' },
+      { day:'Sunday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
+        exercises:[{name:'Full Rest',detail:'Sleep 8+ hrs.',zone:0}],
+        duration:'—', focus:'Recover.' }
+    ];
+  }
+
+  // Week 23 — sharpening continues, no full sim, intensity stays
+  return [
+    { day:'Monday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
+      exercises:[{name:'Easy Run',detail:'40 min @ Z2',zone:2}],
+      duration:'40 min', focus:'📍 Outdoor — Easy.' },
+    { day:'Tuesday', type:'intervals', title:'Race Pace Repeats', icon:'🎯', zone:4,
+      exercises:[
+        {name:'Warm Up',detail:'10 min easy + 5 strides',zone:2},
+        {name:'1km Repeats',detail:'5 × 1km @ 3:55/km / 60 sec rest',zone:4},
+        {name:'Cool Down',detail:'10 min easy',zone:1}
+      ],
+      duration:'50 min', focus:'📍 Outdoor — Final big race pace session.' },
+    { day:'Wednesday', type:'hyrox', title:'Compromised Combo', icon:'😤', zone:4,
+      exercises:[
         {name:'1km Run',detail:'@ 4:00/km',zone:4},
         {name:'Sled Pull',detail:'50m — your weakest station',zone:0},
         {name:'1km Run',detail:'@ 4:00/km',zone:4},
@@ -836,152 +1062,94 @@ function getExecutionWeek(weekNum, deload) {
         {name:'1km Run',detail:'@ 4:00/km',zone:4},
         {name:'Burpee BJ',detail:'80m',zone:0},
         {name:'1km Run',detail:'@ 4:00/km — final',zone:4}
-      ]),
-      duration: deload ? '35 min' : (isFullSim ? '60-70 min' : '55 min'),
-      focus: deload ? 'Easy.' : `📍 Round Rock — ${isFullSim ? 'Execute race plan. Compare to last sim.' : 'Compromised running. Build mental tolerance.'}` },
-
-    { day:'Thursday', type:'run', title:'Easy Run + Mobility', icon:'🏃', zone:1,
+      ],
+      duration:'55 min', focus:'📍 Round Rock — Sharpen the weakest stations.' },
+    { day:'Thursday', type:'run', title:'Easy Run + Strides', icon:'🏃', zone:1,
       exercises:[
         {name:'Easy Run',detail:'30 min @ Z1-Z2',zone:1},
-        {name:'Mobility Flow',detail:'15 min — hip / ankle / thoracic',zone:0}
+        {name:'Strides',detail:'5 × 20 sec relaxed fast',zone:4}
       ],
-      duration:'45 min',
-      focus:'📍 Outdoor — Active recovery. Stay loose between hard sessions.' },
-
+      duration:'35 min', focus:'📍 Outdoor — Stay loose.' },
     { day:'Friday', type:'intervals', title:'Race Pace Tune-Up', icon:'🎯', zone:4,
-      exercises: deload ? [
-        {name:'Easy Run',detail:'25 min',zone:2}
-      ] : [
-        {name:'Warm Up',detail:'10 min',zone:2},
-        {name:'Race Pace',detail:'4 × 1km @ 4:00/km / 90 sec rest',zone:4},
-        {name:'Cool Down',detail:'10 min',zone:1}
-      ],
-      duration: deload ? '25 min' : '40 min',
-      focus: deload ? 'Easy.' : '📍 Outdoor — Stay sharp on race pace. Should feel automatic.' },
-
-    { day:'Saturday', type:'strength', title:'Long Easy + Posterior Maintenance', icon:'💪', zone:2,
       exercises:[
-        {name:'Easy Run',detail:`${Math.round(50 * v)} min @ Z2`,zone:2},
-        {name:'Romanian Deadlift',detail:'3 × 6 — maintain',zone:0},
-        {name:'Hip Thrust',detail:'3 × 10',zone:0},
-        {name:'Single-Leg Hops',detail:'2 × 8 each',zone:0}
+        {name:'Warm Up',detail:'10 min easy',zone:2},
+        {name:'Race Pace',detail:'4 × 1km @ 4:00/km / 90 sec rest',zone:4},
+        {name:'Cool Down',detail:'10 min easy',zone:1}
       ],
-      duration:'85 min',
-      focus:'📍 Mixed — Aerobic volume + posterior chain maintenance.' },
-
+      duration:'40 min', focus:'📍 Outdoor — Race pace should feel automatic now.' },
+    { day:'Saturday', type:'long', title:'Moderate Long + Surges', icon:'🛣️', zone:2,
+      exercises:[
+        {name:'Easy Run',detail:'45 min @ Z2',zone:2},
+        {name:'Race Pace Surges',detail:'3 × 2 min @ 4:00/km / 3 min easy',zone:4}
+      ],
+      duration:'65 min', focus:'📍 Outdoor — Last long-ish run before taper.' },
     { day:'Sunday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
-      exercises:[{name:'Full Rest',detail:'Sleep 8+ hrs. Active recovery walk OK.',zone:0}],
-      duration:'—', focus:'Recovery.' }
+      exercises:[{name:'Full Rest',detail:'Sleep 8+ hrs.',zone:0}],
+      duration:'—', focus:'Taper week starts Monday.' }
   ];
 }
 
-function getPeakTaperWeek(weekNum) {
-  // PHASE 4: PEAK & TAPER (Weeks 27-30)
-  const wk = weekNum - 26;
-  const isRaceWeek = weekNum === 30;
-  const mult = Math.max(0.4, 1 - (wk * 0.15));
-
-  if (isRaceWeek) {
-    return [
-      { day:'Monday', type:'run', title:'Shakeout Run', icon:'🏃', zone:1,
-        exercises:[{name:'Easy Jog',detail:'20 min @ Z1 — legs loose',zone:1}],
-        duration:'20 min', focus:'📍 Outdoor — Just move. Nothing more.' },
-      { day:'Tuesday', type:'intervals', title:'Final Sharpener', icon:'⚡', zone:4,
-        exercises:[
-          {name:'Warm Up',detail:'10 min easy',zone:2},
-          {name:'Race Pace',detail:'3 × 400m @ 4:00/km feel — smooth & controlled',zone:4},
-          {name:'Cool Down',detail:'10 min easy',zone:1}
-        ],
-        duration:'25 min', focus:'📍 Outdoor — Stay sharp. Stay fresh.' },
-      { day:'Wednesday', type:'rest', title:'Rest', icon:'😴', zone:0,
-        exercises:[{name:'Rest & Visualize',detail:'Pack gear. Review race plan. Visualize your race.',zone:0}],
-        duration:'—', focus:'You are ready. Trust your training.' },
-      { day:'Thursday', type:'run', title:'Easy Shakeout', icon:'🏃', zone:1,
-        exercises:[
-          {name:'Easy Jog',detail:'15 min @ Z1',zone:1},
-          {name:'Strides',detail:'4 × 15 sec relaxed fast',zone:4}
-        ],
-        duration:'20 min', focus:'📍 Outdoor — Stay loose. Nothing hard.' },
-      { day:'Friday', type:'rest', title:'Race Eve — Rest', icon:'😴', zone:0,
-        exercises:[
-          {name:'Rest',detail:'Legs up. Hydrate.',zone:0},
-          {name:'Carb Load Dinner',detail:'Pasta or rice + lean protein. Eat by 7pm.',zone:0},
-          {name:'Gear Check',detail:'Lay out everything tonight',zone:0}
-        ],
-        duration:'—', focus:'Early dinner. Early bed. 8+ hours sleep.' },
-      { day:'Saturday', type:'hyrox', title:'RACE DAY — DALLAS', icon:'🏁', zone:5,
-        exercises:[
-          {name:'3 hrs before',detail:'Oats + banana + honey + coffee. 500ml water.',zone:0},
-          {name:'1 hr before',detail:'Small banana or half energy bar',zone:0},
-          {name:'30 min before',detail:'Gel + water. Caffeine 200-300mg. Light warm-up jog.',zone:2},
-          {name:'RACE PLAN',detail:'Runs 1-4: 3:55-4:05/km. Runs 5-8: 4:05-4:15/km.',zone:4},
-          {name:'STATIONS',detail:'Controlled. Technique > speed. Smooth transitions.',zone:0}
-        ],
-        duration:'~65 min', focus:'GO GET THAT PR.' },
-      { day:'Sunday', type:'rest', title:'Celebrate', icon:'🎉', zone:0,
-        exercises:[{name:'Recovery',detail:'You earned it. Protein, full meal, rest.',zone:0}],
-        duration:'—', focus:'🏆' }
-    ];
-  }
-
+function getDallasTaperWeek() {
+  // PHASE 7: DALLAS TAPER (Week 24) — Race Fri Nov 20
   return [
-    { day:'Monday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
-      exercises:[{name:'Easy Run',detail:`${Math.round(30 * mult)} min @ Z2`,zone:2}],
-      duration:`${Math.round(30 * mult)} min`,
-      focus:'📍 Outdoor — Volume dropping. Trust the taper.' },
-    { day:'Tuesday', type:'intervals', title:'Sharp Intervals', icon:'⚡', zone:5,
+    { day:'Monday', type:'run', title:'Shakeout Run', icon:'🏃', zone:1,
+      exercises:[{name:'Easy Jog',detail:'20 min @ Z1 — legs loose',zone:1}],
+      duration:'20 min', focus:'📍 Outdoor — Just move. Nothing more.' },
+    { day:'Tuesday', type:'intervals', title:'Final Sharpener', icon:'⚡', zone:4,
       exercises:[
         {name:'Warm Up',detail:'10 min easy',zone:2},
-        {name:'Intervals',detail:`${Math.max(3, 5 - wk)} × 800m @ 3:45-3:55/km`,zone:5},
+        {name:'Race Pace',detail:'3 × 400m @ 4:00/km feel — smooth & controlled',zone:4},
+        {name:'Strides',detail:'4 × 15 sec relaxed fast',zone:4},
         {name:'Cool Down',detail:'10 min easy',zone:1}
       ],
-      duration:'35 min',
-      focus:'📍 Outdoor — Keep top-end engine. Fast & sharp.' },
-    { day:'Wednesday', type:'hyrox', title:'Light Station Touch', icon:'🟢', zone:2,
+      duration:'30 min', focus:'📍 Outdoor — Stay sharp. Stay fresh.' },
+    { day:'Wednesday', type:'rest', title:'Rest + Visualize', icon:'😴', zone:0,
+      exercises:[{name:'Rest & Visualize',detail:'Pack gear. Review race plan. Visualize your race start-to-finish.',zone:0}],
+      duration:'—', focus:'You are ready. Trust your training.' },
+    { day:'Thursday', type:'rest', title:'Travel + Light Shakeout', icon:'✈️', zone:1,
       exercises:[
-        {name:'Each Station',detail:'70-80% effort — stay familiar',zone:2},
-        {name:'Focus: Sled Pull',detail:'3 × 50m — technique',zone:0},
-        {name:'Focus: Wall Balls',detail:'2 × 30 reps — rhythm',zone:0}
+        {name:'Travel to Dallas',detail:'Hydrate constantly. Walk every 90 min.',zone:0},
+        {name:'Easy Jog',detail:'15 min @ Z1 once arrived',zone:1},
+        {name:'Strides',detail:'4 × 15 sec relaxed fast',zone:4},
+        {name:'Gear Check',detail:'Lay out everything for race morning',zone:0}
       ],
-      duration:'35 min',
-      focus:'📍 Round Rock — Light. Don\'t grind.' },
-    { day:'Thursday', type:'run', title:'Easy Run + Posterior Maintenance', icon:'🏃', zone:1,
+      duration:'25 min', focus:'Carb load dinner. In bed by 9:30pm.' },
+    { day:'Friday', type:'hyrox', title:'RACE DAY — DALLAS SOLO', icon:'🏁', zone:5,
       exercises:[
-        {name:'Easy Run',detail:`${Math.round(25 * mult)} min @ Z1`,zone:1},
-        {name:'Romanian Deadlift',detail:'3 × 6 moderate — maintain',zone:0},
-        {name:'Hip Thrust',detail:'3 × 10 moderate',zone:0}
+        {name:'3 hrs before',detail:'Oats + banana + honey + coffee. 500ml water.',zone:0},
+        {name:'1 hr before',detail:'Small banana or half energy bar',zone:0},
+        {name:'30 min before',detail:'Gel + water. Caffeine 200-300mg. Light warm-up jog.',zone:2},
+        {name:'RUN PLAN',detail:'Runs 1-4: 3:55-4:05/km. Runs 5-8: 4:05-4:15/km. Run + Roxzone counts.',zone:4},
+        {name:'STATIONS',detail:'SET stations (Ski/Sleds/Row): your plan, don\'t deviate. RACE stations (Burpees/Farmers/Lunges/Wall Balls): sell out.',zone:0},
+        {name:'A GOAL',detail:'Sub 1:05. Stretch: sub 1:00.',zone:0}
       ],
-      duration:`${Math.round(25 * mult) + 20} min`, focus:'📍 South Gym — Light run + maintenance lift.' },
-    { day:'Friday', type:'intervals', title:'Race Pace Check', icon:'🎯', zone:4,
-      exercises:[
-        {name:'Warm Up',detail:'10 min easy',zone:2},
-        {name:'Race Pace',detail:`${Math.max(2, 4 - wk)} × 1km @ 4:00/km`,zone:4},
-        {name:'Cool Down',detail:'10 min easy',zone:1}
-      ],
-      duration:'35 min', focus:'📍 Outdoor — Remind legs of race pace. Controlled.' },
-    { day:'Saturday', type:'long', title:'Moderate Long Run', icon:'🛣️', zone:2,
-      exercises:[{name:'Easy Run',detail:`${Math.round(40 * mult)} min @ Z2`,zone:2}],
-      duration:`${Math.round(40 * mult)} min`, focus:'📍 Outdoor — Volume dropping weekly.' },
-    { day:'Sunday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
-      exercises:[{name:'Full Rest',detail:'Sleep 8+ hrs.',zone:0}],
-      duration:'—', focus:'Recover.' }
+      duration:'~65 min', focus:'GO GET THAT PR. 🏆' },
+    { day:'Saturday', type:'rest', title:'Celebrate', icon:'🎉', zone:0,
+      exercises:[{name:'Recovery',detail:'You earned it. Protein, full meal, rest.',zone:0}],
+      duration:'—', focus:'🏆 SEASON COMPLETE.' },
+    { day:'Sunday', type:'rest', title:'Off Season Begins', icon:'🌴', zone:0,
+      exercises:[{name:'Active Rest',detail:'Walk, eat, hydrate. Take 1-2 weeks fully off before next plan.',zone:0}],
+      duration:'—', focus:'You crushed two races in one month. Rest now.' }
   ];
 }
 
 // ===== MASTER PLAN GENERATOR =====
 function generateTrainingPlan() {
   const plan = [];
-  const startDate = new Date('2026-04-27');
+  const startDate = new Date('2026-06-08');
 
-  for (let week = 1; week <= 30; week++) {
+  for (let week = 1; week <= 24; week++) {
     const phase = getPhase(week);
     const deload = isDeloadWeek(week);
 
     let weekDays;
-    if (week <= 10) weekDays = getSpeedFoundationWeek(week, deload);
-    else if (week <= 20) weekDays = getRacePaceWeek(week, deload);
-    else if (week <= 26) weekDays = getExecutionWeek(week, deload);
-    else weekDays = getPeakTaperWeek(week);
+    if (week <= 6)        weekDays = getFoundationWeek(week, deload);
+    else if (week <= 12)  weekDays = getRacePaceWeek(week, deload);
+    else if (week <= 18)  weekDays = getDoublesWeek(week, deload);
+    else if (week <= 20)  weekDays = getTampaTaperWeek(week);
+    else if (week === 21) weekDays = getResetWeek(week);
+    else if (week <= 23)  weekDays = getSoloSharpenWeek(week);
+    else                  weekDays = getDallasTaperWeek();
 
     const weekStartDate = new Date(startDate);
     weekStartDate.setDate(weekStartDate.getDate() + (week - 1) * 7);
@@ -1000,130 +1168,6 @@ function generateTrainingPlan() {
 }
 
 const TRAINING_PLAN = generateTrainingPlan();
-
-// =============================================
-// NUTRITION & FUELING GUIDE
-// Hyrox-specific for Aidan (180 lbs / 81.6 kg)
-// =============================================
-
-const NUTRITION = {
-  overview: {
-    weight: 180,
-    weightKg: 81.6,
-    bodyFatNote: 'Very lean — could benefit from slightly higher caloric intake for endurance training. A small increase in body fat (1-2%) can improve glycogen storage and recovery.',
-    dailyCalories: {
-      training: '2,800 – 3,200',
-      rest: '2,400 – 2,600',
-      raceWeek: '3,000 – 3,400 (carb load last 2 days)'
-    }
-  },
-  
-  macros: {
-    training: {
-      protein: { grams: '145-165g', perKg: '1.8-2.0 g/kg', percent: '20-22%' },
-      carbs: { grams: '350-420g', perKg: '4.3-5.1 g/kg', percent: '50-55%' },
-      fat: { grams: '85-100g', perKg: '1.0-1.2 g/kg', percent: '28-32%' }
-    },
-    rest: {
-      protein: { grams: '145-165g', perKg: '1.8-2.0 g/kg', percent: '25%' },
-      carbs: { grams: '250-300g', perKg: '3.0-3.7 g/kg', percent: '45%' },
-      fat: { grams: '85-100g', perKg: '1.0-1.2 g/kg', percent: '30%' }
-    }
-  },
-  
-  preWorkout: {
-    title: 'Pre-Run / Pre-Workout Fueling',
-    timing: '2-3 hours before',
-    meals: [
-      {
-        name: '🥣 Oatmeal Bowl',
-        details: '1 cup oats + banana + tbsp honey + pinch salt',
-        macros: '~65g carbs, 8g protein, 5g fat',
-        why: 'Slow-release carbs, easy to digest'
-      },
-      {
-        name: '🍞 Toast & Eggs',
-        details: '2 slices sourdough + 2 eggs + banana',
-        macros: '~55g carbs, 18g protein, 12g fat',
-        why: 'Good balance of carbs and protein'
-      },
-      {
-        name: '🍚 Rice & Chicken',
-        details: '1 cup white rice + 4oz chicken breast + soy sauce',
-        macros: '~60g carbs, 30g protein, 4g fat',
-        why: 'Great for longer/harder sessions'
-      }
-    ],
-    topUp: {
-      timing: '30-45 min before',
-      options: [
-        'Banana + small coffee',
-        'Energy gel + water',
-        'Small handful gummy bears (fast carbs)'
-      ]
-    }
-  },
-  
-  duringWorkout: {
-    title: 'During Long/Hard Sessions',
-    rules: [
-      { rule: 'Under 60 min', action: 'Water only — no fuel needed' },
-      { rule: '60-90 min', action: 'Sip sports drink (30-40g carbs/hr)' },
-      { rule: 'Race day', action: 'Small gel at Roxzone 4 if needed' }
-    ],
-    hydration: 'Aim for 500-800ml per hour depending on heat',
-    note: 'Practice your race nutrition in training simulations. Never try anything new on race day.'
-  },
-  
-  postWorkout: {
-    title: 'Post-Workout Recovery',
-    timing: 'Within 30-60 min after training',
-    meals: [
-      {
-        name: '🥤 Protein Shake + Carbs',
-        details: '1 scoop whey + banana + cup milk + tbsp PB',
-        macros: '~45g carbs, 35g protein, 12g fat',
-        why: 'Fast absorption, easy to get down'
-      },
-      {
-        name: '🍗 Chicken Rice Bowl',
-        details: '6oz chicken + 1.5 cups rice + veggies + sauce',
-        macros: '~75g carbs, 45g protein, 10g fat',
-        why: 'Complete recovery meal'
-      }
-    ]
-  },
-  
-  raceDay: {
-    title: '🏁 Race Day Protocol — Dallas',
-    timeline: [
-      { time: 'Night Before', action: 'Carb-heavy dinner: pasta/rice + lean protein. Hydrate well. Bed by 9pm.' },
-      { time: '3 hrs before', action: 'Breakfast: Oatmeal + banana + honey + coffee. 500ml water.' },
-      { time: '1 hr before', action: 'Small banana or half energy bar. Sip water.' },
-      { time: '30 min before', action: 'Energy gel + water (150ml). Light warm-up jog.' },
-      { time: 'During race', action: 'Small sips water at Roxzones. Gel at Roxzone 4 if energy dipping.' },
-      { time: 'After race', action: 'Protein shake within 30 min. Full meal within 2 hours.' }
-    ],
-    avoidRaceDay: [
-      'No new foods — only things you\'ve tested in training',
-      'No high fiber morning of (no beans, cruciferous veggies)',
-      'No dairy if sensitive',
-      'No excessive caffeine beyond your normal',
-      'No alcohol 48 hours before'
-    ]
-  },
-  
-  supplements: {
-    title: 'Suggested Supplements',
-    items: [
-      { name: 'Creatine Monohydrate', dose: '5g daily', why: 'Strength maintenance, may help with repeated high-intensity efforts' },
-      { name: 'Caffeine', dose: '200mg pre-race', why: 'Proven performance enhancer — use what you\'re used to' },
-      { name: 'Electrolytes', dose: 'During long runs & race', why: 'Essential in Texas heat — sodium, potassium, magnesium' },
-      { name: 'Vitamin D', dose: '2000-4000 IU daily', why: 'Most people are deficient, supports recovery' },
-      { name: 'Magnesium', dose: '300-400mg before bed', why: 'Sleep quality, muscle recovery, cramp prevention' }
-    ]
-  }
-};
 
 // =============================================
 // LOCAL STORAGE WRAPPER
@@ -1155,16 +1199,10 @@ const Storage = {
   
   _defaults() {
     return {
-      completedWorkouts: {},  // { '2025-04-07': { completed: true, exercises: [...], rpe: 7, notes: '' } }
-      vo2maxUpdates: [],      // Additional VO2 max entries user adds
-      weightUpdates: [],      // Weight tracking (legacy)
-      meals: [],              // [{ id, dateStr, loggedAt, name, calories, protein, carbs, fat, thumbnail, source, confidence }]
-      weights: [],            // [{ id, dateStr, loggedAt, lbs }]
-      fuelGoals: null,        // { calories, protein, carbs, fat, bodyweight, goalType, pace, goalLbs }
-      lastView: 'dashboard',
-      preferences: {
-        notifications: true
-      }
+      completedWorkouts: {},
+      vo2maxUpdates: [],
+      lastView: 'today',
+      preferences: { notifications: true }
     };
   },
   
@@ -1369,112 +1407,6 @@ const Storage = {
     return stats.sort((a, b) => a.date.localeCompare(b.date));
   },
 
-  // --- meals ---
-  addMeal(meal) {
-    const data = this._load();
-    if (!data.meals) data.meals = [];
-    const m = {
-      id: 'meal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-      loggedAt: new Date().toISOString(),
-      dateStr: localDateStr(new Date()),
-      ...meal
-    };
-    data.meals.unshift(m);
-    this._save();
-    return m;
-  },
-
-  updateMeal(id, patch) {
-    const data = this._load();
-    if (!data.meals) data.meals = [];
-    const m = data.meals.find(x => x.id === id);
-    if (m) Object.assign(m, patch);
-    this._save();
-  },
-
-  deleteMeal(id) {
-    const data = this._load();
-    if (!data.meals) data.meals = [];
-    data.meals = data.meals.filter(x => x.id !== id);
-    this._save();
-  },
-
-  getMealsForDate(dateStr) {
-    const data = this._load();
-    return (data.meals || []).filter(m => m.dateStr === dateStr);
-  },
-
-  getDailyTotals(dateStr) {
-    return this.getMealsForDate(dateStr).reduce((acc, m) => ({
-      calories: acc.calories + (Number(m.calories) || 0),
-      protein: acc.protein + (Number(m.protein) || 0),
-      carbs: acc.carbs + (Number(m.carbs) || 0),
-      fat: acc.fat + (Number(m.fat) || 0)
-    }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
-  },
-
-  // --- fuel goals ---
-  getFuelGoals() {
-    return this._load().fuelGoals || null;
-  },
-
-  setFuelGoals(goals) {
-    const data = this._load();
-    data.fuelGoals = { ...goals };
-    this._save();
-  },
-
-  // --- bodyweight tracking ---
-  addWeight(lbs, dateStr) {
-    const data = this._load();
-    if (!data.weights) data.weights = [];
-    const ds = dateStr || localDateStr(new Date());
-    data.weights = data.weights.filter(w => w.dateStr !== ds); // dedupe per day
-    data.weights.push({
-      id: 'w_' + Date.now(),
-      dateStr: ds,
-      loggedAt: new Date().toISOString(),
-      lbs: Number(lbs) || 0
-    });
-    data.weights.sort((a, b) => a.dateStr.localeCompare(b.dateStr));
-    this._save();
-  },
-
-  deleteWeight(id) {
-    const data = this._load();
-    if (!data.weights) data.weights = [];
-    data.weights = data.weights.filter(w => w.id !== id);
-    this._save();
-  },
-
-  getWeights() {
-    return this._load().weights || [];
-  },
-
-  getLatestWeight() {
-    const ws = this.getWeights();
-    return ws.length ? ws[ws.length - 1] : null;
-  },
-
-  getWeightTrend(daysAgo) {
-    const ws = this.getWeights();
-    if (ws.length < 2) return null;
-    const latest = ws[ws.length - 1];
-    const cutoffStr = localDateStr(new Date(Date.now() - daysAgo * 86400000));
-    let from = null;
-    for (const w of ws) {
-      if (w.dateStr <= cutoffStr) from = w;
-      else break;
-    }
-    if (!from) from = ws[0];
-    if (from.id === latest.id) return null;
-    return {
-      delta: +(latest.lbs - from.lbs).toFixed(1),
-      days: Math.max(1, Math.round((new Date(latest.dateStr) - new Date(from.dateStr)) / 86400000)),
-      fromLbs: from.lbs,
-      fromDate: from.dateStr
-    };
-  }
 };
 
 // =============================================
@@ -1528,12 +1460,12 @@ const Dates = {
   },
   
   getCurrentWeek() {
-    const start = new Date('2026-04-27T00:00:00');
+    const start = new Date('2026-06-08T00:00:00');
     const now = new Date();
     now.setHours(0, 0, 0, 0);
     const diff = now - start;
     const weekNum = Math.floor(diff / (1000 * 60 * 60 * 24 * 7)) + 1;
-    return Math.max(1, Math.min(30, weekNum));
+    return Math.max(1, Math.min(24, weekNum));
   },
   
   getTodayWorkout() {
@@ -1626,81 +1558,6 @@ const Fmt = {
     return n + (s[(v - 20) % 10] || s[v] || s[0]);
   }
 };
-
-// =============================================
-// HELPERS (meal/weight tracking)
-// =============================================
-
-function localDateStr(d) {
-  const dt = (d instanceof Date) ? d : new Date(d);
-  const y = dt.getFullYear();
-  const m = String(dt.getMonth() + 1).padStart(2, '0');
-  const day = String(dt.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-}
-
-function todayStr() {
-  return localDateStr(new Date());
-}
-
-function escapeHtml(s) {
-  return String(s == null ? '' : s)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-}
-
-function fmtDate(iso) {
-  const d = new Date(iso);
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-}
-
-async function fileToCompressedDataUrl(file, maxDim, quality = 0.85) {
-  const url = URL.createObjectURL(file);
-  try {
-    const img = await new Promise((resolve, reject) => {
-      const i = new Image();
-      i.onload = () => resolve(i);
-      i.onerror = () => reject(new Error('Could not load image'));
-      i.src = url;
-    });
-    let w = img.width, h = img.height;
-    if (w > h && w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; }
-    else if (h >= w && h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; }
-    const canvas = document.createElement('canvas');
-    canvas.width = w; canvas.height = h;
-    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-    return canvas.toDataURL('image/jpeg', quality);
-  } finally {
-    URL.revokeObjectURL(url);
-  }
-}
-
-function dataUrlToBase64(dataUrl) {
-  return dataUrl.replace(/^data:image\/\w+;base64,/, '');
-}
-
-// Suggested calorie/macro targets from bodyweight + goal type + pace (lbs/week)
-function suggestGoals(bodyweightLb, goalType, paceLbWeek) {
-  const maintenance = Math.round(bodyweightLb * 15);
-  let pace = paceLbWeek;
-  if (pace == null) pace = goalType === 'gain' ? 0.5 : (goalType === 'cut' ? -0.75 : 0);
-  const calories = Math.round(maintenance + (pace * 3500 / 7));
-  const protein = Math.round(bodyweightLb * (goalType === 'cut' ? 1.1 : 1.0));
-  const fat = Math.max(40, Math.round(calories * 0.25 / 9));
-  const carbs = Math.max(0, Math.round((calories - protein * 4 - fat * 9) / 4));
-  return { calories, protein, carbs, fat, maintenance, pace };
-}
-
-function openOverlay(html) {
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  overlay.innerHTML = html;
-  document.body.appendChild(overlay);
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) overlay.remove();
-  });
-  return overlay;
-}
 
 // =============================================
 // SIMPLE CHARTS (Canvas-based, no dependencies)
@@ -2153,7 +2010,7 @@ function renderCalendar() {
         <div class="t-lg fw-8">Week ${currentWeek}</div>
         <div class="t-xs t-muted">${phase.emoji} ${phase.name}${isDeloadWeek(currentWeek) ? ' · Deload' : ''}</div>
       </div>
-      <button onclick="App.calendarNextWeek()" style="padding:8px 12px;color:var(--text2);${currentWeek >= 30 ? 'opacity:.2' : ''}">
+      <button onclick="App.calendarNextWeek()" style="padding:8px 12px;color:var(--text2);${currentWeek >= 24 ? 'opacity:.2' : ''}">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
       </button>
     </div>
@@ -2199,21 +2056,26 @@ function renderCalendar() {
 
 // === STATS VIEW ===
 function renderStats() {
-  const countdown = Dates.countdownTo(ATHLETE.goalDate);
+  const tampaCountdown = Dates.countdownTo(ATHLETE.doublesDate);
+  const dallasCountdown = Dates.countdownTo(ATHLETE.goalDate);
   const currentWeek = Dates.getCurrentWeek();
   const completed = Storage.getCompletedCount();
   const streak = Storage.getStreak();
-  const daysLeft = countdown.days;
+  // Show nearest race first
+  const tampaPast = tampaCountdown.days < 0;
+  const headlineDays = tampaPast ? dallasCountdown.days : tampaCountdown.days;
+  const headlineLabel = tampaPast ? 'Days to Dallas' : 'Days to Tampa';
 
   return `<div class="view">
     <div class="t-xl fw-9 mb-24">Stats</div>
 
     <!-- Big number -->
     <div style="text-align:center;margin-bottom:32px">
-      <div class="t-3xl fw-9 t-accent tabular" style="line-height:1">${daysLeft}</div>
-      <div class="t-xs t-faint fw-6 mt-8" style="text-transform:uppercase;letter-spacing:1.5px">Days to Dallas</div>
+      <div class="t-3xl fw-9 t-accent tabular" style="line-height:1">${headlineDays}</div>
+      <div class="t-xs t-faint fw-6 mt-8" style="text-transform:uppercase;letter-spacing:1.5px">${headlineLabel}</div>
+      ${!tampaPast ? `<div class="t-xs t-muted mt-4">Then ${dallasCountdown.days} days to Dallas</div>` : ''}
       <div class="row mb-0 mt-16" style="justify-content:center;gap:24px">
-        <div style="text-align:center"><div class="t-lg fw-8 tabular">${currentWeek}/30</div><div class="t-xs t-faint">Week</div></div>
+        <div style="text-align:center"><div class="t-lg fw-8 tabular">${currentWeek}/24</div><div class="t-xs t-faint">Week</div></div>
         <div style="text-align:center"><div class="t-lg fw-8 tabular">${streak}</div><div class="t-xs t-faint">Streak</div></div>
         <div style="text-align:center"><div class="t-lg fw-8 tabular">${completed}</div><div class="t-xs t-faint">Done</div></div>
       </div>
@@ -2279,9 +2141,38 @@ function renderStats() {
     ` : ''}
 
     ${statsTab === 'goals' ? `
-    <div style="text-align:center;margin-bottom:24px">
-      <div class="t-3xl fw-9 t-accent">Sub 1:05</div>
-      <div class="t-sm t-muted mt-8">Current PR: ${ATHLETE.prTime} · Find 10:09</div>
+    <div class="label">The Season</div>
+    <div class="card mb-12" style="padding:14px 16px;border-left:3px solid #9333EA">
+      <div class="row-between mb-4">
+        <div class="t-sm fw-7" style="color:#9333EA">👥 TAMPA DOUBLES</div>
+        <div class="t-xs t-muted tabular">${Dates.formatDate(ATHLETE.doublesDate)}</div>
+      </div>
+      <div class="t-xs t-muted" style="line-height:1.6">Mixed doubles w/ gf. Goal: <strong>sub ${ATHLETE.doublesGoal}</strong>. Her doubles PR: ${ATHLETE.doublesPartnerPR}.</div>
+    </div>
+    <div class="card mb-24" style="padding:14px 16px;border-left:3px solid var(--accent)">
+      <div class="row-between mb-4">
+        <div class="t-sm fw-7" style="color:var(--accent)">🏁 DALLAS SOLO — A-RACE</div>
+        <div class="t-xs t-muted tabular">${Dates.formatDate(ATHLETE.goalDate)}</div>
+      </div>
+      <div class="t-xs t-muted" style="line-height:1.6">Solo. A goal: <strong>sub ${ATHLETE.goalTimeA}</strong>. Stretch: sub ${ATHLETE.goalTimeStretch}. PR: ${ATHLETE.prTime}.</div>
+    </div>
+
+    <div class="label">Speed Development — The Plan</div>
+    <div class="card mb-12" style="padding:14px 16px;border-left:3px solid var(--accent)">
+      <div class="t-sm fw-7 mb-4" style="color:var(--accent)">🩺 Diagnosis</div>
+      <div class="t-xs t-muted" style="line-height:1.6">Endurance is built (10k @ 5:54/km easy, HR 146). The gap to 4:00/km race pace is <strong>top-end speed</strong>, not aerobic capacity. Legs literally can't TURN OVER fast enough yet.</div>
+    </div>
+    <div class="card mb-12" style="padding:14px 16px">
+      <div class="t-sm fw-7 mb-4">⚡ Foundation (Wk 1-6) — SPEED FIRST</div>
+      <div class="t-xs t-muted" style="line-height:1.6">No threshold, no VO2 yet. Wednesday alternates:<br>• <strong>Hill sprints</strong> (10-15s all-out / 3 min walk recovery) — pure neuromuscular power, zero lactate<br>• <strong>200m repeats</strong> (all-out / 200m walk) — leg turnover<br>Tuesday adds <strong>flying 30s</strong> before lifting.</div>
+    </div>
+    <div class="card mb-12" style="padding:14px 16px">
+      <div class="t-sm fw-7 mb-4">🎯 Build (Wk 7-12) — LAYER THRESHOLD/VO2</div>
+      <div class="t-xs t-muted" style="line-height:1.6">Now your legs can move fast. Add the engine:<br>• Tuesday: race pace 1km repeats (progressing 4:20 → 4:05/km)<br>• Wednesday: Norwegian 4×4 VO2 max, then half sims<br>• Week 12: FULL SIM benchmark before doubles phase</div>
+    </div>
+    <div class="card mb-24" style="padding:14px 16px">
+      <div class="t-sm fw-7 mb-4">👥 Doubles → 🏁 Solo (Wk 13-24)</div>
+      <div class="t-xs t-muted" style="line-height:1.6">Doubles-specific work for Tampa, then quick recovery week, sharpen back to solo for Dallas. Race pace finally lives at 3:55-4:00/km.</div>
     </div>
 
     <div class="label">Run + Roxzone Formula</div>
@@ -2418,528 +2309,6 @@ function initRaceCharts() {
   }
 }
 
-// =============================================
-// FUEL VIEW — Daily macro tracking with photo logging
-// =============================================
-
-function renderFuel() {
-  const goals = Storage.getFuelGoals();
-
-  if (!goals) {
-    return `<div class="view">
-      <div class="t-xs t-faint fw-7 mb-4" style="letter-spacing:1.5px">FUEL</div>
-      <div class="t-2xl fw-9 mb-12">Set Daily Goals</div>
-      <div class="t-sm t-muted mb-20">Pick a target weight and pace, and we'll suggest your daily calories and macros. Everything is editable.</div>
-      <button class="btn btn-accent" onclick="openGoalsModal()">Set Daily Goals</button>
-      <div class="spacer"></div>
-      <button class="btn btn-ghost" onclick="openFuelReference()">View Nutrition Reference</button>
-    </div>`;
-  }
-
-  const date = todayStr();
-  const totals = Storage.getDailyTotals(date);
-  const meals = Storage.getMealsForDate(date);
-  const latestW = Storage.getLatestWeight();
-  const trend7 = Storage.getWeightTrend(7);
-  const trend30 = Storage.getWeightTrend(30);
-
-  const kcalPct = goals.calories ? Math.round(totals.calories / goals.calories * 100) : 0;
-  const kcalCls = kcalPct > 110 ? 'over' : (kcalPct >= 90 ? 'good' : '');
-
-  return `<div class="view">
-    <div class="row-between mb-4">
-      <div>
-        <div class="t-xs t-faint fw-7" style="letter-spacing:1.5px">FUEL</div>
-        <div class="t-2xl fw-9 mt-4">Today</div>
-      </div>
-      <div style="display:flex;gap:6px">
-        <button class="pill pill-muted" onclick="openFuelReference()" style="padding:6px 10px;font-size:11px;cursor:pointer">Info</button>
-        <button class="pill pill-muted" onclick="openGoalsModal()" style="padding:6px 10px;font-size:11px;cursor:pointer">Goals</button>
-      </div>
-    </div>
-    <div class="t-sm t-muted mb-20">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</div>
-
-    <div class="card mb-12" style="padding:14px 16px">
-      <div class="kcal-big">
-        <div class="t-2xl fw-9 tabular">${totals.calories}</div>
-        <div class="t-md t-muted tabular">/ ${goals.calories} kcal</div>
-        <div class="t-sm t-faint tabular" style="margin-left:auto">${Math.max(0, goals.calories - totals.calories)} left</div>
-      </div>
-      <div class="prog mt-8"><div class="prog-fill ${kcalCls}" style="width:${Math.min(100, kcalPct)}%"></div></div>
-      <div class="mt-16">
-        ${macroRowHtml('Protein', totals.protein, goals.protein)}
-        ${macroRowHtml('Carbs', totals.carbs, goals.carbs)}
-        ${macroRowHtml('Fat', totals.fat, goals.fat)}
-      </div>
-    </div>
-
-    <div class="card mb-20" style="padding:14px 16px">
-      <div class="row-between">
-        <div>
-          <div class="label" style="margin-bottom:4px">Weight</div>
-          <div class="row" style="gap:8px;align-items:baseline">
-            <div class="t-xl fw-9 tabular">${latestW ? latestW.lbs : '—'}</div>
-            <div class="t-sm t-muted">${latestW ? 'lbs' : 'no entries'}</div>
-          </div>
-          ${trend7 ? `<div class="t-xs t-muted mt-4 tabular">${formatTrend(trend7)} · 7d</div>` : ''}
-          ${trend30 ? `<div class="t-xs t-faint mt-4 tabular">${formatTrend(trend30)} · 30d</div>` : ''}
-          ${goals.goalLbs ? `<div class="t-xs t-faint mt-4 tabular">Goal: ${goals.goalLbs} lbs${latestW ? ` · ${(goals.goalLbs - latestW.lbs).toFixed(1)} to go` : ''}</div>` : ''}
-        </div>
-        <button class="pill pill-accent" onclick="openWeightModal()" style="padding:8px 14px;font-size:12px;cursor:pointer">+ Log Weight</button>
-      </div>
-    </div>
-
-    <button class="btn btn-accent mb-8" onclick="document.getElementById('mealFileInput').click()">📷  Log Meal with Photo</button>
-    <button class="btn btn-ghost mb-20" onclick="openMealConfirm(null, null)">Add Manually</button>
-    <input type="file" accept="image/*" capture="environment" style="display:none" id="mealFileInput" onchange="handleMealFileChange(event)">
-
-    <div class="label">Today's Meals</div>
-    ${meals.length === 0 ? `
-      <div class="card-bg" style="text-align:center;padding:30px 20px;border-radius:14px">
-        <div class="t-md t-muted">No meals logged yet.</div>
-      </div>
-    ` : `
-      <div class="card" style="padding:14px 16px">
-        ${meals.map(m => mealRowHtml(m)).join('')}
-      </div>
-    `}
-  </div>`;
-}
-
-function macroRowHtml(label, current, target) {
-  const pct = target ? Math.round(current / target * 100) : 0;
-  const cls = pct > 110 ? 'over' : (pct >= 90 ? 'good' : '');
-  return `
-    <div class="macro-row">
-      <div class="macro-label">${label}</div>
-      <div class="prog"><div class="prog-fill ${cls}" style="width:${Math.min(100, pct)}%"></div></div>
-      <div class="macro-nums">${current} / ${target}g</div>
-    </div>
-  `;
-}
-
-function mealRowHtml(m) {
-  const time = new Date(m.loggedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-  return `
-    <div class="meal-row" onclick="editMealById('${m.id}')">
-      ${m.thumbnail
-        ? `<img class="meal-thumb" src="${m.thumbnail}" alt="">`
-        : `<div class="meal-thumb"></div>`}
-      <div class="meal-info">
-        <div class="meal-name">${escapeHtml(m.name)}</div>
-        <div class="meal-macros">${m.calories} kcal · ${m.protein}P · ${m.carbs}C · ${m.fat}F · ${time}</div>
-      </div>
-      <button class="meal-del" onclick="event.stopPropagation();deleteMealById('${m.id}')">Delete</button>
-    </div>
-  `;
-}
-
-function formatTrend(t) {
-  if (!t) return '—';
-  const sign = t.delta > 0 ? '+' : (t.delta < 0 ? '' : '±');
-  return `${sign}${t.delta.toFixed(1)} lb`;
-}
-
-function deleteMealById(id) {
-  if (confirm('Delete this meal?')) {
-    Storage.deleteMeal(id);
-    App.navigate('fuel');
-  }
-}
-
-function editMealById(id) {
-  const meal = Storage.getMealsForDate(todayStr()).find(m => m.id === id);
-  if (meal) openMealConfirm(meal.thumbnail || null, meal, true);
-}
-
-function handleMealFileChange(e) {
-  const file = e.target.files?.[0];
-  if (!file) return;
-  e.target.value = '';
-  handleMealPhoto(file);
-}
-
-// ---------- MEAL CAPTURE / CONFIRM ----------
-async function handleMealPhoto(file) {
-  let dataUrl = null, thumb = null;
-  const overlay = openOverlay(`
-    <div class="modal">
-      <div class="t-xl fw-9 mb-4">Analyzing your meal</div>
-      <div class="t-sm t-muted mb-16">Estimating macros from your photo...</div>
-      <img id="capPreview" class="capture-preview" style="margin-bottom:16px">
-      <div style="display:flex;justify-content:center;padding:16px"><div class="spinner"></div></div>
-    </div>
-  `);
-
-  try {
-    [dataUrl, thumb] = await Promise.all([
-      fileToCompressedDataUrl(file, 800, 0.85),
-      fileToCompressedDataUrl(file, 200, 0.6)
-    ]);
-    overlay.querySelector('#capPreview').src = dataUrl;
-
-    const r = await fetch('/api/analyze-meal', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ imageBase64: dataUrlToBase64(dataUrl), mediaType: 'image/jpeg' })
-    });
-    const result = await r.json();
-    overlay.remove();
-    if (!r.ok) {
-      openMealConfirm(thumb, null, false, result.error || `AI failed (${r.status})`);
-    } else {
-      openMealConfirm(thumb, { ...result, source: 'ai' });
-    }
-  } catch (e) {
-    overlay.remove();
-    openMealConfirm(thumb, null, false, e.message || 'Failed to process image');
-  }
-}
-
-function openMealConfirm(thumbnail, meal, isEdit, errorMsg) {
-  isEdit = isEdit || false;
-  errorMsg = errorMsg || null;
-  const m = meal || { name: '', calories: '', protein: '', carbs: '', fat: '', confidence: '', source: 'manual' };
-  const overlay = openOverlay(`
-    <div class="modal">
-      <div class="t-xl fw-9 mb-4">${isEdit ? 'Edit Meal' : (errorMsg ? 'Manual Entry' : 'Confirm Meal')}</div>
-      <div class="t-sm t-muted mb-16">
-        ${errorMsg
-          ? '⚠ ' + escapeHtml(errorMsg) + '. Enter macros below.'
-          : (m.confidence ? `AI estimate · confidence: <span class="t-accent fw-7">${escapeHtml(m.confidence)}</span> · adjust if needed` : 'Enter macros below.')}
-      </div>
-      ${thumbnail ? `<img class="capture-preview" src="${thumbnail}" style="margin-bottom:16px">` : ''}
-
-      <div class="field">
-        <label class="field-label">Meal name</label>
-        <input class="input-text" id="f_name" value="${escapeHtml(String(m.name))}" placeholder="What did you eat?">
-      </div>
-
-      <div class="field">
-        <label class="field-label">Calories</label>
-        <input class="input-text" id="f_cal" type="number" inputmode="numeric" value="${m.calories}" placeholder="0">
-      </div>
-
-      <div class="macro-grid-input">
-        <div class="field">
-          <label class="field-label">Protein (g)</label>
-          <input class="input-text" id="f_p" type="number" inputmode="numeric" value="${m.protein}" placeholder="0">
-        </div>
-        <div class="field">
-          <label class="field-label">Carbs (g)</label>
-          <input class="input-text" id="f_c" type="number" inputmode="numeric" value="${m.carbs}" placeholder="0">
-        </div>
-        <div class="field">
-          <label class="field-label">Fat (g)</label>
-          <input class="input-text" id="f_f" type="number" inputmode="numeric" value="${m.fat}" placeholder="0">
-        </div>
-      </div>
-
-      <button class="btn btn-accent mb-8" id="saveMeal">${isEdit ? 'Save Changes' : 'Save Meal'}</button>
-      <button class="btn btn-ghost" id="cancelMeal">Cancel</button>
-    </div>
-  `);
-
-  overlay.querySelector('#cancelMeal').addEventListener('click', () => overlay.remove());
-  overlay.querySelector('#saveMeal').addEventListener('click', () => {
-    const data = {
-      name: overlay.querySelector('#f_name').value.trim() || 'Meal',
-      calories: parseInt(overlay.querySelector('#f_cal').value, 10) || 0,
-      protein: parseInt(overlay.querySelector('#f_p').value, 10) || 0,
-      carbs: parseInt(overlay.querySelector('#f_c').value, 10) || 0,
-      fat: parseInt(overlay.querySelector('#f_f').value, 10) || 0
-    };
-    if (isEdit) {
-      Storage.updateMeal(m.id, data);
-    } else {
-      Storage.addMeal({
-        ...data,
-        thumbnail: thumbnail || null,
-        source: m.source || 'manual',
-        confidence: m.confidence || null
-      });
-    }
-    overlay.remove();
-    App.navigate('fuel');
-  });
-}
-
-// ---------- WEIGHT MODAL ----------
-function openWeightModal() {
-  const latest = Storage.getLatestWeight();
-  const weights = Storage.getWeights().slice().reverse();
-  const overlay = openOverlay(`
-    <div class="modal">
-      <div class="t-xl fw-9 mb-4">Log Weight</div>
-      <div class="t-sm t-muted mb-16">Today's bodyweight in pounds.</div>
-
-      <div class="field">
-        <label class="field-label">Weight (lbs)</label>
-        <input class="input-text" id="w_lbs" type="number" inputmode="decimal" step="0.1" value="${latest ? latest.lbs : ''}" placeholder="180.0">
-      </div>
-
-      <button class="btn btn-accent mb-12" id="saveWeight">Save</button>
-      <button class="btn btn-ghost mb-20" id="cancelWeight">Cancel</button>
-
-      ${weights.length ? `
-        <div class="label">Recent Entries</div>
-        <div class="card" style="padding:8px 16px">
-          ${weights.slice(0, 10).map(w => `
-            <div class="row-between" style="padding:10px 0;border-bottom:1px solid var(--border)" data-wid="${w.id}">
-              <div>
-                <div class="t-sm fw-7 tabular">${w.lbs} lbs</div>
-                <div class="t-xs t-faint mt-4">${fmtDate(w.loggedAt)}</div>
-              </div>
-              <button class="meal-del weight-del" data-wid="${w.id}">Delete</button>
-            </div>
-          `).join('')}
-        </div>
-      ` : ''}
-    </div>
-  `);
-
-  overlay.querySelector('#cancelWeight').addEventListener('click', () => overlay.remove());
-  overlay.querySelector('#saveWeight').addEventListener('click', () => {
-    const lbs = parseFloat(overlay.querySelector('#w_lbs').value);
-    if (!lbs || lbs <= 0) { alert('Enter a valid weight'); return; }
-    Storage.addWeight(lbs);
-    overlay.remove();
-    App.navigate('fuel');
-  });
-  overlay.querySelectorAll('.weight-del').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      Storage.deleteWeight(btn.dataset.wid);
-      overlay.remove();
-      openWeightModal();
-    });
-  });
-}
-
-// ---------- GOALS MODAL ----------
-function openGoalsModal() {
-  const existing = Storage.getFuelGoals() || {};
-  const latestW = Storage.getLatestWeight();
-  const defaultBw = existing.bodyweight || (latestW ? latestW.lbs : 180);
-  let goalType = existing.goalType || 'gain';
-  let pace = existing.pace != null ? existing.pace : 0.5;
-
-  const overlay = openOverlay(`
-    <div class="modal">
-      <div class="t-xl fw-9 mb-4">Daily Macro Goals</div>
-      <div class="t-sm t-muted mb-16">Targets are estimated from bodyweight + pace. Tap Recalculate after changes, or override any number.</div>
-
-      <div class="field">
-        <label class="field-label">Bodyweight (lbs)</label>
-        <input class="input-text" id="g_bw" type="number" inputmode="decimal" step="0.1" value="${defaultBw}">
-      </div>
-
-      <div class="field">
-        <label class="field-label">Goal</label>
-        <div class="radio-row" id="g_type">
-          <button data-type="gain" class="${goalType === 'gain' ? 'sel' : ''}">Gain</button>
-          <button data-type="maintain" class="${goalType === 'maintain' ? 'sel' : ''}">Maintain</button>
-          <button data-type="cut" class="${goalType === 'cut' ? 'sel' : ''}">Cut</button>
-        </div>
-      </div>
-
-      <div class="field">
-        <label class="field-label">Pace (lbs / week)</label>
-        <input class="input-text" id="g_pace" type="number" inputmode="decimal" step="0.1" value="${pace}">
-        <div class="t-xs t-faint mt-4">Positive = gain (try 0.3-0.7), negative = cut (try -0.5 to -1.0)</div>
-      </div>
-
-      <div class="field">
-        <label class="field-label">Goal Weight (lbs, optional)</label>
-        <input class="input-text" id="g_target" type="number" inputmode="decimal" step="0.1" value="${existing.goalLbs || ''}" placeholder="e.g. 195">
-      </div>
-
-      <button class="btn btn-ghost mb-16" id="g_recalc">↻ Recalculate Suggested Targets</button>
-
-      <div class="field">
-        <label class="field-label">Calories</label>
-        <input class="input-text" id="g_cal" type="number" inputmode="numeric" value="${existing.calories || ''}">
-      </div>
-
-      <div class="macro-grid-input">
-        <div class="field">
-          <label class="field-label">Protein (g)</label>
-          <input class="input-text" id="g_p" type="number" inputmode="numeric" value="${existing.protein || ''}">
-        </div>
-        <div class="field">
-          <label class="field-label">Carbs (g)</label>
-          <input class="input-text" id="g_c" type="number" inputmode="numeric" value="${existing.carbs || ''}">
-        </div>
-        <div class="field">
-          <label class="field-label">Fat (g)</label>
-          <input class="input-text" id="g_f" type="number" inputmode="numeric" value="${existing.fat || ''}">
-        </div>
-      </div>
-
-      <button class="btn btn-accent mb-8" id="saveGoals">Save Goals</button>
-      <button class="btn btn-ghost" id="cancelGoals">Cancel</button>
-    </div>
-  `);
-
-  if (!existing.calories) {
-    const sug = suggestGoals(defaultBw, goalType, pace);
-    overlay.querySelector('#g_cal').value = sug.calories;
-    overlay.querySelector('#g_p').value = sug.protein;
-    overlay.querySelector('#g_c').value = sug.carbs;
-    overlay.querySelector('#g_f').value = sug.fat;
-  }
-
-  overlay.querySelector('#g_type').addEventListener('click', e => {
-    const btn = e.target.closest('button[data-type]');
-    if (!btn) return;
-    goalType = btn.dataset.type;
-    overlay.querySelectorAll('#g_type button').forEach(b => b.classList.toggle('sel', b.dataset.type === goalType));
-    if (goalType === 'gain') overlay.querySelector('#g_pace').value = 0.5;
-    else if (goalType === 'cut') overlay.querySelector('#g_pace').value = -0.75;
-    else overlay.querySelector('#g_pace').value = 0;
-  });
-
-  overlay.querySelector('#g_recalc').addEventListener('click', () => {
-    const bw = parseFloat(overlay.querySelector('#g_bw').value) || defaultBw;
-    const p = parseFloat(overlay.querySelector('#g_pace').value);
-    const sug = suggestGoals(bw, goalType, isNaN(p) ? null : p);
-    overlay.querySelector('#g_cal').value = sug.calories;
-    overlay.querySelector('#g_p').value = sug.protein;
-    overlay.querySelector('#g_c').value = sug.carbs;
-    overlay.querySelector('#g_f').value = sug.fat;
-  });
-
-  overlay.querySelector('#cancelGoals').addEventListener('click', () => overlay.remove());
-  overlay.querySelector('#saveGoals').addEventListener('click', () => {
-    const bw = parseFloat(overlay.querySelector('#g_bw').value) || defaultBw;
-    const p = parseFloat(overlay.querySelector('#g_pace').value);
-    const goalLbs = parseFloat(overlay.querySelector('#g_target').value);
-    Storage.setFuelGoals({
-      calories: parseInt(overlay.querySelector('#g_cal').value, 10) || 0,
-      protein: parseInt(overlay.querySelector('#g_p').value, 10) || 0,
-      carbs: parseInt(overlay.querySelector('#g_c').value, 10) || 0,
-      fat: parseInt(overlay.querySelector('#g_f').value, 10) || 0,
-      bodyweight: bw,
-      goalType,
-      pace: isNaN(p) ? 0 : p,
-      goalLbs: isNaN(goalLbs) ? null : goalLbs
-    });
-    overlay.remove();
-    App.navigate('fuel');
-  });
-}
-
-// ---------- FUEL REFERENCE (existing macros/meals/grocery/race day content) ----------
-function openFuelReference() {
-  let refTab = 'macros';
-  const overlay = openOverlay(`<div class="modal" id="fuelRefModal"></div>`);
-  function render() {
-    const modal = overlay.querySelector('#fuelRefModal');
-    modal.innerHTML = `
-      <div class="row-between mb-12">
-        <div class="t-xl fw-9">Nutrition Reference</div>
-        <button class="meal-del" id="closeRef">Close</button>
-      </div>
-      <div class="tabs" style="display:flex;gap:4px;background:var(--bg2);border-radius:10px;padding:3px;margin-bottom:16px">
-        <button class="tab ${refTab==='macros'?'active':''}" data-rt="macros" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;${refTab==='macros'?'background:var(--accent);color:#FFF':'background:transparent;color:var(--text2);border:none'}">Macros</button>
-        <button class="tab ${refTab==='meals'?'active':''}" data-rt="meals" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;${refTab==='meals'?'background:var(--accent);color:#FFF':'background:transparent;color:var(--text2);border:none'}">Meals</button>
-        <button class="tab ${refTab==='grocery'?'active':''}" data-rt="grocery" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;${refTab==='grocery'?'background:var(--accent);color:#FFF':'background:transparent;color:var(--text2);border:none'}">Grocery</button>
-        <button class="tab ${refTab==='raceday'?'active':''}" data-rt="raceday" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;${refTab==='raceday'?'background:var(--accent);color:#FFF':'background:transparent;color:var(--text2);border:none'}">Race Day</button>
-      </div>
-      ${getReferenceContent(refTab)}
-    `;
-    modal.querySelector('#closeRef').addEventListener('click', () => overlay.remove());
-    modal.querySelectorAll('[data-rt]').forEach(b => b.addEventListener('click', () => { refTab = b.dataset.rt; render(); }));
-  }
-  render();
-}
-
-function getReferenceContent(tab) {
-  if (tab === 'macros') {
-    return `
-      <div class="label">Training Days</div>
-      <div class="card mb-20" style="padding:14px 16px">
-        <div style="text-align:center;margin-bottom:16px">
-          <div class="t-2xl fw-9 t-accent">3,200 - 3,500</div>
-          <div class="t-xs t-faint mt-4">CALORIES PER DAY</div>
-        </div>
-        <div class="metric"><span class="t-sm t-muted">Protein</span><span class="t-sm fw-7">150g <span class="t-faint">(1.8 g/kg)</span></span></div>
-        <div class="metric"><span class="t-sm t-muted">Carbs</span><span class="t-sm fw-7 t-accent">450 - 550g <span class="t-faint">(5-7 g/kg)</span></span></div>
-        <div class="metric"><span class="t-sm t-muted">Fat</span><span class="t-sm fw-7">80 - 100g</span></div>
-      </div>
-      <div class="label">Rest Days</div>
-      <div class="card mb-20" style="padding:14px 16px">
-        <div style="text-align:center;margin-bottom:16px">
-          <div class="t-2xl fw-9">2,600 - 2,800</div>
-          <div class="t-xs t-faint mt-4">CALORIES PER DAY</div>
-        </div>
-        <div class="metric"><span class="t-sm t-muted">Protein</span><span class="t-sm fw-7">140g</span></div>
-        <div class="metric"><span class="t-sm t-muted">Carbs</span><span class="t-sm fw-7">200 - 250g</span></div>
-        <div class="metric"><span class="t-sm t-muted">Fat</span><span class="t-sm fw-7">100 - 115g</span></div>
-      </div>
-      <div class="label">Hydration (Austin Heat)</div>
-      <div class="card mb-20" style="padding:14px 16px">
-        <div class="metric"><span class="t-sm t-muted">Daily Water</span><span class="t-sm fw-7">3.5 - 4+ liters</span></div>
-        <div class="metric"><span class="t-sm t-muted">Sodium/hr (training)</span><span class="t-sm fw-7">500 - 1000mg</span></div>
-        <div class="metric"><span class="t-sm t-muted">Use</span><span class="t-sm fw-7">Electrolytes every run</span></div>
-      </div>
-      <div class="label">Supplements</div>
-      <div class="card" style="padding:14px 16px">
-        <div class="metric"><span class="t-sm t-muted">Creatine</span><span class="t-sm fw-7">5g daily</span></div>
-        <div class="metric"><span class="t-sm t-muted">Vitamin D</span><span class="t-sm fw-7">2,000-5,000 IU daily</span></div>
-        <div class="metric"><span class="t-sm t-muted">Magnesium</span><span class="t-sm fw-7">300-400mg glycinate (bedtime)</span></div>
-        <div class="metric"><span class="t-sm t-muted">Omega-3</span><span class="t-sm fw-7">2-3g EPA/DHA daily</span></div>
-        <div class="metric"><span class="t-sm t-muted">Caffeine (race day)</span><span class="t-sm fw-7">200-400mg</span></div>
-      </div>`;
-  }
-  if (tab === 'meals') {
-    return `
-      <div class="label">Pre-Run (60-90 min before)</div>
-      <div class="card mb-16" style="padding:14px 16px">
-        <div style="padding:8px 0;border-bottom:1px solid var(--border)"><div class="t-sm fw-6">Oatmeal + Banana + Honey</div><div class="t-xs t-muted mt-4">Gold standard pre-run.</div></div>
-        <div style="padding:8px 0;border-bottom:1px solid var(--border)"><div class="t-sm fw-6">Toast + PB + Banana</div><div class="t-xs t-muted mt-4">Quick balanced.</div></div>
-        <div style="padding:8px 0;border-bottom:1px solid var(--border)"><div class="t-sm fw-6">Rice Cakes + Honey + Salt</div><div class="t-xs t-muted mt-4">Light option.</div></div>
-        <div style="padding:8px 0"><div class="t-sm fw-6">Dates + Banana (30 min before)</div><div class="t-xs t-muted mt-4">Quick top-up.</div></div>
-      </div>
-      <div class="label">Post-Run (within 30 min)</div>
-      <div class="card mb-16" style="padding:14px 16px">
-        <div style="padding:8px 0;border-bottom:1px solid var(--border)"><div class="t-sm fw-6">Smoothie: Yogurt + banana + berries + protein</div><div class="t-xs t-muted mt-4">Best option.</div></div>
-        <div style="padding:8px 0"><div class="t-sm fw-6">Chocolate Milk (16 oz)</div><div class="t-xs t-muted mt-4">Legit recovery drink.</div></div>
-      </div>
-      <div class="label">Lunch / Dinner</div>
-      <div class="card" style="padding:14px 16px">
-        <div style="padding:8px 0;border-bottom:1px solid var(--border)"><div class="t-sm fw-6">Burrito Bowl</div><div class="t-xs t-muted mt-4">Rice + beans + chicken + avocado. ~900 cal.</div></div>
-        <div style="padding:8px 0;border-bottom:1px solid var(--border)"><div class="t-sm fw-6">Stir Fry</div><div class="t-xs t-muted mt-4">Rice + protein + veggies. ~800 cal.</div></div>
-        <div style="padding:8px 0;border-bottom:1px solid var(--border)"><div class="t-sm fw-6">Pasta + Meat Sauce</div><div class="t-xs t-muted mt-4">~850 cal.</div></div>
-        <div style="padding:8px 0"><div class="t-sm fw-6">Salmon + Sweet Potato + Veggies</div><div class="t-xs t-muted mt-4">~750 cal.</div></div>
-      </div>`;
-  }
-  if (tab === 'grocery') {
-    return `
-      <div class="label" style="color:var(--accent)">Carbs</div>
-      <div class="card mb-16" style="padding:14px 16px"><div class="t-sm" style="line-height:2">White rice<br>Oats<br>Pasta<br>Bread<br>Bananas<br>Sweet potatoes<br>Honey<br>Tortillas</div></div>
-      <div class="label" style="color:var(--accent)">Protein</div>
-      <div class="card mb-16" style="padding:14px 16px"><div class="t-sm" style="line-height:2">Chicken thighs<br>Ground beef 85/15<br>Eggs<br>Greek yogurt<br>Whey protein<br>Salmon</div></div>
-      <div class="label" style="color:var(--accent)">Fats + Extras</div>
-      <div class="card mb-16" style="padding:14px 16px"><div class="t-sm" style="line-height:2">Peanut butter<br>Avocados<br>Olive oil<br>Cheese<br>Trail mix<br>Frozen berries<br>Vegetables</div></div>
-      <div class="label" style="color:var(--accent)">Supplements</div>
-      <div class="card" style="padding:14px 16px"><div class="t-sm" style="line-height:2">Electrolytes<br>Creatine monohydrate<br>Magnesium glycinate<br>Vitamin D<br>Fish oil<br>Tart cherry juice</div></div>`;
-  }
-  if (tab === 'raceday') {
-    return `
-      <div class="label">3 Days Before</div>
-      <div class="card mb-16" style="padding:14px 16px"><div class="t-sm" style="line-height:1.8">Carb load: 8-10 g/kg<br>Switch to white rice, pasta, bread<br>Reduce training (taper)</div></div>
-      <div class="label">Race Morning</div>
-      <div class="card mb-16" style="padding:14px 16px">
-        <div class="metric"><span class="t-sm t-muted">3-4 hrs before</span><span class="t-sm fw-6">Oats + banana + honey + coffee</span></div>
-        <div class="metric"><span class="t-sm t-muted">90 min before</span><span class="t-sm fw-6">Banana or energy bar</span></div>
-        <div class="metric"><span class="t-sm t-muted">30 min before</span><span class="t-sm fw-6">Gel + water. Caffeine 200-400mg.</span></div>
-      </div>
-      <div class="label">During Race</div>
-      <div class="card" style="padding:14px 16px"><div class="t-sm" style="line-height:1.8">Sip sports drink at Roxzones<br>Gel at station 4 if energy dipping<br>Target: 30-60g carbs/hour</div></div>`;
-  }
-}
-
 
 // =============================================
 // APP CONTROLLER
@@ -2973,7 +2342,6 @@ const App = {
     switch(view) {
       case 'today': app.innerHTML = renderToday(this.detailDate); break;
       case 'plan': app.innerHTML = renderCalendar(); break;
-      case 'fuel': app.innerHTML = renderFuel(); break;
       case 'stats': app.innerHTML = renderStats(); requestAnimationFrame(()=>{initDashboardCharts();initRaceCharts()}); break;
     }
     if (!this.detailDate) app.scrollTop = 0;
