@@ -554,6 +554,41 @@ function isDeloadWeek(weekNum) {
 // 24 weeks, two races: Tampa Doubles (Oct 23) + Dallas Solo (Nov 20)
 // You already have a base from 2 races. This plan attacks SPEED.
 
+// 4-week weak-station focus rotation. Based on Phoenix + Houston race data:
+// Burpee BJ +99s avg | Wall Balls +57s | Row +48s | Sled Pull +69s* | Lunges +33s | SkiErg +32s | Farmers +20s | Sled Push -30s (strength)
+// Rotation targets the biggest gaps most often. Sled push is excluded — already a strength.
+function getWeakStationFocus(weekNum) {
+  if (isDeloadWeek(weekNum)) return null;
+  const idx = (weekNum - 1) % 4;
+  const cycles = [
+    { id:'burpees', label:'Burpee BJ Focus', icon:'🏃',
+      mainStation: ['Burpee BJ Block', 'YOUR #1 GAP (+99s avg). 4 × 20m / 60 sec rest — STEADY rep cadence target ~2 sec/rep. Pacing > max effort.'],
+      secondTouch: ['Burpee BJ Fatigued', '2 × 20m AGAIN — late-race burpees is where 30+ sec disappear. Same cadence even when cooked.'],
+      filler: ['Sled Push', '50m race weight — maintenance touch (already a strength)'],
+      focus:'BURPEE BJ — your #1 station gap. Both Phoenix + Houston ~100s behind goal.'
+    },
+    { id:'walls', label:'Wall Ball Focus', icon:'🎯',
+      mainStation: ['Wall Balls', 'YOUR #2 GAP (+57s avg). 100 reps unbroken if possible. Take initial breath, find cadence.'],
+      secondTouch: ['Wall Balls Fatigued', '75 reps AGAIN — sets of 25 max, 3-5 breaths between. Late-race form falls apart fastest here.'],
+      filler: ['SkiErg', '500m race effort — maintenance'],
+      focus:'WALL BALLS — your #2 gap. Owen Silver protocol week. Volume is the answer.'
+    },
+    { id:'row-pull', label:'Row + Sled Pull Focus', icon:'🚣',
+      mainStation: ['Row', 'YOUR #3 GAP (+48s). 1000m at race effort. HINGE not squat. Slow cadence (24-26 spm), strong even pull.'],
+      secondTouch: ['Sled Pull', '50m — TECHNIQUE: hinge low, lean back, leg drive, hand-over-hand rhythm. Don\'t arm-pull. Phoenix +23s, Houston blew up.'],
+      filler: ['Row Pieces', '3 × 200m hard / 200m easy — drill hinge technique under fatigue'],
+      focus:'ROW + PULL — both rely on hip hinge mechanics. Drill the technique.'
+    },
+    { id:'lunges-ski', label:'Lunges + SkiErg Focus', icon:'🦵',
+      mainStation: ['Sandbag Lunges', 'GAP +33s. 100m unbroken — first rep = last rep cadence (Jack Driscoll cue). Tiptoe whole way OR step whole way, pick one.'],
+      secondTouch: ['Sandbag Lunges Fatigued', '50m AGAIN — late-race lunges is a mental game. Hurts the same whether you go slow or fast.'],
+      filler: ['SkiErg', '1000m race effort'],
+      focus:'LUNGES + SKI — late-race grit + technique consistency.'
+    }
+  ];
+  return cycles[idx];
+}
+
 // Strength progression scheme — 4-week cycles, +5 lb per cycle
 // Reference: Squat, Deadlift, Hip Thrust 3RM (set in Week 1)
 function getStrengthCycle(weekNum) {
@@ -639,28 +674,31 @@ function getFoundationWeek(weekNum, deload) {
         {name:'Bulgarian Split Squat',detail:'3 × 8 each leg — moderate load',zone:0},
         {name:'Nordic Hamstring Curls',detail:'3 × 5-6 — halves injury risk (research-backed)',zone:0},
         {name:'Single-Leg Hops',detail:'3 × 6 each — reactive stiffness for running economy',zone:0},
-        {name:'Wall Balls',detail:'2 × 30 reps — daily wall ball accessory',zone:0},
+        {name:'Burpee BJ Accessory',detail:'3 × 10m / 60 sec rest — STEADY cadence (~2 sec/rep). Your #1 station gap (+99s) — needs weekly exposure beyond Friday focus.',zone:0},
+        {name:'Wall Balls',detail:'2 × 30 reps — daily accessory (60 reps adds to 200-400/wk Owen Silver target)',zone:0},
         {name:'Core: Pallof Press',detail:'3 × 10 each side — anti-rotation',zone:0}
       ],
-      duration:'75 min',
-      focus:'📍 UGP gym — Day 2 of strength. Moderate load (NOT heavy — Tuesday was heavy). Single-leg work + posterior chain + plyos. Builds durability.' },
+      duration:'80 min',
+      focus:'📍 UGP gym — Day 2 of strength. Moderate load + WEAK STATION ACCESSORY (Burpee BJ + Wall Balls — your top 2 gaps).' },
 
-    { day:'Friday', type:'hyrox', title: deload ? 'Light Station Practice' : 'Compromised — Sled Pull Focus', icon:'🪢', zone: deload ? 2 : 4,
+    { day:'Friday', type:'hyrox', title: deload ? 'Light Station Practice' : `Compromised — ${(getWeakStationFocus(weekNum) || {}).label || 'Rotation'}`, icon: (getWeakStationFocus(weekNum) || {}).icon || '😤', zone: deload ? 2 : 4,
       exercises: deload ? [
         {name:'Easy Run',detail:'25 min @ Z2',zone:2},
-        {name:'Sled Pull',detail:'3 × 50m technique focus — hinge & hand-over-hand',zone:0},
-        {name:'Wall Balls',detail:'50 reps',zone:0}
-      ] : [
-        {name:'1km Run',detail:'@ 4:30-4:40/km — settle in. Threshold pace, not race pace.',zone:4},
-        {name:'Sled Pull',detail:'50m race weight — YOUR WEAKEST STATION. Hinge at hips, lean back, drive through legs, hand-over-hand rhythm. Don\'t arm-pull.',zone:0},
-        {name:'1km Run',detail:'@ 4:30-4:40/km — hold pace',zone:4},
-        {name:'Sled Push',detail:'50m race weight — locked arms, low angle',zone:0},
-        {name:'1km Run',detail:'@ 4:30-4:40/km — legs burn, stay upright',zone:4},
-        {name:'Sled Pull',detail:'50m AGAIN — your Phoenix sled pull was 23 sec slow vs goal. Most fixable through technique + reps.',zone:0},
-        {name:'1km Run',detail:'@ 4:30-4:40/km — final',zone:4}
-      ],
+        {name:'Light Station',detail:'2 × any station, technique focus only',zone:0}
+      ] : (() => {
+        const f = getWeakStationFocus(weekNum);
+        return [
+          {name:'1km Run',detail:'@ 4:30-4:40/km — settle in. Threshold pace, not race pace.',zone:4},
+          {name:f.mainStation[0], detail:f.mainStation[1], zone:0},
+          {name:'1km Run',detail:'@ 4:30-4:40/km — hold pace',zone:4},
+          {name:f.filler[0], detail:f.filler[1], zone:0},
+          {name:'1km Run',detail:'@ 4:30-4:40/km — legs burn, stay upright',zone:4},
+          {name:f.secondTouch[0], detail:f.secondTouch[1], zone:0},
+          {name:'1km Run',detail:'@ 4:30-4:40/km — final',zone:4}
+        ];
+      })(),
       duration: deload ? '45 min' : '70 min',
-      focus: deload ? 'Sled pull technique work.' : '📍 Round Rock — KEY SESSION + targeted sled pull bias. Phoenix data: pull was 3:53 (goal 3:30). Closing this gap = ~25 sec off race time. Focus on TECHNIQUE not muscle.' },
+      focus: deload ? 'Light station touch.' : `📍 Round Rock — KEY SESSION. ${(getWeakStationFocus(weekNum) || {}).focus || ''} Rotation hits each weak station ~2× per 6-week phase.` },
 
     { day:'Saturday', type:'long', title:'Long Run — Aerobic Volume', icon:'🛣️', zone:2,
       exercises: deload ? [
@@ -765,21 +803,24 @@ function getRacePaceWeek(weekNum, deload) {
       duration:'90 min',
       focus:`📍 UGP gym — Heavy day, Wk ${weekNum} of strength cycle. Squat/DL/Hip Thrust drive sled push power + running economy.` },
 
-    { day:'Friday', type:'hyrox', title: deload ? 'Light Station' : 'Compromised — Sled Pull Focus', icon:'🪢', zone: deload ? 2 : 4,
+    { day:'Friday', type:'hyrox', title: deload ? 'Light Station' : `Compromised — ${(getWeakStationFocus(weekNum) || {}).label || 'Rotation'}`, icon: (getWeakStationFocus(weekNum) || {}).icon || '😤', zone: deload ? 2 : 4,
       exercises: deload ? [
         {name:'Easy Run',detail:'25 min @ Z2',zone:2},
-        {name:'Sled Pull',detail:'3 × 50m technique focus — hinge & hand-over-hand',zone:0}
-      ] : [
-        {name:'1km Run',detail:`@ ${paceFast}/km — current race pace`,zone:4},
-        {name:'Sled Pull',detail:'50m race weight — WEAKEST STATION focus. Hinge low, lean back, drive legs into the floor, hand-over-hand rhythm.',zone:0},
-        {name:'1km Run',detail:`@ ${paceFast}/km — hold pace`,zone:4},
-        {name:'Sled Push',detail:'50m race weight — locked arms, low angle',zone:0},
-        {name:'1km Run',detail:`@ ${paceFast}/km — legs burning`,zone:4},
-        {name:'Sled Pull',detail:'50m AGAIN — fatigued. This is where Phoenix fell apart (3:53 vs 3:30 goal).',zone:0},
-        {name:'1km Run',detail:`@ ${paceFast}/km — leave it all`,zone:4}
-      ],
+        {name:'Light Station',detail:'2 × any station, technique focus only',zone:0}
+      ] : (() => {
+        const f = getWeakStationFocus(weekNum);
+        return [
+          {name:'1km Run',detail:`@ ${paceFast}/km — current race pace`,zone:4},
+          {name:f.mainStation[0], detail:f.mainStation[1], zone:0},
+          {name:'1km Run',detail:`@ ${paceFast}/km — hold pace`,zone:4},
+          {name:f.filler[0], detail:f.filler[1], zone:0},
+          {name:'1km Run',detail:`@ ${paceFast}/km — legs burning`,zone:4},
+          {name:f.secondTouch[0], detail:f.secondTouch[1], zone:0},
+          {name:'1km Run',detail:`@ ${paceFast}/km — leave it all`,zone:4}
+        ];
+      })(),
       duration: deload ? '35 min' : '70 min',
-      focus: deload ? 'Sled pull technique.' : '📍 Round Rock — KEY SESSION + Sled Pull bias. Closing your pull gap = ~25 sec off finish time.' },
+      focus: deload ? 'Light station touch.' : `📍 Round Rock — KEY SESSION. ${(getWeakStationFocus(weekNum) || {}).focus || ''} Rotation hits each weak station ~2× per 6-week phase.` },
 
     { day:'Saturday', type:'long', title:'Long Run + Threshold Finish', icon:'🛣️', zone:2,
       exercises: deload ? [
@@ -2145,10 +2186,30 @@ function renderStats() {
       <div class="t-xs t-muted" style="line-height:1.6">Solo. PR: ${ATHLETE.prTime}. Tiered targets:<br>• <strong>A goal: sub ${ATHLETE.goalTimeA}</strong> (~7 min PR — very achievable)<br>• <strong>Stretch: sub ${ATHLETE.goalTimeStretch}</strong> (if everything clicks)<br>• <strong>Dream: sub ${ATHLETE.goalTimeDream}</strong> (sub-1 hr, elite territory)</div>
     </div>
 
-    <div class="label">🪢 Station Priority — Sled Pull</div>
-    <div class="card mb-24" style="padding:14px 16px;border-left:3px solid var(--orange)">
-      <div class="t-sm fw-7 mb-4" style="color:var(--orange)">Your Phoenix Gap = ~25 sec</div>
-      <div class="t-xs t-muted" style="line-height:1.6">Phoenix sled pull: <strong>3:53</strong>. Goal: <strong>3:30</strong>. That's 23 sec on one station alone — your single biggest fix.<br><br><strong>Technique cues:</strong> hinge low at hips, lean back, drive legs into floor, hand-over-hand rhythm. Don't arm-pull.<br><br><strong>Plan:</strong> Friday compromised sessions now bias toward Sled Pull (2 touches per session). Closing this gap could be worth 25+ sec off finish time.</div>
+    <div class="label">📊 Station Gap Analysis (Phoenix + Houston)</div>
+    <div class="card mb-12" style="padding:14px 16px;border-left:3px solid var(--red)">
+      <div class="t-sm fw-7 mb-4" style="color:var(--red)">🏃 #1 GAP — Burpee Broad Jumps</div>
+      <div class="t-xs t-muted" style="line-height:1.6">Phoenix +93s · Houston +104s · <strong>Avg +99s</strong> behind goal. Single biggest leak. Pacing/cardio issue, not strength. Need STEADY cadence (~2 sec/rep) under fatigue.</div>
+    </div>
+    <div class="card mb-12" style="padding:14px 16px;border-left:3px solid var(--red)">
+      <div class="t-sm fw-7 mb-4" style="color:var(--red)">🎯 #2 GAP — Wall Balls</div>
+      <div class="t-xs t-muted" style="line-height:1.6">Phoenix +71s · Houston +42s · <strong>Avg +57s</strong>. Volume answer — Owen Silver protocol (200-400 reps/wk).</div>
+    </div>
+    <div class="card mb-12" style="padding:14px 16px;border-left:3px solid var(--orange)">
+      <div class="t-sm fw-7 mb-4" style="color:var(--orange)">🚣 #3 GAP — Row</div>
+      <div class="t-xs t-muted" style="line-height:1.6">Phoenix +51s · Houston +44s · <strong>Avg +48s</strong>. Should be a recovery station. Likely a hinge-not-squat technique fix.</div>
+    </div>
+    <div class="card mb-12" style="padding:14px 16px;border-left:3px solid var(--orange)">
+      <div class="t-sm fw-7 mb-4" style="color:var(--orange)">🪢 Sled Pull · 🦵 Lunges · ⛷️ SkiErg · 🏋️ Farmers</div>
+      <div class="t-xs t-muted" style="line-height:1.6">Sled Pull +23s Phoenix (Houston blew up). Lunges +33s. SkiErg +32s. Farmers +20s. Medium-tier gaps — addressed in rotation.</div>
+    </div>
+    <div class="card mb-12" style="padding:14px 16px;border-left:3px solid var(--green)">
+      <div class="t-sm fw-7 mb-4" style="color:var(--green)">🛷 STRENGTH — Sled Push</div>
+      <div class="t-xs t-muted" style="line-height:1.6">Phoenix <strong>-31s</strong> · Houston <strong>-29s</strong> — actively FASTER than goal both races. Don't over-train. Just maintain.</div>
+    </div>
+    <div class="card mb-24" style="padding:14px 16px">
+      <div class="t-sm fw-7 mb-4">🔄 Friday Rotation (4-week cycle)</div>
+      <div class="t-xs t-muted" style="line-height:1.6">Friday compromised session rotates through your weak stations:<br>• <strong>Wk A</strong> — Burpee BJ Focus (×2 touches)<br>• <strong>Wk B</strong> — Wall Ball Focus (heavy volume)<br>• <strong>Wk C</strong> — Row + Sled Pull (technique)<br>• <strong>Wk D</strong> — Lunges + SkiErg<br><br>Each station gets ~2 dedicated sessions per phase. Burpee BJ + Wall Balls also get accessory work on Thursday lift days.</div>
     </div>
 
     <div class="label">Training Philosophy — Research-Backed</div>
