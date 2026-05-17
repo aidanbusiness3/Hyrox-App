@@ -1848,26 +1848,6 @@ function renderToday(overrideDate) {
     <!-- Focus -->
     <div class="t-sm t-muted mb-20" style="line-height:1.6">${workout.focus}</div>
 
-    ${['run','tempo','intervals','long'].includes(workout.type) ? `
-    <div class="card mb-20" style="padding:12px 14px;border-left:3px solid var(--accent)">
-      <div class="t-xs fw-7 mb-4" style="color:var(--accent);letter-spacing:.5px">FORM CUE</div>
-      <div class="t-xs t-muted" style="line-height:1.55">${(() => {
-        const cues = [
-          'Run TALL — pulley pulling chest up. Opens hips, fires glutes.',
-          'Eyes 20m ahead. Ears stacked over shoulders. No looking down.',
-          'Shoulders dropped. Thumbs up. Hands don\'t cross the centerline.',
-          'Foot lands UNDER your hips, not out in front. Forefoot/midfoot.',
-          'Subtle lean from the ankles — let gravity pull you forward.',
-          'Catch yourself tensing? Drop arms, shake out, reset shoulders.',
-          'Cadence 170-180 spm. Quick, light ground contact.',
-          'Coming out of stations: tall → shoulders → thumbs up → land under hips.'
-        ];
-        const dayIdx = new Date(dateStr).getDate();
-        return cues[dayIdx % cues.length];
-      })()}</div>
-    </div>
-    ` : ''}
-
     ${zoneInfo ? `
     <div class="card mb-20" style="display:flex;justify-content:space-between;align-items:center">
       <div>
@@ -2242,36 +2222,6 @@ function renderStats() {
       <div class="t-xs t-muted">RACE STATION — final push. Take an initial breath before starting. Sets of 25, 3-5 breaths between. Don't fall apart at the end.</div>
     </div>
 
-    <div class="spacer"></div>
-    <div class="label">Running Form — Top-Down Cues</div>
-    <div class="card mb-12" style="padding:14px 16px">
-      <div class="t-sm fw-7 mb-4">👀 Head & Eyes</div>
-      <div class="t-xs t-muted" style="line-height:1.6">Look ~20m ahead toward the horizon — not at the ground, not up. Ears stacked over shoulders. Don't push the head forward.</div>
-    </div>
-    <div class="card mb-12" style="padding:14px 16px">
-      <div class="t-sm fw-7 mb-4">💪 Shoulders</div>
-      <div class="t-xs t-muted" style="line-height:1.6">Loose & relaxed. When you catch yourself tensing or shrugging (especially when tired), drop the arms, shake them out, reset. Tension wastes energy.</div>
-    </div>
-    <div class="card mb-12" style="padding:14px 16px">
-      <div class="t-sm fw-7 mb-4">🤲 Arms & Hands</div>
-      <div class="t-xs t-muted" style="line-height:1.6">Elbows close to ribs. Thumbs UP (not across, not down). Imagine a centerline down your body — hands don't cross it. Hands stay unclenched, no fists.</div>
-    </div>
-    <div class="card mb-12" style="padding:14px 16px;border-left:3px solid var(--accent)">
-      <div class="t-sm fw-7 mb-4" style="color:var(--accent)">🧍 Run Tall — Posture</div>
-      <div class="t-xs t-muted" style="line-height:1.6">Imagine a pulley in the sky lifting your chest upward. This opens the hips and activates glutes — the opposite of the rounded/flexed-hip posture from sitting. Fix this and you'll fix half your form problems.</div>
-    </div>
-    <div class="card mb-12" style="padding:14px 16px;border-left:3px solid var(--orange)">
-      <div class="t-sm fw-7 mb-4" style="color:var(--orange)">🦶 Foot Landing</div>
-      <div class="t-xs t-muted" style="line-height:1.6">Foot lands UNDER your center of gravity — not out in front. Landing in front = braking force every step. Forefoot/midfoot beats heel striking (less impact, faster ground contact). Use gravity: subtle forward lean from the ankles, not the waist.</div>
-    </div>
-    <div class="card mb-12" style="padding:14px 16px">
-      <div class="t-sm fw-7 mb-4">🎯 Pre-Run Drill (30 sec)</div>
-      <div class="t-xs t-muted" style="line-height:1.6">Hands on hips, eyes forward, rise onto balls of feet, then fall forward into a run. Repeat before hard sessions to lock in the "tall + falling forward" feel. Use gravity, don't fight it.</div>
-    </div>
-    <div class="card mb-20" style="padding:14px 16px">
-      <div class="t-sm fw-7 mb-4">🔁 In-Race Reset</div>
-      <div class="t-xs t-muted" style="line-height:1.6">Coming out of every Roxzone, run the checklist: <strong>tall</strong> → <strong>shoulders down</strong> → <strong>thumbs up</strong> → <strong>land under hips</strong>. Form falls apart fastest after stations — that's exactly when you need it most.</div>
-    </div>
     ` : ''}
   </div>`;
 }
