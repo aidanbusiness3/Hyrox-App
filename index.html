@@ -883,10 +883,9 @@ function getTampaTaperWeek(weekNum) {
       { day:'Wednesday', type:'rest', title:'Active Recovery', icon:'🧘', zone:0,
         exercises:[
           {name:'Walk',detail:'30 min easy walk',zone:0},
-          {name:'Mobility',detail:'Hip / ankle / thoracic — 15 min',zone:0},
           {name:'Visualize',detail:'Sit with gf, review race plan, decide handoff order for each station',zone:0}
         ],
-        duration:'45 min', focus:'Lock in the doubles plan with gf.' },
+        duration:'30 min', focus:'Lock in the doubles plan with gf.' },
       { day:'Thursday', type:'rest', title:'Travel + Light Shakeout + HEAT PREP', icon:'✈️', zone:1,
         exercises:[
           {name:'Travel to Tampa',detail:'Hydrate constantly. Walk every 90 min on plane.',zone:0},
@@ -968,24 +967,22 @@ function getResetWeek(weekNum) {
   // PHASE 5: RECOVERY & RESET (Week 21) — Tampa just done, 4 weeks until Dallas
   // Active recovery, mental reorient to solo mode, no hard sessions.
   return [
-    { day:'Monday', type:'rest', title:'Walk + Mobility', icon:'🧘', zone:0,
+    { day:'Monday', type:'rest', title:'Walk', icon:'🚶', zone:0,
       exercises:[
-        {name:'Walk',detail:'30-45 min easy',zone:0},
-        {name:'Mobility Flow',detail:'15 min — hip, ankle, thoracic',zone:0}
+        {name:'Walk',detail:'30-45 min easy',zone:0}
       ],
-      duration:'60 min', focus:'Body is still cashing checks from Tampa. Be patient.' },
+      duration:'45 min', focus:'Body is still cashing checks from Tampa. Be patient.' },
     { day:'Tuesday', type:'run', title:'Shakeout Run', icon:'🏃', zone:1,
       exercises:[
         {name:'Easy Jog',detail:'30 min @ Z1 — HR < 140',zone:1},
         {name:'Strides',detail:'4 × 20 sec relaxed',zone:4}
       ],
       duration:'35 min', focus:'📍 Outdoor — Test the legs. Stop if anything is off.' },
-    { day:'Wednesday', type:'rest', title:'Active Recovery', icon:'🧘', zone:0,
+    { day:'Wednesday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
       exercises:[
-        {name:'Walk',detail:'45 min',zone:0},
-        {name:'Foam Roll',detail:'Full body — 20 min',zone:0}
+        {name:'Full Rest',detail:'Mental reset. Re-read your sub-1:05 race plan.',zone:0}
       ],
-      duration:'65 min', focus:'Mental reset day. Re-read your sub-1:05 race plan.' },
+      duration:'—', focus:'Mental reset day.' },
     { day:'Thursday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
       exercises:[{name:'Easy Run',detail:'40 min @ Z2',zone:2}],
       duration:'40 min', focus:'📍 Outdoor — First real run back. Easy.' },
@@ -1037,12 +1034,11 @@ function getSoloSharpenWeek(weekNum) {
           {name:'1km Run → Wall Balls 100',detail:'',zone:4}
         ],
         duration:'~65 min', focus:'📍 Round Rock — THE benchmark before Dallas. Target sub 1:08 (within 3 min of A goal).' },
-      { day:'Thursday', type:'run', title:'Easy Run + Mobility', icon:'🏃', zone:1,
+      { day:'Thursday', type:'run', title:'Easy Run', icon:'🏃', zone:1,
         exercises:[
-          {name:'Easy Run',detail:'30 min @ Z1-Z2',zone:1},
-          {name:'Mobility',detail:'15 min — hip / ankle / thoracic',zone:0}
+          {name:'Easy Run',detail:'30 min @ Z1-Z2',zone:1}
         ],
-        duration:'45 min', focus:'📍 Outdoor — Recover from the sim.' },
+        duration:'30 min', focus:'📍 Outdoor — Recover from the sim.' },
       { day:'Friday', type:'intervals', title:'Sharp 800s', icon:'⚡', zone:5,
         exercises:[
           {name:'Warm Up',detail:'15 min progressive',zone:2},
@@ -1885,44 +1881,10 @@ function renderToday(overrideDate) {
     <div class="label">Exercises</div>
     <div class="mb-24">
       ${(() => {
-        // Build full exercise list with warm-up + cooldown
-        const isRunType = ['run','tempo','intervals','long'].includes(workout.type);
-        const isStrengthType = ['strength'].includes(workout.type);
-        const isHyroxType = ['hyrox'].includes(workout.type);
-        const isRestType = ['rest'].includes(workout.type);
-        const warmUp = [];
-        const coolDown = [];
-        if (!isRestType && workout.title !== 'Rest Day' && workout.title !== 'Rest' && !workout.title.includes('RACE DAY') && !workout.title.includes('Race Eve')) {
-          if (isRunType) {
-            warmUp.push({name:'Dynamic Warm-Up',detail:'Leg swings (15 ea), walking lunges w/ rotation (8 ea), A-skips + B-skips (20m ea), single-leg glute bridges (8 ea)',zone:0,isWarmUp:true});
-          }
-          if (isStrengthType) {
-            warmUp.push({name:'Activation',detail:'Banded walks (15 steps ea direction), banded clamshells (15 ea), wall slides (10), goblet squat hold (30s)',zone:0,isWarmUp:true});
-          }
-          if (isHyroxType) {
-            warmUp.push({name:'Dynamic Warm-Up',detail:'Leg swings, walking lunges w/ rotation, A-skips, single-leg glute bridges (8 ea)',zone:0,isWarmUp:true});
-          }
-          // Tib raises every training day
-          warmUp.push({name:'Tib Raises',detail:'3 × 25 reps — #1 shin splint prevention at your bodyweight',zone:0,isWarmUp:true});
-          // Cooldown
-          if (isRunType || isHyroxType) {
-            coolDown.push({name:'Foam Roll',detail:'Quads, TFL, calves, glutes — 60-90 sec each',zone:0,isCoolDown:true});
-            coolDown.push({name:'Stretch: Hip Flexor',detail:'Couch stretch — 60 sec each side. Your #1 priority.',zone:0,isCoolDown:true});
-            coolDown.push({name:'Stretch: Calves',detail:'Straight leg + bent knee against wall — 45 sec each',zone:0,isCoolDown:true});
-            coolDown.push({name:'Stretch: Pigeon',detail:'60 sec each side — hip external rotators',zone:0,isCoolDown:true});
-          }
-          if (isStrengthType) {
-            coolDown.push({name:'Foam Roll',detail:'Quads, glutes, upper back — 60 sec each',zone:0,isCoolDown:true});
-            coolDown.push({name:'Stretch: Hip Flexor',detail:'Half-kneeling lunge stretch — 60 sec each side',zone:0,isCoolDown:true});
-          }
-          // Post-training breathing on every session
-          coolDown.push({name:'Breathing',detail:'5 min — 4-count inhale, 6-count exhale. Parasympathetic recovery shift.',zone:0,isCoolDown:true});
-        }
-        const allExercises = [...warmUp, ...workout.exercises, ...coolDown];
-        return allExercises.map((ex, i) => {
+        return workout.exercises.map((ex, i) => {
         const isDone = Storage.isExerciseComplete(dateStr, i);
         const log = Storage.getExerciseLog(dateStr, i);
-        const isLoggable = !ex.zone && ex.name !== 'Full Rest' && ex.name !== 'Optional' && ex.name !== 'Rest & Prep' && ex.name !== 'Rest' && ex.name !== 'Celebrate' && ex.name !== 'Cooldown Stretch' && ex.name !== 'Cool Down' && ex.name !== 'Cooldown' && ex.name !== 'Warm Up' && ex.name !== 'Recovery' && ex.name !== 'Hip Mobility Flow' && ex.name !== 'Foam Rolling' && ex.name !== 'Pre-Race Meal' && ex.name !== 'Gear Check' && ex.name !== 'PRE-RACE' && ex.name !== 'WARM UP' && ex.name !== 'RACE' && ex.name !== 'PACING' && ex.name !== 'STATIONS';
+        const isLoggable = !ex.zone && ex.name !== 'Full Rest' && ex.name !== 'Rest' && ex.name !== 'Celebrate' && ex.name !== 'Cool Down' && ex.name !== 'Warm Up' && ex.name !== 'Recovery' && ex.name !== 'Gear Check' && ex.name !== 'PRE-RACE' && ex.name !== 'RACE' && ex.name !== 'PACING' && ex.name !== 'STATIONS';
 
         return `<div class="ex-row">
           <div class="row" onclick="App.toggleExercise('${dateStr}',${i},this.closest('.ex-row'))">
