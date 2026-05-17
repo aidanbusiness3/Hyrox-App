@@ -164,11 +164,13 @@ const ATHLETE = {
 
   goalRace: 'Dallas',
   goalDate: '2026-11-20',
-  goalTimeA: '1:05:00',
-  goalTimeStretch: '0:59:59',
+  goalTimeA: '1:08:00',       // Primary goal — realistic 7-min PR over 24 weeks of work
+  goalTimeStretch: '1:05:00', // Stretch — if everything clicks
+  goalTimeDream: '0:59:59',   // Dream — sub-1 hour, elite territory
   prTime: '1:15:09',
-  pr5K: null,           // To set via 5K TT in Week 1. Elite 15 prereq: sub-17:00. Goal: sub-19 by Tampa, sub-18 by Dallas.
-  currentWeeklyMileage: 25,  // Baseline May 2026. Foundation phase progresses to 35, Build to 47.
+  pr5K: null,                 // Baseline TT: Sat 2026-05-23 (16 days before plan starts). Goal progression sub-21 → sub-19 → sub-18.
+  pr5KDate: '2026-05-23',     // Scheduled baseline test
+  currentWeeklyMileage: 25,   // Baseline May 2026. Foundation progresses to 35, Build to 47.
 
   trainingStart: '2026-06-08',
   totalWeeks: 24,
@@ -552,6 +554,25 @@ function isDeloadWeek(weekNum) {
 // 24 weeks, two races: Tampa Doubles (Oct 23) + Dallas Solo (Nov 20)
 // You already have a base from 2 races. This plan attacks SPEED.
 
+// Strength progression scheme — 4-week cycles, +5 lb per cycle
+// Reference: Squat, Deadlift, Hip Thrust 3RM (set in Week 1)
+function getStrengthCycle(weekNum) {
+  if (weekNum === 1)  return { label:'FIND YOUR 3RM',         detail:'Work up to a heavy 3-rep set on each: Squat, Deadlift, Hip Thrust. Top set = RPE 9 (hard 3, no rep in reserve). RECORD THE NUMBERS — this is your reference for the entire plan.' };
+  if (weekNum === 2)  return { label:'3×3 @ 95%',              detail:'3 sets × 3 reps at 95% of Wk 1 3RM. Same load all 3 sets. Smooth bar speed.' };
+  if (weekNum === 3)  return { label:'3×3 @ 100% (PR test)',   detail:'3 sets × 3 reps at 100% of Wk 1 3RM. If top set feels solid, attempt new 3RM (add 5 lb).' };
+  if (weekNum === 4)  return { label:'DELOAD — 3×5 @ 80%',     detail:'Cut load to 80%, raise reps to 5. Active recovery for tendons.' };
+  if (weekNum === 5)  return { label:'+5 lb · 3×3 @ 90%',      detail:'Add 5 lb to all lifts (new reference). 3×3 at 90% of new 3RM.' };
+  if (weekNum === 6)  return { label:'3×3 @ 95%',              detail:'3×3 at 95% of new 3RM. PR test next block.' };
+  if (weekNum === 7)  return { label:'3×3 @ 100% (PR test)',   detail:'New 3RM attempt on top set. Add 5 lb if all 3 reps hit clean.' };
+  if (weekNum === 8)  return { label:'DELOAD — 3×5 @ 80%',     detail:'Deload + 5K TT week. Light lifting, easy recovery.' };
+  if (weekNum === 9)  return { label:'+5 lb · 3×3 @ 90%',      detail:'Add 5 lb if Wk 7 hit. 3×3 at 90%.' };
+  if (weekNum === 10) return { label:'3×3 @ 95%',              detail:'3×3 at 95%.' };
+  if (weekNum === 11) return { label:'3×3 @ 100% (PR test)',   detail:'3RM PR attempt.' };
+  if (weekNum === 12) return { label:'Heavy single — top only',detail:'Full sim benchmark week. 1 heavy single per lift @ 95-100%. No volume.' };
+  // Weeks 13+ (Doubles, Taper, Reset, Sharpen, Race) = maintenance only
+  return { label:'Maintenance — 3×3 @ 85%',                    detail:'Doubles & race phases = MAINTAIN strength, prioritize sport-specific work. Keep load, low volume. Don\'t chase PRs now.' };
+}
+
 function getFoundationWeek(weekNum, deload) {
   // PHASE 1: AEROBIC + THRESHOLD FOUNDATION (Weeks 1-6)
   // Research-driven rebuild (May 2026): Elite Hyrox athletes do NOT do hill sprints / flying 30s / 200m repeats.
@@ -568,8 +589,8 @@ function getFoundationWeek(weekNum, deload) {
   const thresholdMinPerRep = deload ? 5 : Math.min(6 + Math.floor(weekNum / 3), 8);
   // Wednesday alternates: odd weeks = THRESHOLD (cruise intervals), even weeks = HILL TEMPOS (long threshold hills)
   const isThresholdWeek = weekNum % 2 === 1;
-  // Week 1 = 5K time trial day (replaces threshold) to set baseline + goal pace
-  const is5KWeek = weekNum === 1;
+  // 5K TT scheduled BEFORE plan starts (Sat 2026-05-23) — no in-plan 5K week
+  const is5KWeek = false;
 
   return [
     { day:'Monday', type:'run', title:'Easy Run — Build Volume', icon:'🏃', zone:2,
@@ -579,18 +600,18 @@ function getFoundationWeek(weekNum, deload) {
       duration:`${easyMin} min`,
       focus:'📍 Outdoor — FASTED OPTIONAL. This is the 80%. Truly easy. Cadence 170-180 spm. Volume is the #1 priority of Foundation phase.' },
 
-    { day:'Tuesday', type:'strength', title:'Heavy Lower + Accessory', icon:'🏋️', zone:0,
+    { day:'Tuesday', type:'strength', title:`Heavy Lower — ${getStrengthCycle(weekNum).label}`, icon:'🏋️', zone:0,
       exercises:[
         {name:'Athletic Warm-Up',detail:'A-skips, B-skips, walking lunges w/ rotation, leg swings — 8 min',zone:0},
-        {name:'Back Squat',detail:'3 × 3-5 @ 85-92% 1RM. Research: heavy strength (≥90% 1RM) drives running economy (Blagrove 2018 meta-analysis, large effect size).',zone:0},
-        {name:'Trap-Bar Deadlift',detail:'3 × 3-5 heavy — full posterior chain power',zone:0},
-        {name:'Hip Thrust',detail:'3 × 6-8 heavy — glute power = sled push power',zone:0},
+        {name:'Back Squat',detail:`${getStrengthCycle(weekNum).detail}`,zone:0},
+        {name:'Trap-Bar Deadlift',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
+        {name:'Hip Thrust',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
         {name:'Box Jumps',detail:'4 × 3 — explosive up, soft landing. Plyo accessory.',zone:0},
         {name:'Pull-Ups',detail:'3 × max',zone:0},
         {name:'Wall Balls',detail:'3 × 25 reps — accessory volume (Owen Silver protocol: 200-400 reps/wk)',zone:0}
       ],
       duration:'70 min',
-      focus:'📍 UGP gym — HEAVY day. Low rep, high load. Not bodybuilding. Squat/DL/Hip Thrust are the 3 lifts that move the needle for Hyrox.' },
+      focus:`📍 UGP gym — HEAVY day, Wk ${weekNum} of strength cycle. ${weekNum === 1 ? '🎯 BASELINE WEEK: Record your 3RM numbers — they anchor the next 12 weeks.' : 'Log loads. Progress is incremental but tracked.'}` },
 
     { day:'Wednesday', type:'intervals', title: deload ? 'Easy Run' : (is5KWeek ? '🎯 5K TIME TRIAL — Baseline' : (isThresholdWeek ? `Threshold ${thresholdReps}×${thresholdMinPerRep}min` : 'Hill Tempos')), icon: is5KWeek ? '⏱️' : (isThresholdWeek ? '🎯' : '⛰️'), zone: deload ? 2 : 4,
       exercises: deload ? [
@@ -624,22 +645,22 @@ function getFoundationWeek(weekNum, deload) {
       duration:'75 min',
       focus:'📍 UGP gym — Day 2 of strength. Moderate load (NOT heavy — Tuesday was heavy). Single-leg work + posterior chain + plyos. Builds durability.' },
 
-    { day:'Friday', type:'hyrox', title: deload ? 'Light Station Practice' : 'Compromised Running', icon:'😤', zone: deload ? 2 : 4,
+    { day:'Friday', type:'hyrox', title: deload ? 'Light Station Practice' : 'Compromised — Sled Pull Focus', icon:'🪢', zone: deload ? 2 : 4,
       exercises: deload ? [
         {name:'Easy Run',detail:'25 min @ Z2',zone:2},
-        {name:'Sled Push',detail:'2 × 50m easy',zone:0},
+        {name:'Sled Pull',detail:'3 × 50m technique focus — hinge & hand-over-hand',zone:0},
         {name:'Wall Balls',detail:'50 reps',zone:0}
       ] : [
         {name:'1km Run',detail:'@ 4:30-4:40/km — settle in. Threshold pace, not race pace.',zone:4},
-        {name:'SkiErg',detail:'1000m @ race effort',zone:4},
-        {name:'1km Run',detail:'@ 4:30-4:40/km — hold pace after SkiErg',zone:4},
+        {name:'Sled Pull',detail:'50m race weight — YOUR WEAKEST STATION. Hinge at hips, lean back, drive through legs, hand-over-hand rhythm. Don\'t arm-pull.',zone:0},
+        {name:'1km Run',detail:'@ 4:30-4:40/km — hold pace',zone:4},
         {name:'Sled Push',detail:'50m race weight — locked arms, low angle',zone:0},
         {name:'1km Run',detail:'@ 4:30-4:40/km — legs burn, stay upright',zone:4},
-        {name:'Wall Balls',detail:'75 reps — sets of 25',zone:0},
+        {name:'Sled Pull',detail:'50m AGAIN — your Phoenix sled pull was 23 sec slow vs goal. Most fixable through technique + reps.',zone:0},
         {name:'1km Run',detail:'@ 4:30-4:40/km — final',zone:4}
       ],
       duration: deload ? '45 min' : '70 min',
-      focus: deload ? 'Light station touch.' : '📍 Round Rock — THE KEY SESSION. Elite athletes do compromised work DAILY. Goal: <20 sec variance across the 4 runs. Pace gets faster as threshold improves.' },
+      focus: deload ? 'Sled pull technique work.' : '📍 Round Rock — KEY SESSION + targeted sled pull bias. Phoenix data: pull was 3:53 (goal 3:30). Closing this gap = ~25 sec off race time. Focus on TECHNIQUE not muscle.' },
 
     { day:'Saturday', type:'long', title:'Long Run — Aerobic Volume', icon:'🛣️', zone:2,
       exercises: deload ? [
@@ -732,33 +753,33 @@ function getRacePaceWeek(weekNum, deload) {
       duration: is5KWeek ? '55 min' : (deload ? '40 min' : (isFullSim ? '65-75 min' : '55 min')),
       focus: is5KWeek ? '📍 TRACK — Re-test your 5K. This is your engine progress check. Big jump = volume + threshold working.' : (deload ? '📍 Outdoor — Deload.' : (isFullSim ? '📍 Round Rock — BENCHMARK. Time every split. Target: sub 1:12. Sets trajectory into doubles phase.' : (isVO2Day ? '📍 Outdoor — VO2 max ceiling raiser. CANNOT talk during work. Strongest predictor of Hyrox finish time (ρ=-0.71, Brandt 2025).' : '📍 Round Rock — Half sim at current race pace. Focus on weakest stations.'))) },
 
-    { day:'Thursday', type:'strength', title:'Heavy Lower + Easy Run', icon:'💪', zone:2,
+    { day:'Thursday', type:'strength', title:`Heavy Lower — ${getStrengthCycle(weekNum).label}`, icon:'💪', zone:2,
       exercises:[
-        {name:'Back Squat',detail:'3 × 3-5 @ 85-92% 1RM — heavy day',zone:0},
-        {name:'Romanian Deadlift',detail:'4 × 6 heavy',zone:0},
-        {name:'Hip Thrust',detail:'3 × 6-8 heavy',zone:0},
-        {name:'Bulgarian Split Squat',detail:'3 × 8 each',zone:0},
+        {name:'Back Squat',detail:`${getStrengthCycle(weekNum).detail}`,zone:0},
+        {name:'Trap-Bar Deadlift',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
+        {name:'Hip Thrust',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
+        {name:'Bulgarian Split Squat',detail:'3 × 8 each — accessory',zone:0},
         {name:'Easy Run',detail:`${Math.round(35 * v)} min @ Z2 (after lift, separate by 2hr if possible)`,zone:2},
         {name:'Wall Balls',detail:'3 × 30 reps — daily accessory',zone:0}
       ],
       duration:'90 min',
-      focus:'📍 UGP gym — Heavy day. Squat/DL/Hip Thrust drive sled push power + running economy. Run AFTER lift (or 2hr later if you can split).' },
+      focus:`📍 UGP gym — Heavy day, Wk ${weekNum} of strength cycle. Squat/DL/Hip Thrust drive sled push power + running economy.` },
 
-    { day:'Friday', type:'hyrox', title: deload ? 'Light Station' : 'Compromised Running — Race Pace', icon:'😤', zone: deload ? 2 : 4,
+    { day:'Friday', type:'hyrox', title: deload ? 'Light Station' : 'Compromised — Sled Pull Focus', icon:'🪢', zone: deload ? 2 : 4,
       exercises: deload ? [
         {name:'Easy Run',detail:'25 min @ Z2',zone:2},
-        {name:'Wall Balls',detail:'50 reps easy',zone:0}
+        {name:'Sled Pull',detail:'3 × 50m technique focus — hinge & hand-over-hand',zone:0}
       ] : [
         {name:'1km Run',detail:`@ ${paceFast}/km — current race pace`,zone:4},
-        {name:'SkiErg',detail:'1000m @ 85% — controlled',zone:4},
+        {name:'Sled Pull',detail:'50m race weight — WEAKEST STATION focus. Hinge low, lean back, drive legs into the floor, hand-over-hand rhythm.',zone:0},
         {name:'1km Run',detail:`@ ${paceFast}/km — hold pace`,zone:4},
-        {name:'Sled Push',detail:'50m race weight',zone:0},
+        {name:'Sled Push',detail:'50m race weight — locked arms, low angle',zone:0},
         {name:'1km Run',detail:`@ ${paceFast}/km — legs burning`,zone:4},
-        {name:'Wall Balls',detail:'100 reps',zone:0},
+        {name:'Sled Pull',detail:'50m AGAIN — fatigued. This is where Phoenix fell apart (3:53 vs 3:30 goal).',zone:0},
         {name:'1km Run',detail:`@ ${paceFast}/km — leave it all`,zone:4}
       ],
       duration: deload ? '35 min' : '70 min',
-      focus: deload ? 'Easy.' : '📍 Round Rock — Track every split. Goal: <15 sec/km variance across all 4 runs.' },
+      focus: deload ? 'Sled pull technique.' : '📍 Round Rock — KEY SESSION + Sled Pull bias. Closing your pull gap = ~25 sec off finish time.' },
 
     { day:'Saturday', type:'long', title:'Long Run + Threshold Finish', icon:'🛣️', zone:2,
       exercises: deload ? [
@@ -814,16 +835,16 @@ function getDoublesWeek(weekNum, deload) {
       duration:'60 min',
       focus:'📍 Round Rock — DOUBLES STRATEGY: high-frequency switching beats 50/50 splits. Every 10-20 reps on wall balls, every 100-200m on machines (HyroxDataLab/RoxBase confirmed). Drill the rhythm.' },
 
-    { day:'Thursday', type:'strength', title:'Heavy Lower + Easy Run', icon:'💪', zone:2,
+    { day:'Thursday', type:'strength', title:`Maintenance Lift — ${getStrengthCycle(weekNum).label}`, icon:'💪', zone:2,
       exercises:[
-        {name:'Back Squat',detail:'3 × 3-5 @ 85-92% 1RM — heavy day continues',zone:0},
-        {name:'Romanian Deadlift',detail:'4 × 6 heavy',zone:0},
-        {name:'Hip Thrust',detail:'3 × 6-8 heavy',zone:0},
+        {name:'Back Squat',detail:`${getStrengthCycle(weekNum).detail}`,zone:0},
+        {name:'Trap-Bar Deadlift',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
+        {name:'Hip Thrust',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
         {name:'Easy Run',detail:`${Math.round(35 * v)} min @ Z2`,zone:2},
         {name:'Wall Balls',detail:'3 × 30 reps — daily accessory',zone:0}
       ],
-      duration:'85 min',
-      focus:'📍 UGP gym — Heavy strength MAINTAINED through doubles phase. Drop volume, keep load.' },
+      duration:'75 min',
+      focus:'📍 UGP gym — MAINTENANCE only during doubles phase. Don\'t chase PRs, hold what you have. Sport-specific work is the priority now.' },
 
     { day:'Friday', type:'intervals', title:'Compromised Doubles Pace', icon:'😤', zone:4,
       exercises:[
@@ -980,7 +1001,7 @@ function getResetWeek(weekNum) {
       duration:'35 min', focus:'📍 Outdoor — Test the legs. Stop if anything is off.' },
     { day:'Wednesday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
       exercises:[
-        {name:'Full Rest',detail:'Mental reset. Re-read your sub-1:05 race plan.',zone:0}
+        {name:'Full Rest',detail:'Mental reset. Re-read your sub-1:08 race plan.',zone:0}
       ],
       duration:'—', focus:'Mental reset day.' },
     { day:'Thursday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
@@ -1006,7 +1027,7 @@ function getResetWeek(weekNum) {
 }
 
 function getSoloSharpenWeek(weekNum) {
-  // PHASE 6: SOLO SHARPENING (Weeks 22-23) — 2 weeks to recall sub-1:05 execution
+  // PHASE 6: SOLO SHARPENING (Weeks 22-23) — 2 weeks to recall sub-1:08 execution
   const isWeek22 = weekNum === 22;
 
   if (isWeek22) {
@@ -1018,7 +1039,7 @@ function getSoloSharpenWeek(weekNum) {
       { day:'Tuesday', type:'intervals', title:'Race Pace 1km Repeats', icon:'🎯', zone:4,
         exercises:[
           {name:'Warm Up',detail:'10 min easy + 5 strides',zone:2},
-          {name:'1km Repeats',detail:'6 × 1km @ 3:55-4:00/km / 60 sec rest — SUB 1:05 PACE',zone:4},
+          {name:'1km Repeats',detail:'6 × 1km @ 4:00-4:05/km / 60 sec rest — SUB 1:08 PACE (solo race pace)',zone:4},
           {name:'Cool Down',detail:'10 min easy',zone:1}
         ],
         duration:'55 min', focus:'📍 Outdoor — Recall solo race pace. Faster than doubles.' },
@@ -1140,7 +1161,7 @@ function getDallasTaperWeek() {
         {name:'30 min before',detail:'Gel + water. Caffeine 200-300mg. Light warm-up jog.',zone:2},
         {name:'RUN PLAN',detail:'Runs 1-4: 3:55-4:05/km. Runs 5-8: 4:05-4:15/km. Run + Roxzone counts.',zone:4},
         {name:'STATIONS',detail:'SET stations (Ski/Sleds/Row): your plan, don\'t deviate. RACE stations (Burpees/Farmers/Lunges/Wall Balls): sell out.',zone:0},
-        {name:'A GOAL',detail:'Sub 1:05. Stretch: sub 1:00.',zone:0}
+        {name:'TIERED TARGETS',detail:'A: sub 1:08 · Stretch: sub 1:05 · Dream: sub 1:00. Race the A goal; the stretch comes if everything clicks.',zone:0}
       ],
       duration:'~65 min', focus:'GO GET THAT PR. 🏆' },
     { day:'Saturday', type:'rest', title:'Celebrate', icon:'🎉', zone:0,
@@ -2060,7 +2081,7 @@ function renderStats() {
       <div class="metric"><span class="t-sm t-muted">LT Pace</span><span class="t-sm fw-7 tabular">${ATHLETE.ltPacePerKm}/km @ ${ATHLETE.ltHeartRate}bpm</span></div>
       <div class="metric"><span class="t-sm t-muted">Easy Pace</span><span class="t-sm fw-7 tabular">${ATHLETE.easyPacePerKm}/km</span></div>
       <div class="metric"><span class="t-sm t-muted">Bench 1RM</span><span class="t-sm fw-7 tabular">${ATHLETE.benchPress1RM} lbs</span></div>
-      <div class="metric"><span class="t-sm t-muted">5K PR</span><span class="t-sm fw-7 tabular">${ATHLETE.pr5K || '— (Week 1 TT)'}</span></div>
+      <div class="metric"><span class="t-sm t-muted">5K PR</span><span class="t-sm fw-7 tabular">${ATHLETE.pr5K || '— (TT Sat May 23)'}</span></div>
       <div class="metric"><span class="t-sm t-muted">Weekly Mileage</span><span class="t-sm fw-7 tabular">${ATHLETE.currentWeeklyMileage} mi → 47 by Wk 12</span></div>
       <div class="metric"><span class="t-sm t-muted">Hyrox PR</span><span class="t-sm fw-7 tabular">${ATHLETE.prTime}</span></div>
       <div class="metric"><span class="t-sm t-muted">A Goal</span><span class="t-sm fw-7 t-accent">Sub ${ATHLETE.goalTimeA}</span></div>
@@ -2121,7 +2142,13 @@ function renderStats() {
         <div class="t-sm fw-7" style="color:var(--accent)">🏁 DALLAS SOLO — A-RACE</div>
         <div class="t-xs t-muted tabular">${Dates.formatDate(ATHLETE.goalDate)}</div>
       </div>
-      <div class="t-xs t-muted" style="line-height:1.6">Solo. A goal: <strong>sub ${ATHLETE.goalTimeA}</strong>. Stretch: sub ${ATHLETE.goalTimeStretch}. PR: ${ATHLETE.prTime}.</div>
+      <div class="t-xs t-muted" style="line-height:1.6">Solo. PR: ${ATHLETE.prTime}. Tiered targets:<br>• <strong>A goal: sub ${ATHLETE.goalTimeA}</strong> (~7 min PR — very achievable)<br>• <strong>Stretch: sub ${ATHLETE.goalTimeStretch}</strong> (if everything clicks)<br>• <strong>Dream: sub ${ATHLETE.goalTimeDream}</strong> (sub-1 hr, elite territory)</div>
+    </div>
+
+    <div class="label">🪢 Station Priority — Sled Pull</div>
+    <div class="card mb-24" style="padding:14px 16px;border-left:3px solid var(--orange)">
+      <div class="t-sm fw-7 mb-4" style="color:var(--orange)">Your Phoenix Gap = ~25 sec</div>
+      <div class="t-xs t-muted" style="line-height:1.6">Phoenix sled pull: <strong>3:53</strong>. Goal: <strong>3:30</strong>. That's 23 sec on one station alone — your single biggest fix.<br><br><strong>Technique cues:</strong> hinge low at hips, lean back, drive legs into floor, hand-over-hand rhythm. Don't arm-pull.<br><br><strong>Plan:</strong> Friday compromised sessions now bias toward Sled Pull (2 touches per session). Closing this gap could be worth 25+ sec off finish time.</div>
     </div>
 
     <div class="label">Training Philosophy — Research-Backed</div>
@@ -2135,7 +2162,7 @@ function renderStats() {
     </div>
     <div class="card mb-12" style="padding:14px 16px">
       <div class="t-sm fw-7 mb-4">🏋️ Strength — Heavy, Not Hypertrophy</div>
-      <div class="t-xs t-muted" style="line-height:1.6">Squat / DL / Hip Thrust at <strong>3×3-5 @ 85-92% 1RM</strong>. Blagrove 2018 meta-analysis: heavy strength improves running economy with large effect size (SMD = -1.42). Roncevic: "get stronger, not build muscles."</div>
+      <div class="t-xs t-muted" style="line-height:1.6">Squat / DL / Hip Thrust at <strong>3×3-5 @ 85-92% 1RM</strong>. Blagrove 2018 meta-analysis: heavy strength improves running economy with large effect size (SMD = -1.42). Roncevic: "get stronger, not build muscles."<br><br><strong>4-week progression cycle:</strong><br>• Wk 1: Find 3RM (baseline)<br>• Wk 2: 3×3 @ 95%<br>• Wk 3: 3×3 @ 100% (PR test)<br>• Wk 4: DELOAD 3×5 @ 80%<br>• Wk 5+: Add 5 lb, restart cycle<br><br>Doubles phase (Wk 13+) = maintenance only (3×3 @ 85%).</div>
     </div>
     <div class="card mb-12" style="padding:14px 16px">
       <div class="t-sm fw-7 mb-4">😤 Compromised Running — Daily</div>
@@ -2147,7 +2174,7 @@ function renderStats() {
     </div>
     <div class="card mb-24" style="padding:14px 16px">
       <div class="t-sm fw-7 mb-4">⏱️ 5K Time Trial — Engine Benchmark</div>
-      <div class="t-xs t-muted" style="line-height:1.6">Week 1 = baseline. Week 8 = re-test. Week 19 (pre-Tampa) = final. Elite 15 prereq is sub-17:00. Realistic progression: sub-21 → sub-19 → sub-18. ${ATHLETE.pr5K ? `<br><strong>Current PR: ${ATHLETE.pr5K}</strong>` : '<br>No PR set yet — Week 1 Wednesday is your baseline test.'}</div>
+      <div class="t-xs t-muted" style="line-height:1.6"><strong>Baseline TT scheduled: Sat ${Dates.formatDate(ATHLETE.pr5KDate)}</strong> (16 days before plan starts). Then re-test at Wk 8 + pre-Tampa (Wk 19). Elite 15 prereq sub-17:00. Realistic progression: sub-21 → sub-19 → sub-18. ${ATHLETE.pr5K ? `<br><strong>Current PR: ${ATHLETE.pr5K}</strong>` : '<br>No PR set yet.'}</div>
     </div>
 
     <div class="label">Run + Roxzone Formula</div>
@@ -2156,11 +2183,11 @@ function renderStats() {
       <div class="t-xs t-muted mt-8">Each venue has ~700m of Roxzone running. Your "5:00/km" is slower when you include it. Use this for honest pacing.</div>
     </div>
 
-    <div class="label">Running Target</div>
+    <div class="label">Running Target (Sub 1:08 A goal)</div>
     <div class="card mb-20" style="padding:14px 16px">
-      <div class="metric"><span class="t-sm t-muted">Current Avg</span><span class="t-sm fw-7 tabular">4:53/km</span></div>
-      <div class="metric"><span class="t-sm t-muted">Target Avg (Run+Rox)</span><span class="t-sm fw-7 t-accent tabular">4:00-4:07/km</span></div>
-      <div class="metric"><span class="t-sm t-muted">Time Savings</span><span class="t-sm fw-7 t-accent tabular">~4:22</span></div>
+      <div class="metric"><span class="t-sm t-muted">Phoenix Avg</span><span class="t-sm fw-7 tabular">4:53/km</span></div>
+      <div class="metric"><span class="t-sm t-muted">Sub-1:08 Target (Run+Rox)</span><span class="t-sm fw-7 t-accent tabular">4:30-4:40/km</span></div>
+      <div class="metric"><span class="t-sm t-muted">Sub-1:05 Stretch (Run+Rox)</span><span class="t-sm fw-7 tabular" style="color:var(--orange)">4:00-4:07/km</span></div>
     </div>
 
     <div class="label">Pacing Philosophy</div>
@@ -2173,7 +2200,7 @@ function renderStats() {
       <div class="t-xs t-muted" style="line-height:1.6">Burpees, Farmers, Lunges, Wall Balls.<br>This is where you take spots. Look at people next to you. First rep = last rep cadence. "Hurts the same whether you go slow or fast."</div>
     </div>
 
-    <div class="label">Station Targets (Sub-1:05)</div>
+    <div class="label">Station Targets (Stretch — Sub 1:05)</div>
     ${RACES[0].stations.filter(s=>s.type==='station').map(ps => {
       const goal = GOAL_SPLITS.stations[ps.name];
       if (!goal) return '';
