@@ -554,6 +554,48 @@ function isDeloadWeek(weekNum) {
 // 24 weeks, two races: Tampa Doubles (Oct 23) + Dallas Solo (Nov 20)
 // You already have a base from 2 races. This plan attacks SPEED.
 
+// Ab/core block — rotates Tue/Thu/Sat for variety. Each hits all 4 core functions + dragon flag progression.
+// Research: McGill anti-movement framework, Escamilla 2006 EMG winners, Sato & Mokha 2009 (core training → 30s 5K improvement).
+function getAbBlock(day) {
+  const blocks = {
+    day1: { // Tuesday — static & bodyweight
+      header: '— CORE: Day 1 (Static & Bodyweight) —',
+      exercises: [
+        {name:'Ab Wheel Rollout',detail:'4 × 8 from knees — full extension, controlled return',zone:0},
+        {name:'Hanging Leg Raise',detail:'3 × 10 straight legs, controlled to 90°+',zone:0},
+        {name:'Cable Woodchopper',detail:'3 × 10/side high-to-low, half-kneeling',zone:0},
+        {name:'Dragon Flag Progression',detail:'4 sets × 5-8 reps OR 20-40s holds (your current stage)',zone:0},
+        {name:'Side Plank',detail:'3 × 45s/side, top hip lifted',zone:0}
+      ]
+    },
+    day2: { // Thursday — loaded & grip
+      header: '— CORE: Day 2 (Loaded & Grip) —',
+      exercises: [
+        {name:'Pallof Press',detail:'3 × 12/side cable or band, half-kneeling',zone:0},
+        {name:'Heavy Suitcase Carry',detail:'4 × 40m, one DB at 50%+ bodyweight',zone:0},
+        {name:'Toes-to-Bar',detail:'3 × 8 (regress to hanging knee-to-elbow if needed)',zone:0},
+        {name:'Dragon Flag Progression',detail:'3 sets × 5-8 reps OR 20-40s holds',zone:0},
+        {name:'RKC Plank',detail:'3 × 20s max tension — squeeze EVERYTHING',zone:0}
+      ]
+    },
+    day3: { // Saturday — dynamic & Hyrox-specific
+      header: '— CORE: Day 3 (Dynamic & Hyrox Transfer) —',
+      exercises: [
+        {name:'Med Ball Slams',detail:'3 × 10 overhead → floor, max effort',zone:0},
+        {name:'Half-Kneeling Landmine Rotation',detail:'3 × 10/side',zone:0},
+        {name:'Hollow Body Hold',detail:'3 × 30-45s arms overhead, lower back pressed down',zone:0},
+        {name:'Dragon Flag Progression',detail:'5 sets × 3-6 reps (volume day — this is where progress happens)',zone:0},
+        {name:'Single-Arm Overhead Carry',detail:'3 × 30m/side KB or DB',zone:0}
+      ]
+    }
+  };
+  const b = blocks[day];
+  return [
+    {name: b.header, detail: 'Rest 60-90s between sets. RPE 8 (2 reps in reserve).', zone: 0},
+    ...b.exercises
+  ];
+}
+
 // 4-week weak-station focus rotation. Based on Phoenix + Houston race data:
 // Burpee BJ +99s avg | Wall Balls +57s | Row +48s | Sled Pull +69s* | Lunges +33s | SkiErg +32s | Farmers +20s | Sled Push -30s (strength)
 // Rotation targets the biggest gaps most often. Sled push is excluded — already a strength.
@@ -643,9 +685,10 @@ function getFoundationWeek(weekNum, deload) {
         {name:'Hip Thrust',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
         {name:'Box Jumps',detail:'4 × 3 — explosive up, soft landing. Plyo accessory.',zone:0},
         {name:'Pull-Ups',detail:'3 × max',zone:0},
-        {name:'Wall Balls',detail:'3 × 25 reps — accessory volume (Owen Silver protocol: 200-400 reps/wk)',zone:0}
+        {name:'Wall Balls',detail:'3 × 25 reps — accessory volume (Owen Silver protocol: 200-400 reps/wk)',zone:0},
+        ...getAbBlock('day1')
       ],
-      duration:'70 min',
+      duration:'85 min',
       focus:`📍 UGP gym — HEAVY day, Wk ${weekNum} of strength cycle. ${weekNum === 1 ? '🎯 BASELINE WEEK: Record your 3RM numbers — they anchor the next 12 weeks.' : 'Log loads. Progress is incremental but tracked.'}` },
 
     { day:'Wednesday', type:'intervals', title: deload ? 'Easy Run' : (is5KWeek ? '🎯 5K TIME TRIAL — Baseline' : (isThresholdWeek ? `Threshold ${thresholdReps}×${thresholdMinPerRep}min` : 'Hill Tempos')), icon: is5KWeek ? '⏱️' : (isThresholdWeek ? '🎯' : '⛰️'), zone: deload ? 2 : 4,
@@ -676,10 +719,10 @@ function getFoundationWeek(weekNum, deload) {
         {name:'Single-Leg Hops',detail:'3 × 6 each — reactive stiffness for running economy',zone:0},
         {name:'Burpee BJ Accessory',detail:'3 × 10m / 60 sec rest — STEADY cadence (~2 sec/rep). Your #1 station gap (+99s) — needs weekly exposure beyond Friday focus.',zone:0},
         {name:'Wall Balls',detail:'2 × 30 reps — daily accessory (60 reps adds to 200-400/wk Owen Silver target)',zone:0},
-        {name:'Core: Pallof Press',detail:'3 × 10 each side — anti-rotation',zone:0}
+        ...getAbBlock('day2')
       ],
-      duration:'80 min',
-      focus:'📍 UGP gym — Day 2 of strength. Moderate load + WEAK STATION ACCESSORY (Burpee BJ + Wall Balls — your top 2 gaps).' },
+      duration:'95 min',
+      focus:'📍 UGP gym — Day 2 of strength. Moderate load + WEAK STATION ACCESSORY (Burpee BJ + Wall Balls) + Day 2 core block.' },
 
     { day:'Friday', type:'hyrox', title: deload ? 'Light Station Practice' : `Compromised — ${(getWeakStationFocus(weekNum) || {}).label || 'Rotation'}`, icon: (getWeakStationFocus(weekNum) || {}).icon || '😤', zone: deload ? 2 : 4,
       exercises: deload ? [
@@ -705,10 +748,11 @@ function getFoundationWeek(weekNum, deload) {
         {name:'Long Run',detail:`60 min easy @ Z2`,zone:2}
       ] : [
         {name:'Easy Run',detail:`${longMin - 5} min @ 6:00-6:30/km — Wk ${weekNum} target: ${Math.round((longMin) / 6.15)} km. Volume is the priority.`,zone:2},
-        {name:'Strides Finish',detail:'4 × 20 sec relaxed-fast / walk recovery. Smooth leg speed on tired legs.',zone:4}
+        {name:'Strides Finish',detail:'4 × 20 sec relaxed-fast / walk recovery. Smooth leg speed on tired legs.',zone:4},
+        ...getAbBlock('day3')
       ],
-      duration:`${deload ? 60 : longMin} min`,
-      focus: deload ? '📍 Outdoor — Easy long run.' : '📍 Outdoor — LONG RUN is the second most important session of the week. Owen Silver built 10K → 60K/wk to break sub-60. Volume + threshold = the engine.' },
+      duration:`${deload ? 60 : longMin + 15} min`,
+      focus: deload ? '📍 Outdoor — Easy long run.' : '📍 Outdoor + ab block — LONG RUN + Day 3 core (dragon flag volume day). Volume + threshold = the engine.' },
 
     { day:'Sunday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
       exercises:[
@@ -798,10 +842,11 @@ function getRacePaceWeek(weekNum, deload) {
         {name:'Hip Thrust',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
         {name:'Bulgarian Split Squat',detail:'3 × 8 each — accessory',zone:0},
         {name:'Easy Run',detail:`${Math.round(35 * v)} min @ Z2 (after lift, separate by 2hr if possible)`,zone:2},
-        {name:'Wall Balls',detail:'3 × 30 reps — daily accessory',zone:0}
+        {name:'Wall Balls',detail:'3 × 30 reps — daily accessory',zone:0},
+        ...getAbBlock('day2')
       ],
-      duration:'90 min',
-      focus:`📍 UGP gym — Heavy day, Wk ${weekNum} of strength cycle. Squat/DL/Hip Thrust drive sled push power + running economy.` },
+      duration:'105 min',
+      focus:`📍 UGP gym — Heavy day, Wk ${weekNum} of strength cycle. Squat/DL/Hip Thrust + Day 2 core block.` },
 
     { day:'Friday', type:'hyrox', title: deload ? 'Light Station' : `Compromised — ${(getWeakStationFocus(weekNum) || {}).label || 'Rotation'}`, icon: (getWeakStationFocus(weekNum) || {}).icon || '😤', zone: deload ? 2 : 4,
       exercises: deload ? [
@@ -828,10 +873,11 @@ function getRacePaceWeek(weekNum, deload) {
       ] : [
         {name:'Easy Run',detail:`${longMin - 20} min @ 6:00-6:30/km — Wk ${weekNum} target: ~${Math.round((longMin - 20) / 6.15)} km easy`,zone:2},
         {name:'Threshold Finish',detail:`4 × 3 min @ ${paceFast}/km / 90 sec easy recovery — 2nd threshold session of the week`,zone:4},
-        {name:'Easy Finish',detail:'10 min @ Z2',zone:2}
+        {name:'Easy Finish',detail:'10 min @ Z2',zone:2},
+        ...getAbBlock('day3')
       ],
-      duration: deload ? '50 min' : `${longMin} min`,
-      focus: deload ? 'Easy.' : '📍 Outdoor — Long aerobic + 2nd threshold dose of the week (elite norm — Driscoll does double-threshold days).' },
+      duration: deload ? '50 min' : `${longMin + 15} min`,
+      focus: deload ? 'Easy.' : '📍 Outdoor + ab block — Long aerobic + threshold + Day 3 core (dragon flag volume).' },
 
     { day:'Sunday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
       exercises:[{name:'Full Rest',detail:'Sleep, eat, recover.',zone:0}],
@@ -882,10 +928,11 @@ function getDoublesWeek(weekNum, deload) {
         {name:'Trap-Bar Deadlift',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
         {name:'Hip Thrust',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
         {name:'Easy Run',detail:`${Math.round(35 * v)} min @ Z2`,zone:2},
-        {name:'Wall Balls',detail:'3 × 30 reps — daily accessory',zone:0}
+        {name:'Wall Balls',detail:'3 × 30 reps — daily accessory',zone:0},
+        ...getAbBlock('day2')
       ],
-      duration:'75 min',
-      focus:'📍 UGP gym — MAINTENANCE only during doubles phase. Don\'t chase PRs, hold what you have. Sport-specific work is the priority now.' },
+      duration:'90 min',
+      focus:'📍 UGP gym — MAINTENANCE only during doubles phase + Day 2 core block. Hold lifts, prioritize sport-specific work.' },
 
     { day:'Friday', type:'intervals', title:'Compromised Doubles Pace', icon:'😤', zone:4,
       exercises:[
