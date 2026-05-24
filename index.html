@@ -172,8 +172,8 @@ const ATHLETE = {
   pr5KDate: '2026-05-23',     // Scheduled baseline test
   currentWeeklyMileage: 25,   // Baseline May 2026. Foundation progresses to 35, Build to 47.
 
-  trainingStart: '2026-06-08',
-  totalWeeks: 24,
+  trainingStart: '2026-05-25',
+  totalWeeks: 26,
   restDay: 'Sunday'
 };
 
@@ -519,20 +519,20 @@ const WORKOUT_DETAILS = {
 };
 
 // =============================================
-// 24-WEEK TRAINING PLAN GENERATOR
-// Start: June 8, 2026 (Mon)
-// Race 1: Tampa Mixed Doubles  — Fri Oct 23, 2026 (Week 20)
-// Race 2: Dallas Solo (A-race) — Fri Nov 20, 2026 (Week 24)
+// 26-WEEK TRAINING PLAN GENERATOR
+// Start: May 25, 2026 (Mon) — moved up 2 weeks (Aidan back from LA early)
+// Race 1: Tampa Mixed Doubles  — Fri Oct 23, 2026 (Week 22)
+// Race 2: Dallas Solo (A-race) — Fri Nov 20, 2026 (Week 26)
 // =============================================
 
 const PHASES = [
-  { id: 'foundation', name: 'Foundation',       weeks: [1, 6],   color: '#3B82F6', emoji: '⚡' },
-  { id: 'build',      name: 'Race Pace Build',  weeks: [7, 12],  color: '#FF8C00', emoji: '🎯' },
-  { id: 'doubles',    name: 'Doubles Specific', weeks: [13, 18], color: '#9333EA', emoji: '👥' },
-  { id: 'tampa',      name: 'Tampa Taper',      weeks: [19, 20], color: '#FF4D4D', emoji: '🏁' },
-  { id: 'reset',      name: 'Recovery & Reset', weeks: [21, 21], color: '#64748B', emoji: '🌱' },
-  { id: 'sharpen',    name: 'Solo Sharpening',  weeks: [22, 23], color: '#E8552E', emoji: '⚔️' },
-  { id: 'dallas',     name: 'Dallas Taper',     weeks: [24, 24], color: '#FFE500', emoji: '🔥' }
+  { id: 'foundation', name: 'Foundation',       weeks: [1, 8],   color: '#3B82F6', emoji: '⚡' },
+  { id: 'build',      name: 'Race Pace Build',  weeks: [9, 14],  color: '#FF8C00', emoji: '🎯' },
+  { id: 'doubles',    name: 'Doubles Specific', weeks: [15, 20], color: '#9333EA', emoji: '👥' },
+  { id: 'tampa',      name: 'Tampa Taper',      weeks: [21, 22], color: '#FF4D4D', emoji: '🏁' },
+  { id: 'reset',      name: 'Recovery & Reset', weeks: [23, 23], color: '#64748B', emoji: '🌱' },
+  { id: 'sharpen',    name: 'Solo Sharpening',  weeks: [24, 25], color: '#E8552E', emoji: '⚔️' },
+  { id: 'dallas',     name: 'Dallas Taper',     weeks: [26, 26], color: '#FFE500', emoji: '🔥' }
 ];
 
 function getPhase(weekNum) {
@@ -541,7 +541,7 @@ function getPhase(weekNum) {
 
 function isDeloadWeek(weekNum) {
   // Deloads at weeks 4 (mid-Foundation) and 8 (mid-Build).
-  // Week 12 = full-sim benchmark before doubles phase (NOT a deload).
+  // Week 14 = full-sim benchmark before doubles phase (NOT a deload).
   // After that, phase structure handles recovery.
   return [4, 8].includes(weekNum);
 }
@@ -666,8 +666,8 @@ function getFoundationWeek(weekNum, deload) {
   const thresholdMinPerRep = deload ? 5 : Math.min(6 + Math.floor(weekNum / 3), 8);
   // Wednesday alternates: odd weeks = THRESHOLD (cruise intervals), even weeks = HILL TEMPOS (long threshold hills)
   const isThresholdWeek = weekNum % 2 === 1;
-  // 5K TT scheduled BEFORE plan starts (Sat 2026-05-23) — no in-plan 5K week
-  const is5KWeek = false;
+  // Baseline 5K TT scheduled BEFORE plan (Sat 2026-05-23). Re-test happens Wk 8 Wednesday (end of Foundation deload).
+  const is5KWeek = weekNum === 8;
 
   return [
     { day:'Monday', type:'run', title:'Easy Run — Build Volume', icon:'🏃', zone:2,
@@ -691,13 +691,13 @@ function getFoundationWeek(weekNum, deload) {
       duration:'85 min',
       focus:`📍 UGP gym — HEAVY day, Wk ${weekNum} of strength cycle. ${weekNum === 1 ? '🎯 BASELINE WEEK: Record your 3RM numbers — they anchor the next 12 weeks.' : 'Log loads. Progress is incremental but tracked.'}` },
 
-    { day:'Wednesday', type:'intervals', title: deload ? 'Easy Run' : (is5KWeek ? '🎯 5K TIME TRIAL — Baseline' : (isThresholdWeek ? `Threshold ${thresholdReps}×${thresholdMinPerRep}min` : 'Hill Tempos')), icon: is5KWeek ? '⏱️' : (isThresholdWeek ? '🎯' : '⛰️'), zone: deload ? 2 : 4,
-      exercises: deload ? [
+    { day:'Wednesday', type:'intervals', title: is5KWeek ? '🎯 5K TIME TRIAL — Re-test' : (deload ? 'Easy Run' : (isThresholdWeek ? `Threshold ${thresholdReps}×${thresholdMinPerRep}min` : 'Hill Tempos')), icon: is5KWeek ? '⏱️' : (isThresholdWeek ? '🎯' : '⛰️'), zone: is5KWeek ? 5 : (deload ? 2 : 4),
+      exercises: is5KWeek ? [
+        {name:'Warm Up',detail:'15 min easy + 4 strides + dynamic',zone:2},
+        {name:'5K TIME TRIAL',detail:'ALL OUT. Track preferred. Compare to baseline (Sat 2026-05-23). Expect 30-60 sec improvement after 8 wks of base + threshold work.',zone:5},
+        {name:'Cool Down',detail:'15 min very easy + log result',zone:1}
+      ] : (deload ? [
         {name:'Easy Run',detail:'40 min @ Z2',zone:2}
-      ] : (is5KWeek ? [
-        {name:'Warm Up',detail:'15 min easy + 4 strides + dynamic stretches',zone:2},
-        {name:'5K TIME TRIAL',detail:'ALL OUT. Track preferred (12.5 laps). Goal: set baseline PR. Elite 15 prereq is sub-17:00. Realistic first goal: sub-21.',zone:5},
-        {name:'Cool Down',detail:'15 min very easy + log result in Stats',zone:1}
       ] : (isThresholdWeek ? [
         {name:'Warm Up',detail:'15 min easy jog + 4 strides',zone:2},
         {name:'Threshold Intervals',detail:`${thresholdReps} × ${thresholdMinPerRep} min @ threshold pace (~4:30-4:45/km, "comfortably hard," can speak 2-3 words). 90 sec easy float between.`,zone:4},
@@ -707,8 +707,8 @@ function getFoundationWeek(weekNum, deload) {
         {name:'Hill Tempos',detail:`${Math.min(5 + Math.floor(weekNum/2), 8)} × 60-90 sec uphill @ threshold effort (NOT all-out sprints — same effort as flat threshold). Jog down recovery.`,zone:4},
         {name:'Cool Down',detail:'10 min easy',zone:1}
       ])),
-      duration: deload ? '40 min' : (is5KWeek ? '50 min' : '60 min'),
-      focus: deload ? 'Deload week. Easy only.' : (is5KWeek ? '📍 TRACK — Set your baseline. You will retest at Week 8 and again pre-Tampa. This is the engine number that matters for Hyrox.' : (isThresholdWeek ? '📍 Outdoor — THRESHOLD is "the anchor" of every elite Hyrox plan (James Kelly). This is the single most important session of the week.' : '📍 Outdoor — Hill tempos = threshold on inclines. Builds running strength AND threshold simultaneously. Hill choice: 4-6% grade.')) },
+      duration: is5KWeek ? '55 min' : (deload ? '40 min' : '60 min'),
+      focus: is5KWeek ? '📍 TRACK — Engine re-test. 8 weeks of base + threshold should show on the clock.' : (deload ? 'Deload week. Easy only.' : (isThresholdWeek ? '📍 Outdoor — THRESHOLD is "the anchor" of every elite Hyrox plan (James Kelly). The single most important session of the week.' : '📍 Outdoor — Hill tempos = threshold on inclines. Builds running strength AND threshold simultaneously. Hill choice: 4-6% grade.')) },
 
     { day:'Thursday', type:'strength', title:'Easy Run + Posterior Chain', icon:'💪', zone:2,
       exercises:[
@@ -764,24 +764,24 @@ function getFoundationWeek(weekNum, deload) {
 }
 
 function getRacePaceWeek(weekNum, deload) {
-  // PHASE 2: RACE PACE BUILD (Weeks 7-12)
+  // PHASE 2: RACE PACE BUILD (Weeks 9-14)
   // Threshold engine + VO2 max + compromised intervals + mileage progression (40 → 47 mi/wk).
   // Elite consensus: threshold > VO2 max as engine driver (James Kelly, Lauren Weeks, Driscoll all confirm).
   const v = deload ? 0.7 : 1.0;
-  const bWeek = weekNum - 6; // 1-6 within phase
+  const bWeek = weekNum - 8; // 1-6 within phase
   // Progressive race pace target (in min:sec/km) — paces aligned with realistic threshold progression
   const paceFast = bWeek <= 2 ? '4:20' : bWeek <= 4 ? '4:15' : '4:10';
   const paceRange = bWeek <= 2 ? '4:20-4:30/km' : bWeek <= 4 ? '4:15-4:25/km' : '4:10-4:20/km';
   const reps = deload ? 4 : Math.min(5 + Math.floor(bWeek / 2), 7);
-  // Progressive long run: 100 min Week 7 → 120 min Week 12 (~17-21 km)
+  // Progressive long run: 100 min Week 9 → 120 min Week 14 (~17-21 km)
   const longMin = deload ? 70 : Math.round(100 + bWeek * 4);
-  // Progressive easy run: 55 min Week 7 → 70 min Week 12
+  // Progressive easy run: 55 min Week 9 → 70 min Week 14
   const easyMin = deload ? 45 : Math.round(55 + bWeek * 3);
-  // Wednesday: week 7 = Half Sim, 8 = DELOAD, 9 = VO2 4×4, 10 = Half Sim, 11 = VO2 4×4, 12 = FULL SIM benchmark
-  const isFullSim = weekNum === 12;
-  const isVO2Day = !deload && !isFullSim && (weekNum === 9 || weekNum === 11);
-  // 5K time trial during deload week 8 (re-test from Week 1 baseline)
-  const is5KWeek = weekNum === 8;
+  // Wednesday: Wk 9 = Half Sim, 10 = VO2 4×4, 11 = Half Sim, 12 = VO2 4×4, 13 = Half Sim, 14 = FULL SIM benchmark
+  const isFullSim = weekNum === 14;
+  const isVO2Day = !deload && !isFullSim && (weekNum === 10 || weekNum === 12);
+  // 5K time trial re-test moved to Foundation Wk 8 deload — no in-Build re-test
+  const is5KWeek = false;
 
   return [
     { day:'Monday', type:'run', title:'Easy Run — Build Volume', icon:'🏃', zone:2,
@@ -886,12 +886,12 @@ function getRacePaceWeek(weekNum, deload) {
 }
 
 function getDoublesWeek(weekNum, deload) {
-  // PHASE 3: DOUBLES SPECIFIC (Weeks 13-18) — Tampa Oct 23
+  // PHASE 3: DOUBLES SPECIFIC (Weeks 15-20) — Tampa Oct 23
   // Same run volume as solo (both partners run all 8km).
   // Station work shifts to split-load + short-rest format = active recovery practice.
   // Saturday is the partner sim slot (with gf if available, solo split otherwise).
   const v = deload ? 0.7 : 1.0;
-  const dWeek = weekNum - 12; // 1-6 within phase
+  const dWeek = weekNum - 14; // 1-6 within phase
   const longMin = Math.round((80 + dWeek * 2) * v);
   const isPartnerSim = dWeek === 2 || dWeek === 4 || dWeek === 6;
 
@@ -973,8 +973,8 @@ function getDoublesWeek(weekNum, deload) {
 }
 
 function getTampaTaperWeek(weekNum) {
-  // PHASE 4: TAMPA TAPER (Weeks 19-20) — Race Fri Oct 23
-  const isRaceWeek = weekNum === 20;
+  // PHASE 4: TAMPA TAPER (Weeks 21-22) — Race Fri Oct 23
+  const isRaceWeek = weekNum === 22;
 
   if (isRaceWeek) {
     return [
@@ -1115,10 +1115,10 @@ function getResetWeek(weekNum) {
 }
 
 function getSoloSharpenWeek(weekNum) {
-  // PHASE 6: SOLO SHARPENING (Weeks 22-23) — 2 weeks to recall sub-1:08 execution
-  const isWeek22 = weekNum === 22;
+  // PHASE 6: SOLO SHARPENING (Weeks 24-25) — 2 weeks to recall sub-1:08 execution
+  const isFirstWeek = weekNum === 24;
 
-  if (isWeek22) {
+  if (isFirstWeek) {
     // Week 22 — re-introduce full station load + race pace + ONE full solo sim
     return [
       { day:'Monday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
@@ -1264,19 +1264,19 @@ function getDallasTaperWeek() {
 // ===== MASTER PLAN GENERATOR =====
 function generateTrainingPlan() {
   const plan = [];
-  const startDate = new Date('2026-06-08');
+  const startDate = new Date('2026-05-25');
 
-  for (let week = 1; week <= 24; week++) {
+  for (let week = 1; week <= 26; week++) {
     const phase = getPhase(week);
     const deload = isDeloadWeek(week);
 
     let weekDays;
-    if (week <= 6)        weekDays = getFoundationWeek(week, deload);
-    else if (week <= 12)  weekDays = getRacePaceWeek(week, deload);
-    else if (week <= 18)  weekDays = getDoublesWeek(week, deload);
-    else if (week <= 20)  weekDays = getTampaTaperWeek(week);
-    else if (week === 21) weekDays = getResetWeek(week);
-    else if (week <= 23)  weekDays = getSoloSharpenWeek(week);
+    if (week <= 8)        weekDays = getFoundationWeek(week, deload);
+    else if (week <= 14)  weekDays = getRacePaceWeek(week, deload);
+    else if (week <= 20)  weekDays = getDoublesWeek(week, deload);
+    else if (week <= 22)  weekDays = getTampaTaperWeek(week);
+    else if (week === 23) weekDays = getResetWeek(week);
+    else if (week <= 25)  weekDays = getSoloSharpenWeek(week);
     else                  weekDays = getDallasTaperWeek();
 
     const weekStartDate = new Date(startDate);
@@ -1588,12 +1588,12 @@ const Dates = {
   },
   
   getCurrentWeek() {
-    const start = new Date('2026-06-08T00:00:00');
+    const start = new Date('2026-05-25T00:00:00');
     const now = new Date();
     now.setHours(0, 0, 0, 0);
     const diff = now - start;
     const weekNum = Math.floor(diff / (1000 * 60 * 60 * 24 * 7)) + 1;
-    return Math.max(1, Math.min(24, weekNum));
+    return Math.max(1, Math.min(26, weekNum));
   },
   
   getTodayWorkout() {
@@ -2084,7 +2084,7 @@ function renderCalendar() {
         <div class="t-lg fw-8">Week ${currentWeek}</div>
         <div class="t-xs t-muted">${phase.emoji} ${phase.name}${isDeloadWeek(currentWeek) ? ' · Deload' : ''}</div>
       </div>
-      <button onclick="App.calendarNextWeek()" style="padding:8px 12px;color:var(--text2);${currentWeek >= 24 ? 'opacity:.2' : ''}">
+      <button onclick="App.calendarNextWeek()" style="padding:8px 12px;color:var(--text2);${currentWeek >= 26 ? 'opacity:.2' : ''}">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
       </button>
     </div>
@@ -2149,7 +2149,7 @@ function renderStats() {
       <div class="t-xs t-faint fw-6 mt-8" style="text-transform:uppercase;letter-spacing:1.5px">${headlineLabel}</div>
       ${!tampaPast ? `<div class="t-xs t-muted mt-4">Then ${dallasCountdown.days} days to Dallas</div>` : ''}
       <div class="row mb-0 mt-16" style="justify-content:center;gap:24px">
-        <div style="text-align:center"><div class="t-lg fw-8 tabular">${currentWeek}/24</div><div class="t-xs t-faint">Week</div></div>
+        <div style="text-align:center"><div class="t-lg fw-8 tabular">${currentWeek}/26</div><div class="t-xs t-faint">Week</div></div>
         <div style="text-align:center"><div class="t-lg fw-8 tabular">${streak}</div><div class="t-xs t-faint">Streak</div></div>
         <div style="text-align:center"><div class="t-lg fw-8 tabular">${completed}</div><div class="t-xs t-faint">Done</div></div>
       </div>
@@ -2170,7 +2170,7 @@ function renderStats() {
       <div class="metric"><span class="t-sm t-muted">Easy Pace</span><span class="t-sm fw-7 tabular">${ATHLETE.easyPacePerKm}/km</span></div>
       <div class="metric"><span class="t-sm t-muted">Bench 1RM</span><span class="t-sm fw-7 tabular">${ATHLETE.benchPress1RM} lbs</span></div>
       <div class="metric"><span class="t-sm t-muted">5K PR</span><span class="t-sm fw-7 tabular">${ATHLETE.pr5K || '— (TT Sat May 23)'}</span></div>
-      <div class="metric"><span class="t-sm t-muted">Weekly Mileage</span><span class="t-sm fw-7 tabular">${ATHLETE.currentWeeklyMileage} mi → 47 by Wk 12</span></div>
+      <div class="metric"><span class="t-sm t-muted">Weekly Mileage</span><span class="t-sm fw-7 tabular">${ATHLETE.currentWeeklyMileage} mi → 47 by Wk 14</span></div>
       <div class="metric"><span class="t-sm t-muted">Hyrox PR</span><span class="t-sm fw-7 tabular">${ATHLETE.prTime}</span></div>
       <div class="metric"><span class="t-sm t-muted">A Goal</span><span class="t-sm fw-7 t-accent">Sub ${ATHLETE.goalTimeA}</span></div>
       <div class="metric"><span class="t-sm t-muted">Stretch</span><span class="t-sm fw-7" style="color:var(--orange)">Sub ${ATHLETE.goalTimeStretch}</span></div>
@@ -2266,7 +2266,7 @@ function renderStats() {
     </div>
     <div class="card mb-12" style="padding:14px 16px">
       <div class="t-sm fw-7 mb-4">📈 The Two Levers</div>
-      <div class="t-xs t-muted" style="line-height:1.6"><strong>1. Aerobic volume:</strong> Currently 25 mi/wk → target 47 by Week 12. Owen Silver went 1:04 → 1:00 in 6 months by going 10K → 60K/wk.<br><strong>2. Threshold capacity:</strong> Foundation Wed = threshold intervals (3-5 × 6-8 min). Build phase adds VO2 4×4. Lauren Weeks (3× world champ) calls threshold "the anchor."</div>
+      <div class="t-xs t-muted" style="line-height:1.6"><strong>1. Aerobic volume:</strong> Currently 25 mi/wk → target 47 by Week 14. Owen Silver went 1:04 → 1:00 in 6 months by going 10K → 60K/wk.<br><strong>2. Threshold capacity:</strong> Foundation Wed = threshold intervals (3-5 × 6-8 min). Build phase adds VO2 4×4. Lauren Weeks (3× world champ) calls threshold "the anchor."</div>
     </div>
     <div class="card mb-12" style="padding:14px 16px">
       <div class="t-sm fw-7 mb-4">🏋️ Strength — Heavy, Not Hypertrophy</div>
@@ -2282,7 +2282,7 @@ function renderStats() {
     </div>
     <div class="card mb-24" style="padding:14px 16px">
       <div class="t-sm fw-7 mb-4">⏱️ 5K Time Trial — Engine Benchmark</div>
-      <div class="t-xs t-muted" style="line-height:1.6"><strong>Baseline TT scheduled: Sat ${Dates.formatDate(ATHLETE.pr5KDate)}</strong> (16 days before plan starts). Then re-test at Wk 8 + pre-Tampa (Wk 19). Elite 15 prereq sub-17:00. Realistic progression: sub-21 → sub-19 → sub-18. ${ATHLETE.pr5K ? `<br><strong>Current PR: ${ATHLETE.pr5K}</strong>` : '<br>No PR set yet.'}</div>
+      <div class="t-xs t-muted" style="line-height:1.6"><strong>Baseline TT: Sat ${Dates.formatDate(ATHLETE.pr5KDate)}</strong> (2 days before plan starts Mon 2026-05-25). Re-test Wk 8 (end of Foundation). Elite 15 prereq sub-17:00. Realistic progression: sub-21 → sub-19 → sub-18. ${ATHLETE.pr5K ? `<br><strong>Current PR: ${ATHLETE.pr5K}</strong>` : '<br>No PR set yet.'}</div>
     </div>
 
     <div class="label">Run + Roxzone Formula</div>
