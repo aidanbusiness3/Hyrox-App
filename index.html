@@ -656,7 +656,7 @@ function getFoundationWeek(weekNum, deload) {
   // They do threshold + compromised running + aerobic volume. Lauren Weeks, James Kelly, Jack Driscoll all confirm.
   // True bottleneck = threshold endurance + weekly running volume (currently 25 mi/wk → target 35 by end of Foundation).
   // VO2 max work moves to Build phase. Heavy lifting (3×3-5 at 85-92%) replaces hypertrophy reps.
-  const v = deload ? 0.7 : 1.0;
+  const v = deload ? 0.55 : 1.0;  // 45% volume drop on deload weeks (Hybrid Engine Blueprint — full recovery enables supercompensation)
   // Progressive easy run (Monday): 50 min Week 1 → 65 min Week 6 (~8-11 km)
   const easyMin = deload ? 40 : Math.round(50 + (weekNum - 1) * 3);
   // Progressive long run (Saturday): 70 min Week 1 → 100 min Week 6 (~12-17 km)
@@ -672,26 +672,12 @@ function getFoundationWeek(weekNum, deload) {
   return [
     { day:'Monday', type:'run', title:'Easy Run — Build Volume', icon:'🏃', zone:2,
       exercises:[
-        {name:'Easy Run',detail:`${easyMin} min @ 6:15-6:45/km — HR under 145bpm. Wk ${weekNum} target: ${Math.round(easyMin / 6.3)} km.`,zone:2}
+        {name:'Easy Run',detail:`${easyMin} min @ 6:15-6:45/km — HR under 155bpm + conversational pace check (can speak 3-4 sentences without gasping). Wk ${weekNum} target: ${Math.round(easyMin / 6.3)} km.`,zone:2}
       ],
       duration:`${easyMin} min`,
       focus:'📍 Outdoor — FASTED OPTIONAL. This is the 80%. Truly easy. Cadence 170-180 spm. Volume is the #1 priority of Foundation phase.' },
 
-    { day:'Tuesday', type:'strength', title:`Heavy Lower — ${getStrengthCycle(weekNum).label}`, icon:'🏋️', zone:0,
-      exercises:[
-        {name:'Athletic Warm-Up',detail:'A-skips, B-skips, walking lunges w/ rotation, leg swings — 8 min',zone:0},
-        {name:'Back Squat',detail:`${getStrengthCycle(weekNum).detail}`,zone:0},
-        {name:'Trap-Bar Deadlift',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
-        {name:'Hip Thrust',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
-        {name:'Box Jumps',detail:'4 × 3 — explosive up, soft landing. Plyo accessory.',zone:0},
-        {name:'Pull-Ups',detail:'3 × max',zone:0},
-        {name:'Wall Balls',detail:'3 × 25 reps — accessory volume (Owen Silver protocol: 200-400 reps/wk)',zone:0},
-        ...getAbBlock('day1')
-      ],
-      duration:'85 min',
-      focus:`📍 UGP gym — HEAVY day, Wk ${weekNum} of strength cycle. ${weekNum === 1 ? '🎯 BASELINE WEEK: Record your 3RM numbers — they anchor the next 12 weeks.' : 'Log loads. Progress is incremental but tracked.'}` },
-
-    { day:'Wednesday', type:'intervals', title: is5KWeek ? '🎯 5K TIME TRIAL — Re-test' : (deload ? 'Easy Run' : (isThresholdWeek ? `Threshold ${thresholdReps}×${thresholdMinPerRep}min` : 'Hill Tempos')), icon: is5KWeek ? '⏱️' : (isThresholdWeek ? '🎯' : '⛰️'), zone: is5KWeek ? 5 : (deload ? 2 : 4),
+    { day:'Tuesday', type:'intervals', title: is5KWeek ? '🎯 5K TIME TRIAL — Re-test' : (deload ? 'Easy Run' : (isThresholdWeek ? `Threshold ${thresholdReps}×${thresholdMinPerRep}min` : 'Hill Tempos')), icon: is5KWeek ? '⏱️' : (isThresholdWeek ? '🎯' : '⛰️'), zone: is5KWeek ? 5 : (deload ? 2 : 4),
       exercises: is5KWeek ? [
         {name:'Warm Up',detail:'15 min easy + 4 strides + dynamic',zone:2},
         {name:'5K TIME TRIAL',detail:'ALL OUT. Track preferred. Compare to baseline (Sat 2026-05-23). Expect 30-60 sec improvement after 8 wks of base + threshold work.',zone:5},
@@ -708,7 +694,21 @@ function getFoundationWeek(weekNum, deload) {
         {name:'Cool Down',detail:'10 min easy',zone:1}
       ])),
       duration: is5KWeek ? '55 min' : (deload ? '40 min' : '60 min'),
-      focus: is5KWeek ? '📍 TRACK — Engine re-test. 8 weeks of base + threshold should show on the clock.' : (deload ? 'Deload week. Easy only.' : (isThresholdWeek ? '📍 Outdoor — THRESHOLD is "the anchor" of every elite Hyrox plan (James Kelly). The single most important session of the week.' : '📍 Outdoor — Hill tempos = threshold on inclines. Builds running strength AND threshold simultaneously. Hill choice: 4-6% grade.')) },
+      focus: is5KWeek ? '📍 TRACK — Engine re-test. 8 weeks of base + threshold should show on the clock.' : (deload ? 'Deload week. Easy only.' : (isThresholdWeek ? '📍 Outdoor — THRESHOLD is "the anchor" of every elite Hyrox plan (James Kelly). Quality run FIRST, before Wed lift — endurance-then-strength amplifies PGC-1α 2× (Hybrid Engine Blueprint).' : '📍 Outdoor — Hill tempos = threshold on inclines. Builds running strength AND threshold simultaneously. Hill choice: 4-6% grade.')) },
+
+    { day:'Wednesday', type:'strength', title:`Heavy Lower — ${getStrengthCycle(weekNum).label}`, icon:'🏋️', zone:0,
+      exercises:[
+        {name:'Athletic Warm-Up',detail:'A-skips, B-skips, walking lunges w/ rotation, leg swings — 8 min',zone:0},
+        {name:'Back Squat',detail:`${getStrengthCycle(weekNum).detail}`,zone:0},
+        {name:'Trap-Bar Deadlift',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
+        {name:'Hip Thrust',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
+        {name:'Box Jumps',detail:'4 × 3 — explosive up, soft landing. Plyo accessory.',zone:0},
+        {name:'Pull-Ups',detail:'3 × max',zone:0},
+        {name:'Wall Balls',detail:'3 × 25 reps — accessory volume (Owen Silver protocol: 200-400 reps/wk)',zone:0},
+        ...getAbBlock('day1')
+      ],
+      duration:'85 min',
+      focus:`📍 UGP gym — HEAVY day, Wk ${weekNum} of strength cycle. Comes AFTER Tue threshold (per Hybrid Engine Blueprint: endurance-then-strength = 2× PGC-1α amplification). ${weekNum === 1 ? '🎯 BASELINE WEEK: Record your 3RM numbers — they anchor the next 12 weeks.' : 'Log loads. Progress is incremental but tracked.'}` },
 
     { day:'Thursday', type:'strength', title:'Easy Run + Posterior Chain', icon:'💪', zone:2,
       exercises:[
@@ -748,6 +748,7 @@ function getFoundationWeek(weekNum, deload) {
         {name:'Long Run',detail:`60 min easy @ Z2`,zone:2}
       ] : [
         {name:'Easy Run',detail:`${longMin - 5} min @ 6:00-6:30/km — Wk ${weekNum} target: ${Math.round((longMin) / 6.15)} km. Volume is the priority.`,zone:2},
+        {name:'🔋 GUT TRAINING',detail:'Practice race-day fueling on this run: 1 gel + sips of sports drink mid-run. Trains intestinal transport proteins (Hybrid Engine Blueprint). Never debut nutrition on race day.',zone:0},
         {name:'Strides Finish',detail:'4 × 20 sec relaxed-fast / walk recovery. Smooth leg speed on tired legs.',zone:4},
         ...getAbBlock('day3')
       ],
@@ -767,7 +768,7 @@ function getRacePaceWeek(weekNum, deload) {
   // PHASE 2: RACE PACE BUILD (Weeks 9-14)
   // Threshold engine + VO2 max + compromised intervals + mileage progression (40 → 47 mi/wk).
   // Elite consensus: threshold > VO2 max as engine driver (James Kelly, Lauren Weeks, Driscoll all confirm).
-  const v = deload ? 0.7 : 1.0;
+  const v = deload ? 0.55 : 1.0;  // 45% volume drop on deload weeks (Hybrid Engine Blueprint — full recovery enables supercompensation)
   const bWeek = weekNum - 8; // 1-6 within phase
   // Progressive race pace target (in min:sec/km) — paces aligned with realistic threshold progression
   const paceFast = bWeek <= 2 ? '4:20' : bWeek <= 4 ? '4:15' : '4:10';
@@ -777,40 +778,39 @@ function getRacePaceWeek(weekNum, deload) {
   const longMin = deload ? 70 : Math.round(100 + bWeek * 4);
   // Progressive easy run: 55 min Week 9 → 70 min Week 14
   const easyMin = deload ? 45 : Math.round(55 + bWeek * 3);
-  // Wednesday: Wk 9 = Half Sim, 10 = VO2 4×4, 11 = Half Sim, 12 = VO2 4×4, 13 = Half Sim, 14 = FULL SIM benchmark
+  // Restructured (May 2026): Wednesday is now RECOVERY (per Hybrid Engine Blueprint — avoid 5 consecutive hard days)
+  // Tuesday alternates: Wks 9/11/13 = Compromised Intervals, Wks 10/12 = VO2 4×4, Wk 14 = pre-sim taper
+  // Wk 14 Wed = exception (Full Sim Benchmark — the trajectory-setting session before Doubles phase)
   const isFullSim = weekNum === 14;
-  const isVO2Day = !deload && !isFullSim && (weekNum === 10 || weekNum === 12);
-  // 5K time trial re-test moved to Foundation Wk 8 deload — no in-Build re-test
-  const is5KWeek = false;
+  const isVO2Day = !isFullSim && (weekNum === 10 || weekNum === 12);
+  const isCompromisedTue = !isFullSim && !isVO2Day;
 
   return [
     { day:'Monday', type:'run', title:'Easy Run — Build Volume', icon:'🏃', zone:2,
       exercises:[
-        {name:'Easy Run',detail:`${easyMin} min @ 6:00-6:30/km — Wk ${weekNum} mileage target: ~${Math.round(easyMin / 6.15)} km. HR under 145.`,zone:2}
+        {name:'Easy Run',detail:`${easyMin} min @ 6:00-6:30/km — Wk ${weekNum} mileage target: ~${Math.round(easyMin / 6.15)} km. HR under 155 + conversational.`,zone:2}
       ],
       duration:`${easyMin} min`,
       focus:'📍 Outdoor — Recovery from weekend + aerobic volume. The base keeps building all the way to Tampa.' },
 
-    { day:'Tuesday', type:'intervals', title: deload ? 'Easy + Strides' : `Compromised Intervals (${paceFast}/km)`, icon:'😤', zone: deload ? 2 : 4,
-      exercises: deload ? [
-        {name:'Easy Run',detail:'40 min @ Z2',zone:2},
-        {name:'Strides',detail:'6 × 20 sec fast & relaxed',zone:4}
+    { day:'Tuesday', type:'intervals', title: isFullSim ? 'Easy + Strides (Pre-Sim Taper)' : (isVO2Day ? 'VO2 Max — Norwegian 4×4' : `Compromised Intervals (${paceFast}/km)`), icon: isFullSim ? '🏃' : (isVO2Day ? '🔥' : '😤'), zone: isFullSim ? 2 : (isVO2Day ? 5 : 4),
+      exercises: isFullSim ? [
+        {name:'Easy Run',detail:'35 min @ Z2 — fresh legs for Wed full sim',zone:2},
+        {name:'Strides',detail:'5 × 20 sec relaxed-fast / walk recovery',zone:4}
+      ] : (isVO2Day ? [
+        {name:'Warm Up',detail:'15 min progressive jog',zone:2},
+        {name:'Norwegian 4×4',detail:'4 × 4 min @ HR 175-185 (3:55-4:15/km). 3 min easy jog between. Research: ~10% VO2max gain in 8 wks (Helgerud 2007).',zone:5},
+        {name:'Cool Down',detail:'10 min easy',zone:1}
       ] : [
         {name:'Warm Up',detail:'10 min easy jog + 4 strides',zone:2},
         {name:'Compromised Block',detail:`${reps} × (1km @ ${paceRange} → 1 station). Rotate stations: ski 500m / 50 wall balls / sled push 50m / row 500m / burpee BJ 40m. 60 sec rest between.`,zone:4},
         {name:'Cool Down',detail:'10 min easy',zone:1}
-      ],
-      duration: deload ? '45 min' : '75 min',
-      focus: deload ? 'Deload.' : '📍 Round Rock — Race-pace intervals BROKEN by stations (elite norm — Roncevic, Kelly do this most days). Builds the specific fitness that pure track work cannot.' },
+      ]),
+      duration: isFullSim ? '40 min' : '75 min',
+      focus: isFullSim ? '📍 Outdoor — Spin legs out before tomorrow\'s benchmark sim. Stay easy.' : (isVO2Day ? '📍 Outdoor — VO2 max ceiling raiser. CANNOT talk during work. Strongest predictor of Hyrox finish time (ρ=-0.71, Brandt 2025).' : '📍 Round Rock — Race-pace intervals BROKEN by stations (elite norm — Roncevic, Kelly do this most days). Builds the specific fitness that pure track work cannot.') },
 
-    { day:'Wednesday', type: isVO2Day ? 'intervals' : (is5KWeek ? 'intervals' : 'hyrox'), title: deload && !is5KWeek ? 'Easy Run' : (is5KWeek ? '🎯 5K TIME TRIAL — Re-test' : (isFullSim ? 'FULL SIM BENCHMARK' : (isVO2Day ? 'VO2 Max — Norwegian 4×4' : 'Half Simulation'))), icon: is5KWeek ? '⏱️' : (isFullSim ? '🏁' : (isVO2Day ? '🔥' : '🟢')), zone: deload && !is5KWeek ? 2 : 5,
-      exercises: is5KWeek ? [
-        {name:'Warm Up',detail:'15 min easy + 4 strides + dynamic',zone:2},
-        {name:'5K TIME TRIAL',detail:'ALL OUT. Compare to Week 1 baseline. Expect 30-60 sec improvement after 7 weeks of threshold + volume.',zone:5},
-        {name:'Cool Down',detail:'15 min very easy + log result',zone:1}
-      ] : (deload ? [
-        {name:'Easy Run',detail:'40 min @ Z2',zone:2}
-      ] : (isFullSim ? [
+    { day:'Wednesday', type: isFullSim ? 'hyrox' : 'run', title: isFullSim ? 'FULL SIM BENCHMARK' : 'Easy Recovery Run', icon: isFullSim ? '🏁' : '🏃', zone: isFullSim ? 5 : 2,
+      exercises: isFullSim ? [
         {name:'1km Run → SkiErg 1000m',detail:'Race effort. Time everything.',zone:4},
         {name:'1km Run → Sled Push 50m',detail:'',zone:4},
         {name:'1km Run → Sled Pull 50m',detail:'',zone:4},
@@ -819,34 +819,24 @@ function getRacePaceWeek(weekNum, deload) {
         {name:'1km Run → Farmers 200m',detail:'',zone:4},
         {name:'1km Run → Lunges 100m',detail:'',zone:4},
         {name:'1km Run → Wall Balls 100',detail:'',zone:4}
-      ] : (isVO2Day ? [
-        {name:'Warm Up',detail:'15 min progressive jog',zone:2},
-        {name:'Norwegian 4×4',detail:'4 × 4 min @ HR 175-185 (3:55-4:15/km). 3 min easy jog between. Research: ~10% VO2max gain in 8 wks (Helgerud 2007).',zone:5},
-        {name:'Cool Down',detail:'10 min easy',zone:1}
       ] : [
-        {name:'1km Run',detail:`@ ${paceRange}`,zone:4},
-        {name:'SkiErg',detail:'1000m race effort',zone:4},
-        {name:'1km Run',detail:`@ ${paceRange}`,zone:4},
-        {name:'Sled Push',detail:'50m race weight',zone:0},
-        {name:'1km Run',detail:`@ ${paceRange}`,zone:4},
-        {name:'Wall Balls',detail:'100 reps — sets of 25',zone:0},
-        {name:'1km Run',detail:`@ ${paceRange} — final push`,zone:4}
-      ]))),
-      duration: is5KWeek ? '55 min' : (deload ? '40 min' : (isFullSim ? '65-75 min' : '55 min')),
-      focus: is5KWeek ? '📍 TRACK — Re-test your 5K. This is your engine progress check. Big jump = volume + threshold working.' : (deload ? '📍 Outdoor — Deload.' : (isFullSim ? '📍 Round Rock — BENCHMARK. Time every split. Target: sub 1:12. Sets trajectory into doubles phase.' : (isVO2Day ? '📍 Outdoor — VO2 max ceiling raiser. CANNOT talk during work. Strongest predictor of Hyrox finish time (ρ=-0.71, Brandt 2025).' : '📍 Round Rock — Half sim at current race pace. Focus on weakest stations.'))) },
+        {name:'Easy Run',detail:'35-40 min @ Z2 — full recovery from Tue, prep for Thu heavy lift',zone:2}
+      ],
+      duration: isFullSim ? '65-75 min' : '40 min',
+      focus: isFullSim ? '📍 Round Rock — BENCHMARK. Time every split. Target: sub 1:12. Sets trajectory into doubles phase.' : '📍 Outdoor — RECOVERY DAY. The middle-week break makes Thu lift + Fri compromised possible. Resist the urge to push.' },
 
-    { day:'Thursday', type:'strength', title:`Heavy Lower — ${getStrengthCycle(weekNum).label}`, icon:'💪', zone:2,
+    { day:'Thursday', type:'strength', title:`Heavy Lower — ${getStrengthCycle(weekNum).label}`, icon:'💪', zone:0,
       exercises:[
+        {name:'Athletic Warm-Up',detail:'A-skips, B-skips, walking lunges w/ rotation — 8 min',zone:0},
         {name:'Back Squat',detail:`${getStrengthCycle(weekNum).detail}`,zone:0},
         {name:'Trap-Bar Deadlift',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
         {name:'Hip Thrust',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
         {name:'Bulgarian Split Squat',detail:'3 × 8 each — accessory',zone:0},
-        {name:'Easy Run',detail:`${Math.round(35 * v)} min @ Z2 (after lift, separate by 2hr if possible)`,zone:2},
         {name:'Wall Balls',detail:'3 × 30 reps — daily accessory',zone:0},
         ...getAbBlock('day2')
       ],
-      duration:'105 min',
-      focus:`📍 UGP gym — Heavy day, Wk ${weekNum} of strength cycle. Squat/DL/Hip Thrust + Day 2 core block.` },
+      duration:'85 min',
+      focus:`📍 UGP gym — LIFT-ONLY day (no run). 6+ hr gap from any run is the Blueprint minimum for mTOR/AMPK separation. Wk ${weekNum} of strength cycle.` },
 
     { day:'Friday', type:'hyrox', title: deload ? 'Light Station' : `Compromised — ${(getWeakStationFocus(weekNum) || {}).label || 'Rotation'}`, icon: (getWeakStationFocus(weekNum) || {}).icon || '😤', zone: deload ? 2 : 4,
       exercises: deload ? [
@@ -890,7 +880,7 @@ function getDoublesWeek(weekNum, deload) {
   // Same run volume as solo (both partners run all 8km).
   // Station work shifts to split-load + short-rest format = active recovery practice.
   // Saturday is the partner sim slot (with gf if available, solo split otherwise).
-  const v = deload ? 0.7 : 1.0;
+  const v = deload ? 0.55 : 1.0;  // 45% volume drop on deload weeks (Hybrid Engine Blueprint — full recovery enables supercompensation)
   const dWeek = weekNum - 14; // 1-6 within phase
   const longMin = Math.round((80 + dWeek * 2) * v);
   const isPartnerSim = dWeek === 2 || dWeek === 4 || dWeek === 6;
@@ -898,7 +888,7 @@ function getDoublesWeek(weekNum, deload) {
   return [
     { day:'Monday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
       exercises:[
-        {name:'Easy Run',detail:`${Math.round(45 * v)} min @ 6:00-6:30/km — HR < 145`,zone:2}
+        {name:'Easy Run',detail:`${Math.round(45 * v)} min @ 6:00-6:30/km — HR < 155 + conversational`,zone:2}
       ],
       duration:`${Math.round(45 * v)} min`,
       focus:'📍 Outdoor — Recovery from weekend. Truly easy.' },
@@ -912,27 +902,24 @@ function getDoublesWeek(weekNum, deload) {
       duration:'75 min',
       focus:'📍 Outdoor — Doubles target = sub 1:07. Run @ ~4:00/km. Practice cruising at speed YOU and gf can hold together.' },
 
-    { day:'Wednesday', type:'hyrox', title:'High-Frequency Switch Drill', icon:'🔄', zone:4,
+    { day:'Wednesday', type:'run', title:'Easy Recovery Run', icon:'🏃', zone:2,
       exercises:[
-        {name:'Warm Up',detail:'10 min jog + activation',zone:2},
-        {name:'Ski/Row Switches',detail:'1000m SkiErg + 1000m Row — switch (or simulate switch by mini-rest) every 200m. Practice the 5-sec transition.',zone:4},
-        {name:'Wall Ball Switches',detail:'100 reps total — go 15-15-15-15-10-10-10-10. Mini-rest replaces partner switch.',zone:0},
-        {name:'Sled Push Splits',detail:'4 × 25m race weight (1/4 of doubles share — male takes 3 of 4 lengths in race).',zone:0}
+        {name:'Easy Run',detail:'35-40 min @ Z2 — full recovery from Tue, prep for Thu heavy lift',zone:2}
       ],
-      duration:'60 min',
-      focus:'📍 Round Rock — DOUBLES STRATEGY: high-frequency switching beats 50/50 splits. Every 10-20 reps on wall balls, every 100-200m on machines (HyroxDataLab/RoxBase confirmed). Drill the rhythm.' },
+      duration:'40 min',
+      focus:'📍 Outdoor — RECOVERY DAY. Switch drill work folded into Sat partner sim (where switching practice belongs). Resist the urge to push.' },
 
-    { day:'Thursday', type:'strength', title:`Maintenance Lift — ${getStrengthCycle(weekNum).label}`, icon:'💪', zone:2,
+    { day:'Thursday', type:'strength', title:`Maintenance Lift — ${getStrengthCycle(weekNum).label}`, icon:'💪', zone:0,
       exercises:[
+        {name:'Athletic Warm-Up',detail:'A-skips, B-skips, walking lunges — 8 min',zone:0},
         {name:'Back Squat',detail:`${getStrengthCycle(weekNum).detail}`,zone:0},
         {name:'Trap-Bar Deadlift',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
         {name:'Hip Thrust',detail:`Same scheme: ${getStrengthCycle(weekNum).label}`,zone:0},
-        {name:'Easy Run',detail:`${Math.round(35 * v)} min @ Z2`,zone:2},
         {name:'Wall Balls',detail:'3 × 30 reps — daily accessory',zone:0},
         ...getAbBlock('day2')
       ],
-      duration:'90 min',
-      focus:'📍 UGP gym — MAINTENANCE only during doubles phase + Day 2 core block. Hold lifts, prioritize sport-specific work.' },
+      duration:'75 min',
+      focus:'📍 UGP gym — LIFT-ONLY day (no run). MAINTENANCE during doubles phase + Day 2 core. Hold lifts, prioritize sport-specific work.' },
 
     { day:'Friday', type:'intervals', title:'Compromised Doubles Pace', icon:'😤', zone:4,
       exercises:[
@@ -964,7 +951,7 @@ function getDoublesWeek(weekNum, deload) {
         {name:'Note',detail:'Your share is roughly 60% of full Hyrox. Short rest between station & next run simulates partner transition.',zone:0}
       ],
       duration: isPartnerSim ? '~70 min' : '~80 min',
-      focus: isPartnerSim ? '📍 Round Rock — REAL doubles practice with GF. DRILL THE TRANSITIONS — bad handoffs cost 10-45 sec per station. Single verbal cue ("switch"). Tag-and-go.' : '📍 Round Rock — Solo execution of YOUR doubles share. 60% station volume + short rest = doubles fatigue without partner.' },
+      focus: isPartnerSim ? '📍 Round Rock — REAL doubles practice with GF. **SWITCH PRACTICE happens HERE** (every 200m machines, every 10-20 wall balls). DRILL TRANSITIONS — bad handoffs cost 10-45 sec/station. Single verbal cue ("switch"). Tag-and-go.' : '📍 Round Rock — Solo execution of YOUR doubles share. 60% station volume + short rest = doubles fatigue without partner. Use mini-rests to simulate partner switches.' },
 
     { day:'Sunday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
       exercises:[{name:'Full Rest',detail:'Sleep, eat, recover.',zone:0}],
