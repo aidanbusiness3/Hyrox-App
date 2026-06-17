@@ -130,8 +130,8 @@ const ATHLETE = {
   ],
   
   // Lactate Threshold
-  ltPacePerKm: '4:50',    // min/km
-  ltPaceSeconds: 290,      // seconds per km
+  ltPacePerMile: '7:29',    // min/mile
+  ltPaceSeconds: 449,      // seconds per mile
   ltHeartRate: 175,         // bpm
   
   // Heart Rate
@@ -139,7 +139,7 @@ const ATHLETE = {
   maxHR: 192,              // estimated (220 - age or LT-based)
   
   // Running
-  easyPacePerKm: '6:00',
+  easyPacePerMile: '9:17',
   easyPaceSeconds: 360,
   
   // Strength
@@ -155,12 +155,11 @@ const ATHLETE = {
   sandbagLungeWeight: '10 kg',
   
   // Goals — TWO races
-  // Race 1: Tampa Mixed Doubles w/ girlfriend (Oct 23)
+  // Race 1: Tampa Mixed Doubles (Oct 23)
   // Race 2: Dallas Solo (Nov 20)  ← A-race
   doublesRace: 'Tampa',
   doublesDate: '2026-10-23',
-  doublesGoal: '1:07:00',       // Joint goal w/ gf
-  doublesPartnerPR: '1:15:00',  // Her doubles PR
+  doublesGoal: '1:07:00',       // Team doubles goal
 
   goalRace: 'Dallas',
   goalDate: '2026-11-20',
@@ -261,7 +260,7 @@ const RACES = [
 const GOAL_SPLITS = {
   totalTime: '1:05:00',
   totalSeconds: 3900,
-  runs: { avgPace: '4:00', avgSeconds: 240, total: '32:00', totalSeconds: 1920 },
+  runs: { avgPace: '6:26', avgSeconds: 386, total: '32:00', totalSeconds: 1920 },
   stations: {
     'SkiErg':      { target: '03:45', seconds: 225 },  // 1:50/500m pace
     'Sled Push':   { target: '02:45', seconds: 165 },  // Jack: realistic & race-pace
@@ -283,9 +282,9 @@ const ZONES = [
   {
     zone: 1,
     name: 'Recovery',
-    paceRange: '6:30 – 7:00',
-    paceMinSec: 390,
-    paceMaxSec: 420,
+    paceRange: '10:04 – 10:50',
+    paceMinSec: 604,
+    paceMaxSec: 650,
     hrRange: '< 140',
     hrMin: 0,
     hrMax: 140,
@@ -296,9 +295,9 @@ const ZONES = [
   {
     zone: 2,
     name: 'Easy Aerobic',
-    paceRange: '5:45 – 6:15',
-    paceMinSec: 345,
-    paceMaxSec: 375,
+    paceRange: '8:54 – 9:41',
+    paceMinSec: 534,
+    paceMaxSec: 581,
     hrRange: '140 – 155',
     hrMin: 140,
     hrMax: 155,
@@ -309,9 +308,9 @@ const ZONES = [
   {
     zone: 3,
     name: 'Tempo',
-    paceRange: '5:10 – 5:30',
-    paceMinSec: 310,
-    paceMaxSec: 330,
+    paceRange: '8:00 – 8:31',
+    paceMinSec: 480,
+    paceMaxSec: 511,
     hrRange: '155 – 168',
     hrMin: 155,
     hrMax: 168,
@@ -322,9 +321,9 @@ const ZONES = [
   {
     zone: 4,
     name: 'Threshold',
-    paceRange: '4:45 – 5:00',
-    paceMinSec: 285,
-    paceMaxSec: 300,
+    paceRange: '7:21 – 7:44',
+    paceMinSec: 441,
+    paceMaxSec: 464,
     hrRange: '168 – 178',
     hrMin: 168,
     hrMax: 178,
@@ -335,9 +334,9 @@ const ZONES = [
   {
     zone: 5,
     name: 'VO2 Max',
-    paceRange: '4:15 – 4:35',
-    paceMinSec: 255,
-    paceMaxSec: 275,
+    paceRange: '6:34 – 7:06',
+    paceMinSec: 394,
+    paceMaxSec: 426,
     hrRange: '178 – 192',
     hrMin: 178,
     hrMax: 192,
@@ -672,7 +671,7 @@ function getFoundationWeek(weekNum, deload) {
   return [
     { day:'Monday', type:'run', title:'Easy Run — Build Volume', icon:'🏃', zone:2,
       exercises:[
-        {name:'Easy Run',detail:`${easyMin} min @ 6:15-6:45/km — HR under 155bpm + conversational pace check (can speak 3-4 sentences without gasping). Wk ${weekNum} target: ${Math.round(easyMin / 6.3)} km.`,zone:2}
+        {name:'Easy Run',detail:`${easyMin} min @ 9:41-10:27/mile — HR under 155bpm + conversational pace check (can speak 3-4 sentences without gasping). Wk ${weekNum} target: ${Math.round(easyMin / 10.14)} mi.`,zone:2}
       ],
       duration:`${easyMin} min`,
       focus:'📍 Outdoor — FASTED OPTIONAL. This is the 80%. Truly easy. Cadence 170-180 spm. Volume is the #1 priority of Foundation phase.' },
@@ -686,7 +685,7 @@ function getFoundationWeek(weekNum, deload) {
         {name:'Easy Run',detail:'40 min @ Z2',zone:2}
       ] : (isThresholdWeek ? [
         {name:'Warm Up',detail:'15 min easy jog + 4 strides',zone:2},
-        {name:'Threshold Intervals',detail:`${thresholdReps} × ${thresholdMinPerRep} min @ threshold pace (~4:30-4:45/km, "comfortably hard," can speak 2-3 words). 90 sec easy float between.`,zone:4},
+        {name:'Threshold Intervals',detail:`${thresholdReps} × ${thresholdMinPerRep} min @ threshold pace (~6:58-7:21/mile, "comfortably hard," can speak 2-3 words). 90 sec easy float between.`,zone:4},
         {name:'Cool Down',detail:'10 min easy',zone:1}
       ] : [
         {name:'Warm Up',detail:'15 min easy + 4 strides',zone:2},
@@ -731,13 +730,13 @@ function getFoundationWeek(weekNum, deload) {
       ] : (() => {
         const f = getWeakStationFocus(weekNum);
         return [
-          {name:'1km Run',detail:'@ 4:30-4:40/km — settle in. Threshold pace, not race pace.',zone:4},
+          {name:'1km Run',detail:'@ 6:58-7:14/mile — settle in. Threshold pace, not race pace.',zone:4},
           {name:f.mainStation[0], detail:f.mainStation[1], zone:0},
-          {name:'1km Run',detail:'@ 4:30-4:40/km — hold pace',zone:4},
+          {name:'1km Run',detail:'@ 6:58-7:14/mile — hold pace',zone:4},
           {name:f.filler[0], detail:f.filler[1], zone:0},
-          {name:'1km Run',detail:'@ 4:30-4:40/km — legs burn, stay upright',zone:4},
+          {name:'1km Run',detail:'@ 6:58-7:14/mile — legs burn, stay upright',zone:4},
           {name:f.secondTouch[0], detail:f.secondTouch[1], zone:0},
-          {name:'1km Run',detail:'@ 4:30-4:40/km — final',zone:4}
+          {name:'1km Run',detail:'@ 6:58-7:14/mile — final',zone:4}
         ];
       })(),
       duration: deload ? '45 min' : '70 min',
@@ -747,7 +746,7 @@ function getFoundationWeek(weekNum, deload) {
       exercises: deload ? [
         {name:'Long Run',detail:`60 min easy @ Z2`,zone:2}
       ] : [
-        {name:'Easy Run',detail:`${longMin - 5} min @ 6:00-6:30/km — Wk ${weekNum} target: ${Math.round((longMin) / 6.15)} km. Volume is the priority.`,zone:2},
+        {name:'Easy Run',detail:`${longMin - 5} min @ 9:17-10:04/mile — Wk ${weekNum} target: ${Math.round((longMin) / 9.90)} mi. Volume is the priority.`,zone:2},
         {name:'🔋 GUT TRAINING',detail:'Practice race-day fueling on this run: 1 gel + sips of sports drink mid-run. Trains intestinal transport proteins (Hybrid Engine Blueprint). Never debut nutrition on race day.',zone:0},
         {name:'Strides Finish',detail:'4 × 20 sec relaxed-fast / walk recovery. Smooth leg speed on tired legs.',zone:4},
         ...getAbBlock('day3')
@@ -772,7 +771,7 @@ function getRacePaceWeek(weekNum, deload) {
   const bWeek = weekNum - 8; // 1-6 within phase
   // Progressive race pace target (in min:sec/km) — paces aligned with realistic threshold progression
   const paceFast = bWeek <= 2 ? '4:20' : bWeek <= 4 ? '4:15' : '4:10';
-  const paceRange = bWeek <= 2 ? '4:20-4:30/km' : bWeek <= 4 ? '4:15-4:25/km' : '4:10-4:20/km';
+  const paceRange = bWeek <= 2 ? '6:42-6:58/mile' : bWeek <= 4 ? '6:34-6:50/mile' : '6:27-6:43/mile';
   const reps = deload ? 4 : Math.min(5 + Math.floor(bWeek / 2), 7);
   // Progressive long run: 100 min Week 9 → 120 min Week 14 (~17-21 km)
   const longMin = deload ? 70 : Math.round(100 + bWeek * 4);
@@ -788,18 +787,18 @@ function getRacePaceWeek(weekNum, deload) {
   return [
     { day:'Monday', type:'run', title:'Easy Run — Build Volume', icon:'🏃', zone:2,
       exercises:[
-        {name:'Easy Run',detail:`${easyMin} min @ 6:00-6:30/km — Wk ${weekNum} mileage target: ~${Math.round(easyMin / 6.15)} km. HR under 155 + conversational.`,zone:2}
+        {name:'Easy Run',detail:`${easyMin} min @ 9:17-10:04/mile — Wk ${weekNum} mileage target: ~${Math.round(easyMin / 9.90)} mi. HR under 155 + conversational.`,zone:2}
       ],
       duration:`${easyMin} min`,
       focus:'📍 Outdoor — Recovery from weekend + aerobic volume. The base keeps building all the way to Tampa.' },
 
-    { day:'Tuesday', type:'intervals', title: isFullSim ? 'Easy + Strides (Pre-Sim Taper)' : (isVO2Day ? 'VO2 Max — Norwegian 4×4' : `Compromised Intervals (${paceFast}/km)`), icon: isFullSim ? '🏃' : (isVO2Day ? '🔥' : '😤'), zone: isFullSim ? 2 : (isVO2Day ? 5 : 4),
+    { day:'Tuesday', type:'intervals', title: isFullSim ? 'Easy + Strides (Pre-Sim Taper)' : (isVO2Day ? 'VO2 Max — Norwegian 4×4' : `Compromised Intervals (${paceFast}/mile)`), icon: isFullSim ? '🏃' : (isVO2Day ? '🔥' : '😤'), zone: isFullSim ? 2 : (isVO2Day ? 5 : 4),
       exercises: isFullSim ? [
         {name:'Easy Run',detail:'35 min @ Z2 — fresh legs for Wed full sim',zone:2},
         {name:'Strides',detail:'5 × 20 sec relaxed-fast / walk recovery',zone:4}
       ] : (isVO2Day ? [
         {name:'Warm Up',detail:'15 min progressive jog',zone:2},
-        {name:'Norwegian 4×4',detail:'4 × 4 min @ HR 175-185 (3:55-4:15/km). 3 min easy jog between. Research: ~10% VO2max gain in 8 wks (Helgerud 2007).',zone:5},
+        {name:'Norwegian 4×4',detail:'4 × 4 min @ HR 175-185 (6:03-6:34/mile). 3 min easy jog between. Research: ~10% VO2max gain in 8 wks (Helgerud 2007).',zone:5},
         {name:'Cool Down',detail:'10 min easy',zone:1}
       ] : [
         {name:'Warm Up',detail:'10 min easy jog + 4 strides',zone:2},
@@ -845,13 +844,13 @@ function getRacePaceWeek(weekNum, deload) {
       ] : (() => {
         const f = getWeakStationFocus(weekNum);
         return [
-          {name:'1km Run',detail:`@ ${paceFast}/km — current race pace`,zone:4},
+          {name:'1km Run',detail:`@ ${paceFast}/mile — current race pace`,zone:4},
           {name:f.mainStation[0], detail:f.mainStation[1], zone:0},
-          {name:'1km Run',detail:`@ ${paceFast}/km — hold pace`,zone:4},
+          {name:'1km Run',detail:`@ ${paceFast}/mile — hold pace`,zone:4},
           {name:f.filler[0], detail:f.filler[1], zone:0},
-          {name:'1km Run',detail:`@ ${paceFast}/km — legs burning`,zone:4},
+          {name:'1km Run',detail:`@ ${paceFast}/mile — legs burning`,zone:4},
           {name:f.secondTouch[0], detail:f.secondTouch[1], zone:0},
-          {name:'1km Run',detail:`@ ${paceFast}/km — leave it all`,zone:4}
+          {name:'1km Run',detail:`@ ${paceFast}/mile — leave it all`,zone:4}
         ];
       })(),
       duration: deload ? '35 min' : '70 min',
@@ -861,8 +860,8 @@ function getRacePaceWeek(weekNum, deload) {
       exercises: deload ? [
         {name:'Long Run',detail:'50 min @ Z2',zone:2}
       ] : [
-        {name:'Easy Run',detail:`${longMin - 20} min @ 6:00-6:30/km — Wk ${weekNum} target: ~${Math.round((longMin - 20) / 6.15)} km easy`,zone:2},
-        {name:'Threshold Finish',detail:`4 × 3 min @ ${paceFast}/km / 90 sec easy recovery — 2nd threshold session of the week`,zone:4},
+        {name:'Easy Run',detail:`${longMin - 20} min @ 9:17-10:04/mile — Wk ${weekNum} target: ~${Math.round((longMin - 20) / 9.90)} mi easy`,zone:2},
+        {name:'Threshold Finish',detail:`4 × 3 min @ ${paceFast}/mile / 90 sec easy recovery — 2nd threshold session of the week`,zone:4},
         {name:'Easy Finish',detail:'10 min @ Z2',zone:2},
         ...getAbBlock('day3')
       ],
@@ -879,7 +878,7 @@ function getDoublesWeek(weekNum, deload) {
   // PHASE 3: DOUBLES SPECIFIC (Weeks 15-20) — Tampa Oct 23
   // Same run volume as solo (both partners run all 8km).
   // Station work shifts to split-load + short-rest format = active recovery practice.
-  // Saturday is the partner sim slot (with gf if available, solo split otherwise).
+  // Saturday is the doubles sim slot.
   const v = deload ? 0.55 : 1.0;  // 45% volume drop on deload weeks (Hybrid Engine Blueprint — full recovery enables supercompensation)
   const dWeek = weekNum - 14; // 1-6 within phase
   const longMin = Math.round((80 + dWeek * 2) * v);
@@ -888,7 +887,7 @@ function getDoublesWeek(weekNum, deload) {
   return [
     { day:'Monday', type:'run', title:'Easy Run', icon:'🏃', zone:2,
       exercises:[
-        {name:'Easy Run',detail:`${Math.round(45 * v)} min @ 6:00-6:30/km — HR < 155 + conversational`,zone:2}
+        {name:'Easy Run',detail:`${Math.round(45 * v)} min @ 9:17-10:04/mile — HR < 155 + conversational`,zone:2}
       ],
       duration:`${Math.round(45 * v)} min`,
       focus:'📍 Outdoor — Recovery from weekend. Truly easy.' },
@@ -896,11 +895,11 @@ function getDoublesWeek(weekNum, deload) {
     { day:'Tuesday', type:'intervals', title:'Doubles Race Pace', icon:'🎯', zone:4,
       exercises:[
         {name:'Warm Up',detail:'10 min easy + 5 strides (20s on / 40s off)',zone:2},
-        {name:'1km Repeats',detail:'8 × 1km @ 3:55-4:05/km / 60 sec rest — 8km is the full doubles run load',zone:4},
+        {name:'1km Repeats',detail:'8 × 1km @ 6:03-6:19/mile / 60 sec rest — 8km is the full doubles run load',zone:4},
         {name:'Cool Down',detail:'10 min easy',zone:1}
       ],
       duration:'75 min',
-      focus:'📍 Outdoor — Doubles target = sub 1:07. Run @ ~4:00/km. Practice cruising at speed YOU and gf can hold together.' },
+      focus:'📍 Outdoor — Doubles target = sub 1:07. Run @ ~6:11/mile. Practice cruising at team-sustainable pace.' },
 
     { day:'Wednesday', type:'run', title:'Easy Recovery Run', icon:'🏃', zone:2,
       exercises:[
@@ -923,35 +922,35 @@ function getDoublesWeek(weekNum, deload) {
 
     { day:'Friday', type:'intervals', title:'Compromised Doubles Pace', icon:'😤', zone:4,
       exercises:[
-        {name:'1km Run',detail:'@ 4:05/km — doubles race pace (gf-pace)',zone:4},
+        {name:'1km Run',detail:'@ 6:19/mile — doubles race pace',zone:4},
         {name:'SkiErg',detail:'500m hard (your half — male takes opening pull)',zone:4},
-        {name:'1km Run',detail:'@ 4:05/km — hold',zone:4},
+        {name:'1km Run',detail:'@ 6:19/mile — hold',zone:4},
         {name:'Wall Balls',detail:'60 reps unbroken (60% share — male takes more)',zone:0},
-        {name:'1km Run',detail:'@ 4:05/km',zone:4},
+        {name:'1km Run',detail:'@ 6:19/mile',zone:4},
         {name:'Sled Push',detail:'50m × 3 lengths (75% share — male takes 3 of 4)',zone:0},
-        {name:'1km Run',detail:'@ 4:05/km — final',zone:4}
+        {name:'1km Run',detail:'@ 6:19/mile — final',zone:4}
       ],
       duration:'65 min',
       focus:'📍 Round Rock — Your share of stations in doubles is HEAVIER than 50/50 (research-backed: male takes 3 of 4 sled lengths, 60% wall balls, 60% farmers).' },
 
-    { day:'Saturday', type:'hyrox', title: isPartnerSim ? 'PARTNER SIM with GF' : 'Doubles Solo Sim', icon: isPartnerSim ? '👥' : '🏁', zone:4,
+    { day:'Saturday', type:'hyrox', title: isPartnerSim ? 'PARTNER SIM' : 'Doubles Solo Sim', icon: isPartnerSim ? '👥' : '🏁', zone:4,
       exercises: isPartnerSim ? [
-        {name:'Run Together',detail:'All 8 × 1km @ GF threshold pace (~4:50-5:00/km if she can hold). YOU adjust DOWN to her, not up.',zone:4},
+        {name:'Run Together',detail:'All 8 × 1km @ doubles target pace (~7:29-7:44/mile). Run at the slower partner's sustainable pace.',zone:4},
         {name:'SkiErg',detail:'1000m — switch every 200m (5 switches). You take opening 200.',zone:4},
-        {name:'Sled Push',detail:'4 × 25m — YOU take 3 lengths, GF takes 1 (Men\'s Open weight 152kg).',zone:0},
-        {name:'Sled Pull',detail:'4 × 25m — YOU take 3 lengths, GF takes 1.',zone:0},
+        {name:'Sled Push',detail:'4 × 25m — YOU take 3 lengths, partner takes 1 (Men\'s Open weight 152kg).',zone:0},
+        {name:'Sled Pull',detail:'4 × 25m — YOU take 3 lengths, partner takes 1.',zone:0},
         {name:'Burpee BJ',detail:'80m — switch every 10m (8 switches). Even split.',zone:0},
         {name:'Row',detail:'1000m — switch every 200m. You take opening pull.',zone:4},
-        {name:'Farmers',detail:'200m — YOU take 2 lengths, GF takes 1-2 (60% your share).',zone:0},
+        {name:'Farmers',detail:'200m — YOU take 2 lengths, partner takes 1-2 (60% your share).',zone:0},
         {name:'Lunges',detail:'100m — even split, but YOU finish the last 25m (closer).',zone:0},
         {name:'Wall Balls',detail:'100 reps — split 15-15-15-15-10-10-10-10 alternating. YOU take ~60 reps (60/40 split).',zone:0}
       ] : [
-        {name:'Run',detail:'8 × 1km @ doubles pace ~4:05/km',zone:4},
+        {name:'Run',detail:'8 × 1km @ doubles pace ~6:19/mile',zone:4},
         {name:'Station Solo Sim',detail:'After each km, do YOUR doubles share: 500m ski / 3×25m push / 3×25m pull / 40m burpee / 500m row / 100m farmers / 50m lunges / 60 wall balls',zone:4},
         {name:'Note',detail:'Your share is roughly 60% of full Hyrox. Short rest between station & next run simulates partner transition.',zone:0}
       ],
       duration: isPartnerSim ? '~70 min' : '~80 min',
-      focus: isPartnerSim ? '📍 Round Rock — REAL doubles practice with GF. **SWITCH PRACTICE happens HERE** (every 200m machines, every 10-20 wall balls). DRILL TRANSITIONS — bad handoffs cost 10-45 sec/station. Single verbal cue ("switch"). Tag-and-go.' : '📍 Round Rock — Solo execution of YOUR doubles share. 60% station volume + short rest = doubles fatigue without partner. Use mini-rests to simulate partner switches.' },
+      focus: isPartnerSim ? '📍 Round Rock — REAL doubles practice with partner. **SWITCH PRACTICE happens HERE** (every 200m machines, every 10-20 wall balls). DRILL TRANSITIONS — bad handoffs cost 10-45 sec/station. Single verbal cue ("switch"). Tag-and-go.' : '📍 Round Rock — Solo execution of YOUR doubles share. 60% station volume + short rest = doubles fatigue without partner. Use mini-rests to simulate partner switches.' },
 
     { day:'Sunday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
       exercises:[{name:'Full Rest',detail:'Sleep, eat, recover.',zone:0}],
@@ -971,7 +970,7 @@ function getTampaTaperWeek(weekNum) {
       { day:'Tuesday', type:'intervals', title:'Final Sharpener', icon:'⚡', zone:4,
         exercises:[
           {name:'Warm Up',detail:'10 min easy',zone:2},
-          {name:'Race Pace',detail:'4 × 400m @ 4:00/km feel — smooth, never strain',zone:4},
+          {name:'Race Pace',detail:'4 × 400m @ 6:11/mile feel — smooth, never strain',zone:4},
           {name:'Strides',detail:'4 × 20 sec fast & relaxed',zone:4},
           {name:'Cool Down',detail:'10 min easy',zone:1}
         ],
@@ -979,9 +978,9 @@ function getTampaTaperWeek(weekNum) {
       { day:'Wednesday', type:'rest', title:'Active Recovery', icon:'🧘', zone:0,
         exercises:[
           {name:'Walk',detail:'30 min easy walk',zone:0},
-          {name:'Visualize',detail:'Sit with gf, review race plan, decide handoff order for each station',zone:0}
+          {name:'Visualize',detail:'Sit with partner, review race plan, decide handoff order for each station',zone:0}
         ],
-        duration:'30 min', focus:'Lock in the doubles plan with gf.' },
+        duration:'30 min', focus:'Lock in the doubles plan with partner.' },
       { day:'Thursday', type:'rest', title:'Travel + Light Shakeout + HEAT PREP', icon:'✈️', zone:1,
         exercises:[
           {name:'Travel to Tampa',detail:'Hydrate constantly. Walk every 90 min on plane.',zone:0},
@@ -997,14 +996,14 @@ function getTampaTaperWeek(weekNum) {
           {name:'3 hrs before',detail:'Oats + banana + honey + coffee. 500ml water + 500mg sodium.',zone:0},
           {name:'90 min before',detail:'Sip another 500ml water + sodium. Restroom now.',zone:0},
           {name:'1 hr before',detail:'Small banana or half energy bar',zone:0},
-          {name:'30 min before',detail:'Gel + water. Caffeine 200mg. Light warm-up jog WITH gf — sweat-test the climate.',zone:2},
+          {name:'30 min before',detail:'Gel + water. Caffeine 200mg. Light warm-up jog with partner — sweat-test the climate.',zone:2},
           {name:'IN-RACE HYDRATION',detail:'Tampa heat = 1-1.5 L/hr sweat rate. Sip electrolyte at Roxzones 2, 4, 6. Gel at Roxzone 4.',zone:0},
-          {name:'RUN PLAN',detail:'All 8 × 1km @ GF\'s threshold (~4:50-5:00/km). YOU adjust to her, not vice versa.',zone:4},
+          {name:'RUN PLAN',detail:'All 8 × 1km @ GF\'s threshold (~7:29-7:44/mile). YOU adjust to her, not vice versa.',zone:4},
           {name:'STATION PLAN',detail:'Male takes 3 of 4 sleds, 60% wall balls, 60% farmers. High-freq switching every 10-20 reps (research). Single verbal cue: "switch".',zone:0},
           {name:'TRANSITIONS',detail:'Tag-and-go. No talking. Bad handoffs cost 10-45 sec per station. THIS is where the race lives.',zone:0},
           {name:'TARGET',detail:'Sub 1:07. Stations done, focus on transitions.',zone:0}
         ],
-        duration:'~67 min', focus:'GO WIN IT WITH HER. 🏆' },
+        duration:'~67 min', focus:'GO WIN IT TOGETHER. 🏆' },
       { day:'Saturday', type:'rest', title:'Recovery Day', icon:'🎉', zone:0,
         exercises:[{name:'Recover',detail:'Full meal. Walk. Celebrate. Massage if available.',zone:0}],
         duration:'—', focus:'You earned it. Now: 4 weeks to Dallas.' },
@@ -1022,19 +1021,19 @@ function getTampaTaperWeek(weekNum) {
     { day:'Tuesday', type:'intervals', title:'Sharp Race Pace', icon:'⚡', zone:5,
       exercises:[
         {name:'Warm Up',detail:'10 min easy',zone:2},
-        {name:'Intervals',detail:'5 × 600m @ 3:50/km / 90 sec recovery',zone:5},
+        {name:'Intervals',detail:'5 × 600m @ 5:56/mile / 90 sec recovery',zone:5},
         {name:'Cool Down',detail:'10 min easy',zone:1}
       ],
       duration:'40 min', focus:'📍 Outdoor — Keep top-end engine sharp. Fast & smooth.' },
     { day:'Wednesday', type:'hyrox', title:'Doubles Tune-Up', icon:'👥', zone:4,
       exercises:[
-        {name:'1km Run',detail:'@ 4:00/km',zone:4},
+        {name:'1km Run',detail:'@ 6:11/mile',zone:4},
         {name:'SkiErg',detail:'500m @ 1:50/500m pace',zone:4},
-        {name:'1km Run',detail:'@ 4:00/km',zone:4},
+        {name:'1km Run',detail:'@ 6:11/mile',zone:4},
         {name:'Wall Balls',detail:'50 reps unbroken',zone:0},
-        {name:'1km Run',detail:'@ 4:00/km',zone:4},
+        {name:'1km Run',detail:'@ 6:11/mile',zone:4},
         {name:'Sled Push',detail:'2 × 50m race weight',zone:0},
-        {name:'1km Run',detail:'@ 4:00/km',zone:4}
+        {name:'1km Run',detail:'@ 6:11/mile',zone:4}
       ],
       duration:'45 min', focus:'📍 Round Rock — Light touch on doubles pace. Don\'t grind.' },
     { day:'Thursday', type:'run', title:'Easy + Strides', icon:'🏃', zone:2,
@@ -1114,7 +1113,7 @@ function getSoloSharpenWeek(weekNum) {
       { day:'Tuesday', type:'intervals', title:'Race Pace 1km Repeats', icon:'🎯', zone:4,
         exercises:[
           {name:'Warm Up',detail:'10 min easy + 5 strides',zone:2},
-          {name:'1km Repeats',detail:'6 × 1km @ 4:00-4:05/km / 60 sec rest — SUB 1:08 PACE (solo race pace)',zone:4},
+          {name:'1km Repeats',detail:'6 × 1km @ 6:11-6:19/mile / 60 sec rest — SUB 1:08 PACE (solo race pace)',zone:4},
           {name:'Cool Down',detail:'10 min easy',zone:1}
         ],
         duration:'55 min', focus:'📍 Outdoor — Recall solo race pace. Faster than doubles.' },
@@ -1138,10 +1137,10 @@ function getSoloSharpenWeek(weekNum) {
       { day:'Friday', type:'intervals', title:'Sharp 800s', icon:'⚡', zone:5,
         exercises:[
           {name:'Warm Up',detail:'15 min progressive',zone:2},
-          {name:'800m Repeats',detail:'5 × 800m @ 3:45-3:55/km / 2 min rest',zone:5},
+          {name:'800m Repeats',detail:'5 × 800m @ 5:48-6:03/mile / 2 min rest',zone:5},
           {name:'Cool Down',detail:'10 min easy',zone:1}
         ],
-        duration:'45 min', focus:'📍 Outdoor — Top-end speed. Make 4:00/km feel easy.' },
+        duration:'45 min', focus:'📍 Outdoor — Top-end speed. Make 6:11/mile feel easy.' },
       { day:'Saturday', type:'strength', title:'Long Easy + Posterior Maintenance', icon:'💪', zone:2,
         exercises:[
           {name:'Easy Run',detail:'50 min @ Z2',zone:2},
@@ -1164,19 +1163,19 @@ function getSoloSharpenWeek(weekNum) {
     { day:'Tuesday', type:'intervals', title:'Race Pace Repeats', icon:'🎯', zone:4,
       exercises:[
         {name:'Warm Up',detail:'10 min easy + 5 strides',zone:2},
-        {name:'1km Repeats',detail:'5 × 1km @ 3:55/km / 60 sec rest',zone:4},
+        {name:'1km Repeats',detail:'5 × 1km @ 6:03/mile / 60 sec rest',zone:4},
         {name:'Cool Down',detail:'10 min easy',zone:1}
       ],
       duration:'50 min', focus:'📍 Outdoor — Final big race pace session.' },
     { day:'Wednesday', type:'hyrox', title:'Compromised Combo', icon:'😤', zone:4,
       exercises:[
-        {name:'1km Run',detail:'@ 4:00/km',zone:4},
+        {name:'1km Run',detail:'@ 6:11/mile',zone:4},
         {name:'Sled Pull',detail:'50m — your weakest station',zone:0},
-        {name:'1km Run',detail:'@ 4:00/km',zone:4},
+        {name:'1km Run',detail:'@ 6:11/mile',zone:4},
         {name:'Wall Balls',detail:'100 reps unbroken if possible',zone:0},
-        {name:'1km Run',detail:'@ 4:00/km',zone:4},
+        {name:'1km Run',detail:'@ 6:11/mile',zone:4},
         {name:'Burpee BJ',detail:'80m',zone:0},
-        {name:'1km Run',detail:'@ 4:00/km — final',zone:4}
+        {name:'1km Run',detail:'@ 6:11/mile — final',zone:4}
       ],
       duration:'55 min', focus:'📍 Round Rock — Sharpen the weakest stations.' },
     { day:'Thursday', type:'run', title:'Easy Run + Strides', icon:'🏃', zone:1,
@@ -1188,14 +1187,14 @@ function getSoloSharpenWeek(weekNum) {
     { day:'Friday', type:'intervals', title:'Race Pace Tune-Up', icon:'🎯', zone:4,
       exercises:[
         {name:'Warm Up',detail:'10 min easy',zone:2},
-        {name:'Race Pace',detail:'4 × 1km @ 4:00/km / 90 sec rest',zone:4},
+        {name:'Race Pace',detail:'4 × 1km @ 6:11/mile / 90 sec rest',zone:4},
         {name:'Cool Down',detail:'10 min easy',zone:1}
       ],
       duration:'40 min', focus:'📍 Outdoor — Race pace should feel automatic now.' },
     { day:'Saturday', type:'long', title:'Moderate Long + Surges', icon:'🛣️', zone:2,
       exercises:[
         {name:'Easy Run',detail:'45 min @ Z2',zone:2},
-        {name:'Race Pace Surges',detail:'3 × 2 min @ 4:00/km / 3 min easy',zone:4}
+        {name:'Race Pace Surges',detail:'3 × 2 min @ 6:11/mile / 3 min easy',zone:4}
       ],
       duration:'65 min', focus:'📍 Outdoor — Last long-ish run before taper.' },
     { day:'Sunday', type:'rest', title:'Rest Day', icon:'😴', zone:0,
@@ -1213,7 +1212,7 @@ function getDallasTaperWeek() {
     { day:'Tuesday', type:'intervals', title:'Final Sharpener', icon:'⚡', zone:4,
       exercises:[
         {name:'Warm Up',detail:'10 min easy',zone:2},
-        {name:'Race Pace',detail:'3 × 400m @ 4:00/km feel — smooth & controlled',zone:4},
+        {name:'Race Pace',detail:'3 × 400m @ 6:11/mile feel — smooth & controlled',zone:4},
         {name:'Strides',detail:'4 × 15 sec relaxed fast',zone:4},
         {name:'Cool Down',detail:'10 min easy',zone:1}
       ],
@@ -1234,7 +1233,7 @@ function getDallasTaperWeek() {
         {name:'3 hrs before',detail:'Oats + banana + honey + coffee. 500ml water.',zone:0},
         {name:'1 hr before',detail:'Small banana or half energy bar',zone:0},
         {name:'30 min before',detail:'Gel + water. Caffeine 200-300mg. Light warm-up jog.',zone:2},
-        {name:'RUN PLAN',detail:'Runs 1-4: 3:55-4:05/km. Runs 5-8: 4:05-4:15/km. Run + Roxzone counts.',zone:4},
+        {name:'RUN PLAN',detail:'Runs 1-4: 6:03-6:19/mile. Runs 5-8: 6:19-6:34/mile. Run + Roxzone counts.',zone:4},
         {name:'STATIONS',detail:'SET stations (Ski/Sleds/Row): your plan, don\'t deviate. RACE stations (Burpees/Farmers/Lunges/Wall Balls): sell out.',zone:0},
         {name:'TIERED TARGETS',detail:'A: sub 1:08 · Stretch: sub 1:05 · Dream: sub 1:00. Race the A goal; the stretch comes if everything clicks.',zone:0}
       ],
@@ -1646,10 +1645,10 @@ const Fmt = {
   },
   
   // Pace
-  paceDisplay(secondsPerKm) {
-    const min = Math.floor(secondsPerKm / 60);
-    const sec = Math.round(secondsPerKm % 60);
-    return `${min}:${String(sec).padStart(2, '0')}/km`;
+  paceDisplay(secondsPerMile) {
+    const min = Math.floor(secondsPerMile / 60);
+    const sec = Math.round(secondsPerMile % 60);
+    return `${min}:${String(sec).padStart(2, '0')}/mile`;
   },
   
   // Diff display
@@ -1949,7 +1948,7 @@ function renderToday(overrideDate) {
       <div>
         <span class="pill z${workout.zone}" style="margin-right:6px">Z${workout.zone} ${zoneInfo.name}</span>
       </div>
-      <div class="t-xs t-muted tabular">${zoneInfo.paceRange}/km · ${zoneInfo.hrRange} bpm</div>
+      <div class="t-xs t-muted tabular">${zoneInfo.paceRange}/mile · ${zoneInfo.hrRange} bpm</div>
     </div>
     ` : ''}
 
@@ -2010,11 +2009,11 @@ function renderToday(overrideDate) {
           </div>
           <div>
             <div class="t-xs t-faint mb-4">Avg Pace</div>
-            <input class="input" type="text" placeholder="0:00/km" id="rs-pace" value="${rs.avgPace||''}" onchange="App.saveRunStats('${dateStr}')" style="text-align:left;padding:8px 10px;font-size:14px">
+            <input class="input" type="text" placeholder="0:00/mile" id="rs-pace" value="${rs.avgPace||''}" onchange="App.saveRunStats('${dateStr}')" style="text-align:left;padding:8px 10px;font-size:14px">
           </div>
           <div>
             <div class="t-xs t-faint mb-4">Distance</div>
-            <input class="input" type="text" inputmode="decimal" placeholder="km" id="rs-dist" value="${rs.distance||''}" onchange="App.saveRunStats('${dateStr}')" style="text-align:left;padding:8px 10px;font-size:14px">
+            <input class="input" type="text" inputmode="decimal" placeholder="mi" id="rs-dist" value="${rs.distance||''}" onchange="App.saveRunStats('${dateStr}')" style="text-align:left;padding:8px 10px;font-size:14px">
           </div>
           <div>
             <div class="t-xs t-faint mb-4">Garmin VO2 Max</div>
@@ -2153,8 +2152,8 @@ function renderStats() {
     <div>
       <div class="metric"><span class="t-sm t-muted">VO2 Max</span><span class="t-sm fw-7 t-accent tabular">${ATHLETE.vo2max}</span></div>
       <div class="metric"><span class="t-sm t-muted">Weight</span><span class="t-sm fw-7 tabular">${ATHLETE.weight} lbs</span></div>
-      <div class="metric"><span class="t-sm t-muted">LT Pace</span><span class="t-sm fw-7 tabular">${ATHLETE.ltPacePerKm}/km @ ${ATHLETE.ltHeartRate}bpm</span></div>
-      <div class="metric"><span class="t-sm t-muted">Easy Pace</span><span class="t-sm fw-7 tabular">${ATHLETE.easyPacePerKm}/km</span></div>
+      <div class="metric"><span class="t-sm t-muted">LT Pace</span><span class="t-sm fw-7 tabular">${ATHLETE.ltPacePerMile}/mile @ ${ATHLETE.ltHeartRate}bpm</span></div>
+      <div class="metric"><span class="t-sm t-muted">Easy Pace</span><span class="t-sm fw-7 tabular">${ATHLETE.easyPacePerMile}/mile</span></div>
       <div class="metric"><span class="t-sm t-muted">Bench 1RM</span><span class="t-sm fw-7 tabular">${ATHLETE.benchPress1RM} lbs</span></div>
       <div class="metric"><span class="t-sm t-muted">5K PR</span><span class="t-sm fw-7 tabular">${ATHLETE.pr5K || '— (TT Sat May 23)'}</span></div>
       <div class="metric"><span class="t-sm t-muted">Weekly Mileage</span><span class="t-sm fw-7 tabular">${ATHLETE.currentWeeklyMileage} mi → 47 by Wk 14</span></div>
@@ -2162,6 +2161,34 @@ function renderStats() {
       <div class="metric"><span class="t-sm t-muted">A Goal</span><span class="t-sm fw-7 t-accent">Sub ${ATHLETE.goalTimeA}</span></div>
       <div class="metric"><span class="t-sm t-muted">Stretch</span><span class="t-sm fw-7" style="color:var(--orange)">Sub ${ATHLETE.goalTimeStretch}</span></div>
     </div>
+
+    <div class="spacer"></div>
+    <div class="label">Training Paces — LT ${ATHLETE.ltPacePerMile}/mile @ ${ATHLETE.ltHeartRate}bpm</div>
+    ${ZONES.map(z => `
+      <div class="card mb-12" style="border-left:3px solid ${z.color}">
+        <div class="row" style="justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <div class="row" style="gap:8px;align-items:center">
+            <span style="display:inline-block;padding:3px 8px;background:${z.color}22;color:${z.color};border-radius:6px;font-weight:700;font-size:11px;font-family:monospace">Z${z.zone}</span>
+            <span class="t-sm fw-7">${z.name}</span>
+          </div>
+          <div style="text-align:right">
+            <div class="t-sm fw-7 tabular">${z.paceRange}/mi</div>
+            <div class="t-xs t-muted tabular">${z.hrRange} bpm</div>
+          </div>
+        </div>
+        <div class="t-xs t-muted" style="line-height:1.5">${z.description}</div>
+        <div class="t-xs t-muted" style="margin-top:4px;font-style:italic;opacity:0.7">"${z.feel}"</div>
+      </div>
+    `).join('')}
+
+    <div class="card mb-24" style="border-color:rgba(57,255,20,0.25);background:rgba(57,255,20,0.05)">
+      <div class="t-xs t-accent fw-7 mb-4">💡 The 80/20 Rule</div>
+      <div class="t-xs t-muted" style="line-height:1.6">
+        80% of running should be Z1-Z2 (easy, conversational). Only 20% should be Z3+.
+        Going too fast on easy days is what makes VO2 max decline. Easy days easy, hard days hard.
+      </div>
+    </div>
+
     <div class="spacer"></div>
     <div class="label">VO2 Max Trend</div>
     <div class="card mb-24"><canvas id="vo2-chart" style="width:100%;height:130px"></canvas></div>
@@ -2210,7 +2237,7 @@ function renderStats() {
         <div class="t-sm fw-7" style="color:#9333EA">👥 TAMPA DOUBLES</div>
         <div class="t-xs t-muted tabular">${Dates.formatDate(ATHLETE.doublesDate)}</div>
       </div>
-      <div class="t-xs t-muted" style="line-height:1.6">Mixed doubles w/ gf. Goal: <strong>sub ${ATHLETE.doublesGoal}</strong>. Her doubles PR: ${ATHLETE.doublesPartnerPR}.</div>
+      <div class="t-xs t-muted" style="line-height:1.6">Mixed doubles. Goal: <strong>sub ${ATHLETE.doublesGoal}</strong>.</div>
     </div>
     <div class="card mb-24" style="padding:14px 16px;border-left:3px solid var(--accent)">
       <div class="row-between mb-4">
@@ -2249,7 +2276,7 @@ function renderStats() {
     <div class="label">Training Philosophy — Research-Backed</div>
     <div class="card mb-12" style="padding:14px 16px;border-left:3px solid var(--accent)">
       <div class="t-sm fw-7 mb-4" style="color:var(--accent)">🩺 Diagnosis (corrected)</div>
-      <div class="t-xs t-muted" style="line-height:1.6">Endurance is built (10k @ 5:54/km easy, HR 146). What looks like a "speed problem" is actually a <strong>threshold problem</strong>. Hyrox doesn't reward max velocity — it rewards "time under threshold." Research: VO2max is the #1 predictor of Hyrox finish (ρ = -0.71, Brandt 2025).</div>
+      <div class="t-xs t-muted" style="line-height:1.6">Endurance is built (10k @ 9:08/mile easy, HR 146). What looks like a "speed problem" is actually a <strong>threshold problem</strong>. Hyrox doesn't reward max velocity — it rewards "time under threshold." Research: VO2max is the #1 predictor of Hyrox finish (ρ = -0.71, Brandt 2025).</div>
     </div>
     <div class="card mb-12" style="padding:14px 16px">
       <div class="t-sm fw-7 mb-4">📈 The Two Levers</div>
@@ -2275,14 +2302,14 @@ function renderStats() {
     <div class="label">Run + Roxzone Formula</div>
     <div class="card mb-20" style="padding:14px 16px">
       <div class="t-sm" style="line-height:1.6">Total run time + Roxzone time ÷ <strong>8.7 km</strong> = your true pace.</div>
-      <div class="t-xs t-muted mt-8">Each venue has ~700m of Roxzone running. Your "5:00/km" is slower when you include it. Use this for honest pacing.</div>
+      <div class="t-xs t-muted mt-8">Each venue has ~700m of Roxzone running. Your "7:44/mile" is slower when you include it. Use this for honest pacing.</div>
     </div>
 
     <div class="label">Running Target (Sub 1:08 A goal)</div>
     <div class="card mb-20" style="padding:14px 16px">
-      <div class="metric"><span class="t-sm t-muted">Phoenix Avg</span><span class="t-sm fw-7 tabular">4:53/km</span></div>
-      <div class="metric"><span class="t-sm t-muted">Sub-1:08 Target (Run+Rox)</span><span class="t-sm fw-7 t-accent tabular">4:30-4:40/km</span></div>
-      <div class="metric"><span class="t-sm t-muted">Sub-1:05 Stretch (Run+Rox)</span><span class="t-sm fw-7 tabular" style="color:var(--orange)">4:00-4:07/km</span></div>
+      <div class="metric"><span class="t-sm t-muted">Phoenix Avg</span><span class="t-sm fw-7 tabular">7:34/mile</span></div>
+      <div class="metric"><span class="t-sm t-muted">Sub-1:08 Target (Run+Rox)</span><span class="t-sm fw-7 t-accent tabular">6:58-7:14/mile</span></div>
+      <div class="metric"><span class="t-sm t-muted">Sub-1:05 Stretch (Run+Rox)</span><span class="t-sm fw-7 tabular" style="color:var(--orange)">6:11-6:23/mile</span></div>
     </div>
 
     <div class="label">Pacing Philosophy</div>
