@@ -552,6 +552,21 @@ const WORKOUT_DETAILS = {
 //   Hip Thrust 360 x 3 (1RM ~390 lb)
 //   Bench 285 x 1RM (MAINTENANCE — above E15 avg)
 
+// ===== AIDAN ELITE 15 TRAJECTORY — v4 (Back-to-back doubles + real strength loads) =====
+// Start: Mon Jun 22, 2026
+//
+// Weekly split (BLOCK STRESS — back-to-back doubles Tue/Wed/Thu):
+//   Mon: Long Run AM (single)
+//   Tue: Heavy Lower AM + Easy PM (DOUBLE)
+//   Wed: Threshold AM + Stations PM (DOUBLE — only double-hard)
+//   Thu: Heavy Upper AM + Easy PM (DOUBLE)
+//   Fri: VO2 AM (single)
+//   Sat: Sim AM (single)
+//   Sun: REST + Sunday Mobility Flow
+//
+// Why back-to-back: Block periodization concentrates stress for stronger adaptation stimulus.
+// Hunter McIntyre HAOS model. Young athletes with good recovery capacity benefit most.
+
 const PHASES = [
   { id: 'base',         name: 'Aerobic + Strength Base', weeks: [1, 12],   color: '#3B82F6', emoji: '⚡' },
   { id: 'build',        name: 'Race-Specific Build',     weeks: [13, 17],  color: '#FF8C00', emoji: '🎯' },
@@ -577,7 +592,6 @@ function getBaseWeek(weekNum) {
   const longMin = isDeload ? 50 : Math.min(75 + Math.floor((phaseWk - 1) / 2) * 5, 100);
   const easyMin = isDeload ? 30 : Math.min(30 + Math.floor((phaseWk - 1) / 4) * 5, 45);
 
-  // Threshold progression
   let thresholdSession;
   if (isDeload) thresholdSession = '20 min easy run + 4 strides (deload week)';
   else if (phaseWk <= 2) thresholdSession = '4 × 800m @ 7:25-7:40/mile, 90 sec easy jog rest';
@@ -587,7 +601,6 @@ function getBaseWeek(weekNum) {
   else if (phaseWk <= 10) thresholdSession = '6 × 1km @ 7:25-7:40/mile, 60 sec rest';
   else thresholdSession = '8 × 1km @ 7:25-7:40/mile, 60 sec rest (Owen Silver elite benchmark)';
 
-  // VO2 progression
   let vo2Session;
   if (isDeload) vo2Session = 'Easy run 35-40 min Z2 (no VO2 deload week)';
   else if (phaseWk <= 2) vo2Session = '4 × 3 min @ vVO2 (~7:00-7:15/mile), 2 min easy jog';
@@ -595,7 +608,7 @@ function getBaseWeek(weekNum) {
   else if (phaseWk <= 10) vo2Session = '5 × 4 min @ vVO2 (~6:50-7:05/mile), 3 min easy jog';
   else vo2Session = '4 × 5 min @ vVO2 (~6:50-7:05/mile), 3 min easy jog';
 
-  // Squat loads (real numbers from 1RM 365 lb)
+  // Real strength loads from Aidan's 3RMs (Jun 17, 2026)
   let squatLoad, hingeLoad, hipThrustLoad;
   if (isDeload) {
     squatLoad = '3 × 5 @ 255 lb (70%, deload — technique focus)';
@@ -619,7 +632,6 @@ function getBaseWeek(weekNum) {
     hipThrustLoad = '🎯 NEW 3RM TEST — target 370-375 lb';
   }
 
-  // Saturday rotation
   const rotIdx = (weekNum - 1) % 4;
   let satTitle, satDetail;
   if (rotIdx === 0) {
@@ -638,21 +650,19 @@ function getBaseWeek(weekNum) {
   }
 
   return [
-    // ===== MONDAY: Long Run + Easy PM (DOUBLE) =====
-    { day:'Monday', type:'run', title:`AM Long Run + PM Easy Recovery`, icon:'🛣️', zone:2,
+    // ===== MONDAY: Long Run (SINGLE) =====
+    { day:'Monday', type:'run', title:`Long Easy Run — ${longMin} min`, icon:'🛣️', zone:2,
       exercises:[
-        {name:'— AM SESSION (6:00 AM) — Long Easy Run —',detail:`${longMin} min`,zone:2},
         {name:'Pre-Run Dynamic Warmup',detail:'4 min: leg swings + knee hugs + walking lunges + high knees + butt kicks',zone:0},
         {name:'Long Easy Run',detail:`${longMin} min @ 9:00-9:30/mile (Z2). HR < 155, conversational. If hills push HR up, walk them. Slowest pace IS the workout.`,zone:2},
-        {name:'Post-Run Static Stretch',detail:'8 min: pigeon + couch stretch + calf + hamstring + lat + pec + child\'s pose',zone:0},
-        {name:'— PM SESSION (4:00 PM) — Easy Recovery —',detail:`${easyMin} min`,zone:2},
-        {name:'Easy Recovery Run',detail:`${easyMin} min @ 10:00-10:30/mile (Z1-Z2). Slower than slow. HR < 145.`,zone:2}
+        {name:'Post-Run Static Stretch',detail:'8 min: pigeon + couch stretch + calf + hamstring + lat + pec + child\'s pose',zone:0}
       ],
-      duration:`AM ${longMin} min + PM ${easyMin} min`, focus:`📍 WHY: Mon double = highest aerobic stimulus of the week. Long run builds capillary density + mitochondria (VO2 max correlates -0.71 with Hyrox finish — Brandt 2025). PM easy run adds polarized Z2 volume without single-session fatigue. After Sunday rest, legs are fresh to absorb both.` },
+      duration:`${longMin} min`, focus:`📍 WHY: Single highest-volume aerobic stimulus of the week. Fresh from Sunday rest. Easy mileage builds capillary density + mitochondria (VO2 max correlates -0.71 with Hyrox finish — Brandt 2025). The slower you can hold the same HR, the fitter you're getting. Long run is the day — no PM run, give it full focus.` },
 
-    // ===== TUESDAY: Heavy Lower (SINGLE) =====
-    { day:'Tuesday', type:'strength', title:'Heavy Lower', icon:'🏋️', zone:0,
+    // ===== TUESDAY: Heavy Lower AM + Easy Recovery PM (DOUBLE — block stress day 1) =====
+    { day:'Tuesday', type:'strength', title:'AM Heavy Lower + PM Easy Recovery', icon:'🏋️', zone:0,
       exercises:[
+        {name:'— AM SESSION (6:30 AM) — Heavy Lower —',detail:'~80 min total',zone:0},
         {name:'Warm Up',detail:'10 min bike + dynamic mobility',zone:0},
         {name:'Pre-Lift Activation',detail:'6 min: band pull-aparts × 20, banded glute bridge × 12, lateral walks × 10/side, goblet squat hold × 30 sec, World\'s Greatest Stretch × 3/side',zone:0},
         {name:'Back Squat',detail:squatLoad,zone:0},
@@ -663,14 +673,16 @@ function getBaseWeek(weekNum) {
         {name:'Calf Raises',detail:'3 × 15 heavy (sled push power)',zone:0},
         {name:'Plank (anti-extension)',detail:'3 × 45 sec, rib cage down, glutes squeezed',zone:0},
         {name:'Ab Wheel Rollout',detail:'3 × 8 from knees, control the negative',zone:0},
-        {name:'Post-Workout Static Stretch',detail:'8 min: pigeon + couch stretch + hamstring + calf + child\'s pose',zone:0}
+        {name:'Post-Workout Static Stretch',detail:'8 min: pigeon + couch stretch + hamstring + calf + child\'s pose',zone:0},
+        {name:`— PM SESSION (4:00 PM) — Easy Recovery Run ${easyMin} min —`,detail:'Recovery + volume',zone:2},
+        {name:'Easy Recovery Run',detail:`${easyMin} min @ 10:00-10:30/mile (Z1-Z2). Slower than slow. HR < 145.`,zone:2}
       ],
-      duration:'80 min', focus:`📍 WHY: Single heavy lower day — your strength is already above E15 male average (335 squat 3RM vs E15 295 avg, +14%). Goal is MAINTAIN + small Base progression, not PR push. Hip thrust direct sled push carryover. Single day = full recovery for Wed threshold.` },
+      duration:`AM 80 min + PM ${easyMin} min`, focus:`📍 WHY: Block stress day 1. Heavy squat is direct 152 kg sled push carryover. Your strength is +14% above E15 male avg — MAINTAIN with small progression. Blagrove 2018: heavy strength improves running economy (SMD -1.42). PM easy run flushes legs + accumulates Z2 volume — how Elite 15 athletes hit 50+ mi/wk without single crushing sessions.` },
 
-    // ===== WEDNESDAY: Threshold + Stations PM (DOUBLE — only double-hard) =====
+    // ===== WEDNESDAY: Threshold AM + Stations PM (DOUBLE — only double-hard, block stress day 2) =====
     { day:'Wednesday', type:'intervals', title:'AM Threshold + PM Hyrox Stations', icon:'⚡', zone:4,
       exercises:[
-        {name:'— AM SESSION (6:00 AM) — Threshold —',detail:'~55 min total',zone:4},
+        {name:'— AM SESSION (6:00 AM) — Threshold Intervals —',detail:'~55 min total',zone:4},
         {name:'Pre-Run Dynamic Warmup',detail:'4 min dynamic + 10 min easy + 4 strides',zone:2},
         {name:'Threshold Intervals',detail:thresholdSession,zone:4},
         {name:'Cool Down',detail:'10 min easy',zone:1},
@@ -682,12 +694,13 @@ function getBaseWeek(weekNum) {
         {name:'Farmers Carry',detail:`3 × 40m at ${phaseWk <= 4 ? 'moderate' : phaseWk <= 8 ? '75% race weight' : 'RACE weight (2 × 24 kg)'}`,zone:0},
         {name:'Wall Ball Finisher',detail:'2 × 30 reps (grease the groove — Owen Silver)',zone:0}
       ],
-      duration:`AM 55 min + PM 50 min`, focus:`📍 WHY: The ONLY double-hard day of the week. Threshold is "the anchor" of every elite Hyrox plan (Lauren Weeks, James Kelly) — most leveraged session for race pace ceiling. PM stations = Owen Silver wall ball protocol (200-400/wk → 1:04 → 1:00 PR in 6 months). Wed mid-week gives 48 hr recovery on either side.` },
+      duration:`AM 55 min + PM 50 min`, focus:`📍 WHY: The ONLY double-hard day of the week. Threshold is "the anchor" of every elite Hyrox plan (Lauren Weeks, James Kelly) — most leveraged session for race pace ceiling. PM stations = Owen Silver wall ball protocol (200-400/wk → 1:04 → 1:00 Hyrox PR in 6 months). Block stress day 2: sandwiched by Tue lower + Thu upper.` },
 
-    // ===== THURSDAY: Heavy Upper (SINGLE) =====
-    { day:'Thursday', type:'strength', title:'Heavy Upper', icon:'💪', zone:0,
+    // ===== THURSDAY: Heavy Upper AM + Easy Recovery PM (DOUBLE — block stress day 3) =====
+    { day:'Thursday', type:'strength', title:'AM Heavy Upper + PM Easy Aerobic', icon:'💪', zone:0,
       exercises:[
-        {name:'Warm Up',detail:'10 min bike + band pull-aparts + scap activation',zone:0},
+        {name:'— AM SESSION (6:30 AM) — Heavy Upper —',detail:'~75 min total',zone:0},
+        {name:'Warm Up',detail:'10 min + band pull-aparts + scap activation',zone:0},
         {name:'Pre-Lift Activation',detail:'6 min: band work + World\'s Greatest Stretch',zone:0},
         {name:'Push Press',detail:`${phaseWk <= 6 ? '5 × 5 @ RPE 7-8 (heavy overhead — primary lift)' : '4 × 5 @ RPE 8 (heavy overhead)'}`,zone:0},
         {name:'Weighted Pull-Ups',detail:'4 × 5 (add weight if 12+ BW reps possible)',zone:0},
@@ -696,28 +709,24 @@ function getBaseWeek(weekNum) {
         {name:'Bench Press',detail:'2 × 5 @ RPE 6-7 (maintenance only — your 285 1RM is already above E15 avg)',zone:0},
         {name:'Pallof Press (anti-rotation)',detail:'3 × 10/side, half-kneeling, resist the twist',zone:0},
         {name:'Suitcase Carry',detail:'3 × 40m one heavy DB (anti-lateral flexion)',zone:0},
-        {name:'Post-Workout Static Stretch',detail:'8 min: lat + pec + child\'s pose + t-spine',zone:0}
+        {name:'Post-Workout Static Stretch',detail:'8 min: lat + pec + child\'s pose + t-spine',zone:0},
+        {name:`— PM SESSION (4:00 PM) — Easy Aerobic ${easyMin + 5} min —`,detail:'Polarized volume',zone:2},
+        {name:'Easy Aerobic Run',detail:`${easyMin + 5} min @ 9:00-9:30/mile Z2${phaseWk >= 7 ? '. Add 4 × 20 sec strides at the end (neuromuscular speed)' : ''}`,zone:2}
       ],
-      duration:'75 min', focus:`📍 WHY: Single heavy upper day (no PM). Push Press is now PRIMARY (heavier than bench) — direct wall ball power-endurance transfer. Single-arm DB Press replaces bench volume because unilateral shoulder pressing = better Hyrox transfer + shoulder stability. Bench dropped to maintenance only (you're already above E15 avg at 285 1RM). Single day = clean recovery for Fri VO2.` },
+      duration:`AM 75 min + PM ${easyMin + 5} min`, focus:`📍 WHY: Block stress day 3 — final hard day of the block. Push Press is now PRIMARY (heavier than bench) — direct wall ball power-endurance transfer. Single-Arm DB Press replaces bench volume because unilateral shoulder pressing = better Hyrox transfer + shoulder stability. PM aerobic dose between Wed double-hard and Fri VO2.` },
 
-    // ===== FRIDAY: VO2 + Easy PM (DOUBLE) =====
-    { day:'Friday', type:'intervals', title: isDeload ? 'AM Easy Run + PM Easy' : 'AM VO2 Max + PM Easy', icon: isDeload ? '🏃' : '🔥', zone: isDeload ? 2 : 5,
+    // ===== FRIDAY: VO2 (SINGLE) =====
+    { day:'Friday', type:'intervals', title: isDeload ? 'Easy Run (Deload)' : 'VO2 Max Intervals', icon: isDeload ? '🏃' : '🔥', zone: isDeload ? 2 : 5,
       exercises: isDeload ? [
-        {name:'— AM SESSION (6:00 AM) — Easy Run —',detail:'Deload week, no VO2',zone:2},
-        {name:'Pre-Run Dynamic',detail:'4 min dynamic warmup',zone:0},
-        {name:'Easy Run',detail:'35-40 min @ Z2 conversational',zone:2},
-        {name:'— PM SESSION (4:00 PM) — Easy Recovery —',detail:`${easyMin} min`,zone:2},
-        {name:'Easy Recovery Run',detail:`${easyMin} min @ Z2`,zone:2}
+        {name:'Pre-Run Dynamic',detail:'4 min',zone:0},
+        {name:'Easy Run',detail:'35-40 min @ Z2 conversational. Deload week.',zone:2}
       ] : [
-        {name:'— AM SESSION (6:00 AM) — VO2 Max —',detail:'~55 min total',zone:5},
         {name:'Pre-Run Dynamic Warmup',detail:'4 min dynamic + 15 min easy + 4 strides',zone:2},
         {name:'VO2 Intervals',detail:vo2Session,zone:5},
         {name:'Cool Down',detail:'10 min easy',zone:1},
-        {name:'Post-Run Static Stretch',detail:'8 min static stretch',zone:0},
-        {name:`— PM SESSION (4:00 PM) — Easy ${easyMin} min —`,detail:'Z2 flush',zone:2},
-        {name:'Easy Recovery Run',detail:`${easyMin} min @ 10:00-10:30/mile. Slower than slow. Doesn\'t add fatigue, adds volume.`,zone:2}
+        {name:'Post-Run Static Stretch',detail:'8 min static',zone:0}
       ],
-      duration: isDeload ? `AM 40 min + PM ${easyMin} min` : `AM 55 min + PM ${easyMin} min`, focus: isDeload ? '📍 WHY: Deload week. Easy aerobic only. Adaptations compile during recovery.' : '📍 WHY: VO2 max needs to climb 53 → 60+ for E15 territory. Norwegian-style longer reps (3-5 min) at vVO2 = highest leverage stimulus. PM easy run is genuinely easy (Z2) — adds volume without compromising Sat sim 14 hours later.' },
+      duration: isDeload ? '40 min' : '55 min', focus: isDeload ? '📍 WHY: Deload week. Easy aerobic only.' : '📍 WHY: VO2 max needs to climb 53 → 60+ for E15 territory. Norwegian-style longer reps (3-5 min) at vVO2 = highest leverage. SINGLE session — protects Sat sim quality with full recovery.' },
 
     // ===== SATURDAY: Sim (SINGLE) =====
     { day:'Saturday', type:'hyrox', title:`Sat Sim — ${satTitle}`, icon:'🏁', zone:4,
@@ -729,13 +738,13 @@ function getBaseWeek(weekNum) {
       ],
       duration:'70-90 min', focus:`📍 WHY: Race format under fatigue = closest stimulus to race day. James Kelly: "the athlete who recovers quickest delivers the best 1000m splits." 4-week rotation prevents adaptation plateau. EMOM is the benchmark to track — burpee count climbs across the phase (150 → 175 → 200+).` },
 
-    // ===== SUNDAY: REST + Dedicated Mobility =====
+    // ===== SUNDAY: REST + Mobility =====
     { day:'Sunday', type:'rest', title:'Full Rest + Sunday Mobility Flow', icon:'😴', zone:0,
       exercises:[
         {name:'Rest',detail:'Full training rest. Sleep 8+ hours. Hydrate. Eat.',zone:0},
         {name:'Sunday Mobility Flow (20-30 min)',detail:'5 min foam roll (IT bands, quads, glutes, lats, t-spine) + 5 min lacrosse ball (pec minor, glute medius, plantar fascia) + 15-20 min flow (pigeon 90s, couch stretch 90s, frog stretch, seated forward fold, thread the needle, banded hip distraction)',zone:0}
       ],
-      duration:'25 min mobility', focus:`📍 WHY: Sunday is the only deep mobility session of the week. Flexibility is a known weak point — 3.5 hrs/wk of mobility (daily + Sunday) is what moves the needle. Linda Meier (World Champion) credits daily mobility for her durability.` }
+      duration:'25 min mobility', focus:`📍 WHY: Sunday is the only deep mobility session of the week. Flexibility is a known weak point — 3.5 hrs/wk of mobility (daily + Sunday) moves the needle. Linda Meier (World Champion) credits daily mobility for her durability.` }
   ];
 }
 
@@ -745,33 +754,33 @@ function getBuildWeek(weekNum) {
   const isDeload = (weekNum === 16);
 
   return [
-    { day:'Monday', type:'run', title:'AM Long Run + Race-Pace Surges + PM Easy', icon:'🛣️', zone:2,
+    { day:'Monday', type:'run', title:'Long Run + Race-Pace Surges', icon:'🛣️', zone:2,
       exercises:[
-        {name:'— AM — Long Run with Surges —',detail:'95 min',zone:3},
         {name:'Pre-Run Dynamic',detail:'4 min',zone:0},
-        {name:'Long Run + Surges',detail:`95 min Z2 base. Middle 20 min = 4 × 4 min @ Tampa doubles goal pace (~7:50/mile), 2 min easy jog between. Race-pace gear-shift practice.`,zone:3},
-        {name:'Post-Run Static',detail:'8 min',zone:0},
-        {name:'— PM — Easy 35 min —',detail:'',zone:2},
-        {name:'Easy Recovery',detail:'35 min Z2',zone:2}
+        {name:'Long Run with Surges',detail:`95 min Z2 base. Middle 20 min = 4 × 4 min @ Tampa doubles goal pace (~7:50/mile), 2 min easy jog between. Race-pace gear-shift practice.`,zone:3},
+        {name:'Post-Run Static',detail:'8 min',zone:0}
       ],
-      duration:'AM 95 min + PM 35 min', focus:'📍 WHY: Race day requires shifting between easy and hard repeatedly. This long run teaches your body to switch gears mid-effort. Surges practice the pace-change skill needed on runs between Tampa stations.' },
+      duration:'95 min', focus:'📍 WHY: Race day requires shifting between easy and hard repeatedly. Surges practice the pace-change skill needed on runs between Tampa stations.' },
 
-    { day:'Tuesday', type:'strength', title:'Heavy Lower — Maintenance', icon:'🏋️', zone:0,
+    { day:'Tuesday', type:'strength', title:'AM Heavy Lower Maintenance + PM Easy', icon:'🏋️', zone:0,
       exercises:[
-        {name:'Warm Up + Pre-Lift Activation',detail:'15 min total',zone:0},
-        {name:'Back Squat',detail:`3 × 3 @ ${isDeload ? '255 lb (70%)' : '310-320 lb (85-88%)'} (maintenance, no PR push in Build)`,zone:0},
+        {name:'— AM —',detail:'Maintenance, not PRs',zone:0},
+        {name:'Warm Up + Pre-Lift',detail:'15 min total',zone:0},
+        {name:'Back Squat',detail:`3 × 3 @ ${isDeload ? '255 lb (70%)' : '310-320 lb (85-88%)'} (maintenance)`,zone:0},
         {name:'Trap Bar DL',detail:'3 × 4 @ 405 lb (85%)',zone:0},
         {name:'Hip Thrust',detail:'3 × 6 @ 320 lb (82%)',zone:0},
         {name:'Bulgarian Split Squat',detail:'3 × 8/leg heavy DBs',zone:0},
         {name:'Plank + Ab Wheel',detail:'3 × 60 sec + 3 × 10',zone:0},
-        {name:'Post-Lift Static',detail:'8 min',zone:0}
+        {name:'Post-Lift Static',detail:'8 min',zone:0},
+        {name:'— PM —',detail:'Z2 flush',zone:2},
+        {name:'Easy Recovery Run',detail:'40 min @ 9:30-10:00/mile',zone:2}
       ],
-      duration:'70 min', focus:'📍 WHY: Strength is BUILT in Base, MAINTAINED in Build. 3×3 @ 85-88% holds neural drive without depleting recovery for threshold + sim quality.' },
+      duration:'AM 70 min + PM 40 min', focus:'📍 WHY: Strength BUILT in Base, MAINTAINED in Build. 3×3 @ 85-88% holds neural drive without depleting recovery for threshold + sim quality.' },
 
     { day:'Wednesday', type:'intervals', title:'AM Longer Threshold + PM Race Weight Stations', icon:'⚡', zone:4,
       exercises:[
-        {name:'— AM — Longer Threshold —',detail:'',zone:4},
-        {name:'Pre-Run Dynamic',detail:'4 min + 10 min easy + 4 strides',zone:2},
+        {name:'— AM —',detail:'',zone:4},
+        {name:'Pre-Run Dynamic',detail:'4 min + 10 min easy + strides',zone:2},
         {name:'Threshold',detail: isDeload ? 'Easy run 30 min Z2 (deload)' :
                                   phaseWk === 1 ? '4 × 1.6km @ 7:20-7:35/mile, 2 min rest' :
                                   phaseWk === 2 ? '3 × 2km @ 7:20-7:35/mile, 2 min rest' :
@@ -785,43 +794,40 @@ function getBuildWeek(weekNum) {
         {name:'Farmers',detail:'4 × 50m @ 2 × 24 kg RACE weight',zone:0},
         {name:'Sandbag Lunge',detail:'3 × 20m @ 20 kg RACE weight',zone:0}
       ],
-      duration:'AM 65 min + PM 55 min', focus:'📍 WHY: Threshold reps move from 1km to 1.6-3km — closer to sustained race effort. PM stations at race weights = your body learns race intensity is normal. By Wk 17 you\'ve done this 4-5 times — race day stations are familiar.' },
+      duration:'AM 65 min + PM 55 min', focus:'📍 WHY: Threshold reps move from 1km to 1.6-3km — closer to sustained race effort. PM stations at race weights = your body learns race intensity is normal.' },
 
-    { day:'Thursday', type:'strength', title:'Heavy Upper — Maintenance', icon:'💪', zone:0,
+    { day:'Thursday', type:'strength', title:'AM Heavy Upper Maintenance + PM Easy', icon:'💪', zone:0,
       exercises:[
+        {name:'— AM —',detail:'Maintenance',zone:0},
         {name:'Warm Up + Pre-Lift',detail:'15 min',zone:0},
         {name:'Push Press',detail:'3 × 3 @ heavy (power-endurance for wall balls)',zone:0},
         {name:'Weighted Pull-Ups',detail:'3 × 6 weighted',zone:0},
         {name:'Single-Arm DB Press',detail:'3 × 6/side heavy',zone:0},
         {name:'Single-Arm Row',detail:'3 × 8/side heavy',zone:0},
         {name:'Pallof Press + Suitcase Carry',detail:'3 × 12/side + 3 × 40m',zone:0},
-        {name:'Post-Lift Static',detail:'8 min',zone:0}
+        {name:'Post-Lift Static',detail:'8 min',zone:0},
+        {name:'— PM —',detail:'Strides + volume',zone:2},
+        {name:'Easy Aerobic',detail:'45 min @ Z2 + 6 × 20 sec strides at end',zone:2}
       ],
-      duration:'65 min', focus:'📍 WHY: Upper maintenance. Hold patterns, don\'t push for PRs in Build phase.' },
+      duration:'AM 65 min + PM 45 min', focus:'📍 WHY: Upper maintenance. Strides keep top-end speed alive while volume builds endurance.' },
 
-    { day:'Friday', type:'intervals', title: isDeload ? 'AM Easy + PM Easy' : 'AM VO2 (Tighter Rest) + PM Easy', icon: isDeload ? '🏃' : '🔥', zone: isDeload ? 2 : 5,
+    { day:'Friday', type:'intervals', title: isDeload ? 'Easy Run' : 'VO2 Max (Tighter Rest)', icon: isDeload ? '🏃' : '🔥', zone: isDeload ? 2 : 5,
       exercises: isDeload ? [
-        {name:'— AM —',detail:'Deload',zone:2},
-        {name:'Easy Run',detail:'40 min Z2',zone:2},
-        {name:'— PM —',detail:'',zone:2},
-        {name:'Easy Recovery',detail:'30 min Z2',zone:2}
+        {name:'Easy Run',detail:'30-40 min Z2',zone:2}
       ] : [
-        {name:'— AM — VO2 (Race-Tight Rest) —',detail:'',zone:5},
         {name:'Pre-Run Dynamic',detail:'4 min + 15 min easy + strides',zone:2},
-        {name:'VO2 Intervals',detail:'5 × 3 min @ vVO2 (~6:50-7:00/mile), 90 sec rest (tighter rest, race-intensity tolerance)',zone:5},
-        {name:'Cool Down + Static',detail:'10 min easy + 8 min static',zone:1},
-        {name:'— PM — Easy 40 min —',detail:'',zone:2},
-        {name:'Easy Recovery',detail:'40 min Z2',zone:2}
+        {name:'VO2 Intervals',detail:'5 × 3 min @ vVO2 (~6:50-7:00/mile), 90 sec rest (tighter — race-intensity tolerance)',zone:5},
+        {name:'Cool Down + Static',detail:'10 min easy + 8 min static',zone:1}
       ],
-      duration: isDeload ? 'AM 40 min + PM 30 min' : 'AM 55 min + PM 40 min', focus: isDeload ? '📍 WHY: Final deload before race block.' : '📍 WHY: VO2 reps stay short but rest shrinks. Race-specific tolerance: hard effort with less recovery = exactly what stations + run combos feel like.' },
+      duration: isDeload ? '40 min' : '55 min', focus: isDeload ? '📍 WHY: Final deload before race block.' : '📍 WHY: VO2 reps stay short, rest shrinks. Race-specific tolerance.' },
 
     { day:'Saturday', type:'hyrox', title:'Full Doubles Sim with Jo', icon:'👥', zone:4,
       exercises:[
         {name:'Pre-Run Dynamic',detail:'15 min + dynamic',zone:2},
-        {name:'Doubles Sim',detail:'Full doubles: 8 × 1km + 8 stations at race intensity, WITH Jo. Practice station switches (every 100-200m on machines). Pacing together — adjust DOWN to slower partner\'s sustainable pace.',zone:4},
+        {name:'Doubles Sim',detail:'Full doubles: 8 × 1km + 8 stations at race intensity, WITH Jo. Practice station switches (every 100-200m on machines). Pacing together.',zone:4},
         {name:'Cool Down + Static',detail:'10 min + 8 min static',zone:1}
       ],
-      duration:'80-90 min', focus:'📍 WHY: This IS the race. Sims with Jo surface every weakness before they cost you on race day. Doubles teams that practice switches + pacing together beat teams that don\'t.' },
+      duration:'80-90 min', focus:'📍 WHY: This IS the race. Sims with Jo surface every weakness before race day.' },
 
     { day:'Sunday', type:'rest', title:'Full Rest + Sunday Mobility', icon:'😴', zone:0,
       exercises:[
@@ -836,35 +842,35 @@ function getBuildWeek(weekNum) {
 function getTampaRaceWeek() {
   return [
     { day:'Monday', type:'run', title:'Easy Shake-Out', icon:'🏃', zone:2,
-      exercises:[{name:'Easy Run',detail:'30-40 min Z2. Nothing harder.',zone:2}],
+      exercises:[{name:'Easy Run',detail:'30-40 min Z2',zone:2}],
       duration:'35 min', focus:'📍 WHY: Race week opens with easy movement.' },
     { day:'Tuesday', type:'strength', title:'Light Lower Activation', icon:'🏋️', zone:0,
       exercises:[
-        {name:'Squat',detail:'3 × 3 @ 255 lb (70%) — feel the bar',zone:0},
+        {name:'Squat',detail:'3 × 3 @ 255 lb (70%)',zone:0},
         {name:'Trap DL',detail:'3 × 5 @ 335 lb (70%)',zone:0},
         {name:'Plank',detail:'2 × 30 sec',zone:0}
       ],
       duration:'30 min', focus:'📍 WHY: Activation wakes neural pathways without depleting glycogen.' },
-    { day:'Wednesday', type:'intervals', title:'Sharp Sharpening Intervals', icon:'⚡', zone:4,
+    { day:'Wednesday', type:'intervals', title:'Sharp Intervals', icon:'⚡', zone:4,
       exercises:[
         {name:'Warm Up',detail:'10 min easy + 4 strides',zone:2},
         {name:'Sharp Intervals',detail:'4 × 400m @ slightly above threshold, 90 sec rest',zone:4},
         {name:'Cool Down',detail:'10 min easy',zone:1}
       ],
-      duration:'40 min', focus:'📍 WHY: Short sharp intervals 48 hr before race. Recovery complete by Friday.' },
+      duration:'40 min', focus:'📍 WHY: Short sharp intervals 48 hr before race.' },
     { day:'Thursday', type:'hyrox', title:'Race Plan Walk-Through with Jo', icon:'🎯', zone:0,
       exercises:[
-        {name:'Wall Ball Skills',detail:'2 × 15 technique only',zone:0},
+        {name:'Wall Ball Skills',detail:'2 × 15 technique',zone:0},
         {name:'Sled Push Light',detail:'2 × 25m @ 50% — feel only',zone:0},
-        {name:'Doubles Walk-Through',detail:'Visualize every transition. Plan station switches.',zone:0},
+        {name:'Doubles Walk-Through',detail:'Visualize every transition. Plan switches.',zone:0},
         {name:'Light Mobility',detail:'10-15 min',zone:0}
       ],
-      duration:'45 min', focus:'📍 WHY: Mental rehearsal day. Walking through with Jo removes race-day decision fatigue.' },
+      duration:'45 min', focus:'📍 WHY: Mental rehearsal day.' },
     { day:'Friday', type:'hyrox', title:'🏁 TAMPA DOUBLES — RACE DAY', icon:'🏆', zone:5,
-      exercises:[{name:'Race Day',detail:'GO EXECUTE WITH JO. Race the plan. Slower partner sets pace. Station switches every 200m. 17 weeks built this.',zone:5}],
-      duration:'~1:07', focus:'📍 WHY: Today is the test. Trust training, execute the plan.' },
+      exercises:[{name:'Race Day',detail:'GO EXECUTE WITH JO. Race the plan. Slower partner sets pace. 17 weeks built this.',zone:5}],
+      duration:'~1:07', focus:'📍 WHY: Today is the test.' },
     { day:'Saturday', type:'rest', title:'Full Recovery', icon:'😴', zone:0,
-      exercises:[{name:'Rest',detail:'Celebrate. Eat. Sleep. Travel home.',zone:0}],
+      exercises:[{name:'Rest',detail:'Celebrate. Eat. Sleep.',zone:0}],
       duration:'—', focus:'📍 WHY: Post-race rest.' },
     { day:'Sunday', type:'rest', title:'Easy Walk', icon:'🚶', zone:1,
       exercises:[{name:'Easy Walk',detail:'30 min walk.',zone:1}],
@@ -877,18 +883,17 @@ function getDallasBuildWeek(weekNum) {
   const phaseWk = weekNum - 18;
 
   if (phaseWk === 1) {
-    // Recovery week after Tampa
     return [
       { day:'Monday', type:'rest', title:'Active Recovery Walk', icon:'🚶', zone:1,
         exercises:[{name:'Easy Walk',detail:'45 min walk',zone:1}],
-        duration:'45 min', focus:'📍 WHY: Post-Tampa recovery. Body first.' },
+        duration:'45 min', focus:'📍 WHY: Post-Tampa recovery.' },
       { day:'Tuesday', type:'strength', title:'Light Lower Reintroduction', icon:'🏋️', zone:0,
         exercises:[
           {name:'Goblet Squat',detail:'3 × 8 moderate',zone:0},
           {name:'RDL',detail:'3 × 6 moderate',zone:0},
           {name:'Lunges',detail:'2 × 10/leg light',zone:0}
         ],
-        duration:'40 min', focus:'📍 WHY: Gentle reintroduction. Body needs 7-10 days to fully heal post-race.' },
+        duration:'40 min', focus:'📍 WHY: Gentle reintroduction.' },
       { day:'Wednesday', type:'run', title:'Easy + Strides', icon:'🏃', zone:2,
         exercises:[
           {name:'Easy Run',detail:'45 min Z2',zone:2},
@@ -913,32 +918,33 @@ function getDallasBuildWeek(weekNum) {
           {name:'Rest',detail:'Full recovery.',zone:0},
           {name:'Sunday Mobility',detail:'25 min mobility flow',zone:0}
         ],
-        duration:'25 min mobility', focus:'📍 WHY: Recovery week rest.' }
+        duration:'25 min mobility', focus:'📍 WHY: Recovery week.' }
     ];
   }
 
-  // Wks 20-21 = Solo race prep with Option A split
   const isLastFullWk = (phaseWk === 2);
   return [
-    { day:'Monday', type:'run', title:`AM Long Run ${isLastFullWk ? 90 : 75} min + PM Easy`, icon:'🛣️', zone:2,
+    { day:'Monday', type:'run', title:`Long Easy Run — ${isLastFullWk ? 90 : 75} min`, icon:'🛣️', zone:2,
       exercises:[
-        {name:'— AM Long Easy —',detail:'',zone:2},
+        {name:'Pre-Run Dynamic',detail:'4 min',zone:0},
         {name:'Long Easy',detail:`${isLastFullWk ? 90 : 75} min @ Z2`,zone:2},
-        {name:'— PM Easy —',detail:'',zone:2},
-        {name:'Easy Recovery',detail:'30 min Z2',zone:2}
+        {name:'Post-Run Static',detail:'8 min',zone:0}
       ],
-      duration:`AM ${isLastFullWk ? 90 : 75} min + PM 30 min`, focus:'📍 WHY: Dallas is solo — every km is yours. Long run rebuilds endurance for 8 × 1km back-to-back.' },
+      duration:`${isLastFullWk ? 90 : 75} min`, focus:'📍 WHY: Dallas is solo — long run rebuilds endurance.' },
 
-    { day:'Tuesday', type:'strength', title:'Heavy Lower Maintenance', icon:'🏋️', zone:0,
+    { day:'Tuesday', type:'strength', title:'AM Heavy Lower Maintenance + PM Easy', icon:'🏋️', zone:0,
       exercises:[
+        {name:'— AM —',detail:'',zone:0},
         {name:'Warm Up + Pre-Lift',detail:'15 min',zone:0},
         {name:'Back Squat',detail:'4 × 4 @ 310 lb (85%)',zone:0},
         {name:'Trap DL',detail:'3 × 5 @ 380 lb (80%)',zone:0},
         {name:'Hip Thrust',detail:'3 × 6 @ 300 lb',zone:0},
         {name:'Lunges',detail:'3 × 12',zone:0},
-        {name:'Plank + Ab Wheel',detail:'3 × 45 sec + 3 × 8',zone:0}
+        {name:'Plank + Ab Wheel',detail:'3 × 45 sec + 3 × 8',zone:0},
+        {name:'— PM —',detail:'',zone:2},
+        {name:'Easy Recovery Run',detail:'35 min Z2',zone:2}
       ],
-      duration:'65 min', focus:'📍 WHY: Maintain strength for Dallas. Hold what you have.' },
+      duration:'AM 65 min + PM 35 min', focus:'📍 WHY: Maintain strength for Dallas.' },
 
     { day:'Wednesday', type:'intervals', title:'AM Threshold + PM Solo Hyrox Stations', icon:'⚡', zone:4,
       exercises:[
@@ -953,36 +959,36 @@ function getDallasBuildWeek(weekNum) {
         {name:'Burpee BJ',detail:'3 × 20m race cadence',zone:0},
         {name:'Sandbag Lunge',detail:'3 × 20m @ 20 kg',zone:0}
       ],
-      duration:'AM 55 min + PM 55 min', focus:'📍 WHY: Dallas is solo — Tampa was doubles where you only did half stations. Solo race-weight practice teaches body what full workload feels like.' },
+      duration:'AM 55 min + PM 55 min', focus:'📍 WHY: Dallas is solo. Solo race-weight practice teaches body full workload.' },
 
-    { day:'Thursday', type:'strength', title:'Heavy Upper Maintenance', icon:'💪', zone:0,
+    { day:'Thursday', type:'strength', title:'AM Heavy Upper Maintenance + PM Easy', icon:'💪', zone:0,
       exercises:[
+        {name:'— AM —',detail:'',zone:0},
         {name:'Warm Up + Pre-Lift',detail:'15 min',zone:0},
         {name:'Push Press',detail:'4 × 4 @ RPE 7-8',zone:0},
         {name:'Pull-Ups',detail:'3 × 6',zone:0},
         {name:'Single-Arm DB Press',detail:'3 × 6/side',zone:0},
         {name:'Row',detail:'3 × 8 heavy',zone:0},
-        {name:'Pallof Press',detail:'3 × 10/side',zone:0}
+        {name:'Pallof Press',detail:'3 × 10/side',zone:0},
+        {name:'— PM —',detail:'',zone:2},
+        {name:'Easy Aerobic',detail:'40 min Z2',zone:2}
       ],
-      duration:'60 min', focus:'📍 WHY: Upper maintenance.' },
+      duration:'AM 65 min + PM 40 min', focus:'📍 WHY: Upper maintenance.' },
 
-    { day:'Friday', type:'intervals', title:'AM Sharp VO2 + PM Easy', icon:'🔥', zone:5,
+    { day:'Friday', type:'intervals', title:'Sharp VO2 Intervals', icon:'🔥', zone:5,
       exercises:[
-        {name:'— AM Sharp VO2 —',detail:'',zone:5},
         {name:'Warm Up',detail:'15 min easy + strides',zone:2},
         {name:'Sharp VO2',detail:'4 × 3 min @ vVO2, 2 min rest',zone:5},
-        {name:'Cool Down',detail:'10 min easy',zone:1},
-        {name:'— PM Easy —',detail:'',zone:2},
-        {name:'Easy Recovery',detail:'35 min Z2',zone:2}
+        {name:'Cool Down',detail:'10 min easy',zone:1}
       ],
-      duration:'AM 50 min + PM 35 min', focus:'📍 WHY: Sharp engine work between Wed PM stations and Sat solo sim.' },
+      duration:'50 min', focus:'📍 WHY: Sharp engine work.' },
 
     { day:'Saturday', type:'hyrox', title:'Half Hyrox SOLO Sim', icon:'🏁', zone:4,
       exercises:[
         {name:'Warm Up',detail:'15 min + dynamic',zone:2},
-        {name:'Solo Half Sim',detail:'4 × (1km + 1 station) at race intensity, SOLO format. Practice solo pacing. Last solo sim before Dallas.',zone:4}
+        {name:'Solo Half Sim',detail:'4 × (1km + 1 station) at race intensity, SOLO format. Practice solo pacing.',zone:4}
       ],
-      duration:'60 min', focus:'📍 WHY: Solo pacing is a learned skill. Final dress rehearsal for Dallas race format.' },
+      duration:'60 min', focus:'📍 WHY: Solo pacing dress rehearsal.' },
 
     { day:'Sunday', type:'rest', title:'Rest + Mobility', icon:'😴', zone:0,
       exercises:[
@@ -1016,12 +1022,12 @@ function getDallasRaceWeek() {
       exercises:[
         {name:'Wall Ball',detail:'2 × 15 technique',zone:0},
         {name:'Sled Push Light',detail:'2 × 25m at 50%',zone:0},
-        {name:'Solo Visualization',detail:'Walk through every station + transition for solo race format. Plan pacing.',zone:0}
+        {name:'Solo Visualization',detail:'Walk through every station + transition.',zone:0}
       ],
-      duration:'30 min', focus:'📍 WHY: Solo race plan walk-through. Every station, every transition is YOURS.' },
+      duration:'30 min', focus:'📍 WHY: Solo race plan walk-through.' },
     { day:'Friday', type:'hyrox', title:'🏁 DALLAS SOLO — RACE DAY', icon:'🏆', zone:5,
-      exercises:[{name:'Race Day',detail:'GO RUN YOUR RACE. Pace yourself. Execute every station. 21 weeks built this.',zone:5}],
-      duration:'~1:08-1:12', focus:'📍 WHY: First serious solo Hyrox attempt with the new program.' },
+      exercises:[{name:'Race Day',detail:'GO RUN YOUR RACE. Pace yourself. 21 weeks built this.',zone:5}],
+      duration:'~1:08-1:12', focus:'📍 WHY: First solo Hyrox.' },
     { day:'Saturday', type:'rest', title:'Full Recovery', icon:'😴', zone:0,
       exercises:[{name:'Rest',detail:'Celebrate. Eat. Sleep.',zone:0}],
       duration:'—', focus:'📍 WHY: Post-race.' },
@@ -1073,16 +1079,10 @@ function getResetWeek(weekNum) {
     ];
   }
 
-  // Wk 24 — light return with Option A pattern
   return [
-    { day:'Monday', type:'run', title:'AM Long 70 min + PM Easy', icon:'🛣️', zone:2,
-      exercises:[
-        {name:'— AM Long —',detail:'',zone:2},
-        {name:'Long Easy',detail:'70 min Z2',zone:2},
-        {name:'— PM Easy —',detail:'',zone:2},
-        {name:'Easy Recovery',detail:'25 min Z2',zone:2}
-      ],
-      duration:'AM 70 min + PM 25 min', focus:'📍 WHY: Light return to structure.' },
+    { day:'Monday', type:'run', title:'Long Easy — 70 min', icon:'🛣️', zone:2,
+      exercises:[{name:'Long Easy',detail:'70 min Z2',zone:2}],
+      duration:'70 min', focus:'📍 WHY: Light return to structure.' },
     { day:'Tuesday', type:'strength', title:'Light Lower', icon:'🏋️', zone:0,
       exercises:[
         {name:'Back Squat',detail:'4 × 5 @ 240 lb (65%, light)',zone:0},
@@ -1120,7 +1120,7 @@ function getResetWeek(weekNum) {
         {name:'Rest',detail:'Full recovery.',zone:0},
         {name:'Sunday Mobility',detail:'25 min flow',zone:0}
       ],
-      duration:'25 min', focus:'📍 WHY: Final rest before Year 2 base starts Wk 25.' }
+      duration:'25 min', focus:'📍 WHY: Final rest before Year 2 base.' }
   ];
 }
 
