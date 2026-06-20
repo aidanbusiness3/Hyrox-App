@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hyrox-v21';
+const CACHE_NAME = 'hyrox-v22';
 
 self.addEventListener('install', e => {
   e.waitUntil(
