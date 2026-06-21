@@ -599,6 +599,25 @@ function isDeloadWeek(weekNum) {
   return [4, 8].includes(weekNum);
 }
 
+// ===== TWO-WEEK WORK-SHIFT OVERLAY (Weeks 1-2: Jun 22 - Jul 5, 2026) =====
+// Aidan's work schedule for the first two weeks. Tells each day when to slot
+// the session around the shift. Day map and training content are unchanged.
+function getWorkShiftNote(weekNum, day) {
+  if (weekNum !== 1 && weekNum !== 2) return null;
+  const notes = {
+    Monday:    'WORK 10:00am to 4:30pm. Do the long run this evening, around 5:00pm. Morning works only if you start by 8:00am.',
+    Tuesday:   'WORK 4:00pm to 10:00pm. Both sessions go before work today. Heavy Lower around 7:30am, Easy Recovery Run around 12:30pm. Out the door by 3:30pm.',
+    Wednesday: 'OFF work. Your only double-hard day lands on a free day. Threshold in the AM, stations in the PM as written.',
+    Thursday:  'OFF work. Heavy Upper in the AM, easy aerobic run in the PM as written.',
+    Friday:    'WORK 4:00pm to 10:00pm. Do VO2 in the morning, around 8:30am. Out the door by 3:30pm.',
+    Saturday:  weekNum === 1
+      ? 'WORK 10:00am to 4:00pm. Do the sim this evening, around 4:45pm. Or before 9:00am if you prefer mornings.'
+      : 'WORK 3:00pm to 10:00pm. Do the sim late morning, around 10:00am. Out the door by 2:00pm.',
+    Sunday:    'WORK 3:00pm to 10:00pm. Rest day either way. Do the mobility flow in the morning.'
+  };
+  return notes[day] || null;
+}
+
 // ===== PHASE 1 — BASE (Weeks 1-12) =====
 function getBaseWeek(weekNum) {
   const isDeload = (weekNum === 4 || weekNum === 8);
@@ -664,7 +683,7 @@ function getBaseWeek(weekNum) {
     satDetail = `Every 3 min × 8 rounds: 400m run + MAX burpees with remaining time. Total burpees = score. Target this week: ${target}+. (Kelly\'s PR: 247)`;
   }
 
-  return [
+  const week = [
     // ===== MONDAY: Long Run (SINGLE) =====
     { day:'Monday', type:'run', title:`Long Easy Run — ${longMin} min`, icon:'🛣️', zone:2,
       exercises:[
@@ -763,6 +782,19 @@ function getBaseWeek(weekNum) {
       ],
       duration:'25 min mobility', focus:`📍 WHY: Sunday is the only deep mobility session of the week. Flexibility is a known weak point — 3.5 hrs/wk of mobility (daily + Sunday) moves the needle. Linda Meier (World Champion) credits daily mobility for her durability.` }
   ];
+
+  // Weeks 1-2 work-shift overlay: Tuesday's easy run moves off the 4:00 PM slot
+  // (Aidan works Tue 4-10pm) to midday, before work. Day-of timing banner is
+  // rendered separately via getWorkShiftNote().
+  if (weekNum === 1 || weekNum === 2) {
+    const tue = week.find(d => d.day === 'Tuesday');
+    if (tue) tue.exercises.forEach(ex => {
+      ex.name = ex.name.replace('PM SESSION (4:00 PM) — Easy Recovery Run', 'PM SESSION (MIDDAY ~12:30 PM) — Easy Recovery Run');
+    });
+    tue.duration = tue.duration.replace('AM 80 min + PM', 'AM 80 min (~7:30am) + midday');
+  }
+
+  return week;
 }
 
 // ===== PHASE 2 — BUILD (Weeks 13-17) =====
@@ -1883,6 +1915,7 @@ function renderToday(overrideDate) {
   else if (todayS <= ATHLETE.goalDate) { nextRaceName = ATHLETE.goalRace; nextRaceDate = ATHLETE.goalDate; }
   const wksToRace = nextRaceDate ? Math.max(0, Dates.weeksUntil(nextRaceDate)) : 0;
   const isDeload = weekNum ? isDeloadWeek(weekNum) : false;
+  const workShift = weekNum ? getWorkShiftNote(weekNum, workout.day) : null;
 
   return `<div class="view">
     <!-- Date Nav -->
@@ -1903,6 +1936,11 @@ function renderToday(overrideDate) {
     <div class="card mb-16" style="background:rgba(232,85,46,.1);border:1px solid rgba(232,85,46,.25);display:flex;align-items:center;gap:10px;padding:12px 14px">
       <span style="font-size:18px">⚠️</span>
       <div><div class="t-sm fw-8 t-accent">Deload Week</div><div class="t-xs t-muted">Pull back ~25% on volume and intensity. This is the gas station, not a setback.</div></div>
+    </div>` : ''}
+    ${workShift ? `
+    <div class="card mb-16" style="background:rgba(59,130,246,.10);border:1px solid rgba(59,130,246,.28);display:flex;align-items:flex-start;gap:10px;padding:12px 14px">
+      <span style="font-size:18px">🕐</span>
+      <div><div class="t-sm fw-8" style="color:#2563EB">Work-Shift Timing</div><div class="t-xs t-muted" style="line-height:1.5">${workShift}</div></div>
     </div>` : ''}
     ${nextRaceName ? `
     <div class="row-between mb-16" style="background:var(--bg2);border-radius:10px;padding:9px 14px">
