@@ -1945,7 +1945,7 @@ function renderToday(overrideDate) {
         return workout.exercises.map((ex, i) => {
         const log = Storage.getExerciseLog(dateStr, i);
         const isLoggable = !ex.zone && ex.name !== 'Full Rest' && ex.name !== 'Rest' && ex.name !== 'Celebrate' && ex.name !== 'Cool Down' && ex.name !== 'Warm Up' && ex.name !== 'Recovery' && ex.name !== 'Gear Check' && ex.name !== 'PRE-RACE' && ex.name !== 'RACE' && ex.name !== 'PACING' && ex.name !== 'STATIONS';
-        const isLiftCard = isLoggable && /^\s*\d+\s*[×x]/.test(ex.detail || '');
+        const isLiftCard = isLoggable && (/^\s*\d+\s*[×x]/.test(ex.detail || '') || /\d\s?RM\b|AMRAP|work up|max (?:strict|reps|effort)|LOG weight|🎯/i.test((ex.name || '') + ' ' + (ex.detail || '')));
 
         // --- Non-lift items: session headers + simple checkable rows (warm-ups, runs, stretches) ---
         if (!isLiftCard) {
