@@ -611,8 +611,8 @@ function getWorkShiftNote(weekNum, day) {
     Thursday:  'OFF work. Heavy Upper in the AM, easy aerobic run in the PM as written.',
     Friday:    'WORK 4:00pm to 10:00pm. Do VO2 in the morning, around 8:30am. Out the door by 3:30pm.',
     Saturday:  weekNum === 1
-      ? 'WORK 10:00am to 4:00pm. Do the sim this evening, around 4:45pm. Or before 9:00am if you prefer mornings.'
-      : 'WORK 3:00pm to 10:00pm. Do the sim late morning, around 10:00am. Out the door by 2:00pm.',
+      ? 'WORK 10:00am to 4:00pm. Sim goes this evening after work, around 4:45pm. A morning sim does not fit: the gym opens 7:00am on weekends and the sim gym is 30-40 min away, so you cannot finish and get back before your 10:00am shift.'
+      : 'WORK 3:00pm to 10:00pm. Sim is late morning. Gym opens 7:00am and is 30-40 min away, so leave home by ~9:00am to start around 9:45am. Done and driving back by ~11:15, easy buffer before your 3:00pm shift.',
     Sunday:    'WORK 3:00pm to 10:00pm. Rest day either way. Do the mobility flow in the morning.'
   };
   return notes[day] || null;
@@ -738,8 +738,7 @@ function getBaseWeek(weekNum) {
         {name:'Warm Up',detail:'10 min + band pull-aparts + scap activation',zone:0},
         {name:'Pre-Lift Activation',detail:'6 min: band work + World\'s Greatest Stretch',zone:0},
         {name:'Push Press',detail:`${phaseWk <= 6 ? '5 × 5 @ RPE 7-8' : '4 × 5 @ RPE 8'} — direct WALL BALL transfer (overhead power-endurance + leg drive)`,zone:0},
-        {name:'Weighted Pull-Ups (Strength)',detail:'3 × 5 weighted (add weight if 12+ BW) — sled pull strength',zone:0},
-        {name:'Pull-Ups AMRAP (Endurance)',detail:'1 × AMRAP bodyweight — target 10+ — pull endurance for fatigued sled pull / late-race pulling',zone:0},
+        {name:'Weighted Pull-Ups',detail:'4 × 6 weighted (add weight if 12+ BW). Make the last set a bodyweight AMRAP to failure. One movement covers sled-pull strength plus pull endurance for late-race pulling.',zone:0},
         {name:'T-Bar Row',detail:'4 × 6 heavy — direct SLED PULL + ROW machine (heavy hinge-and-pull)',zone:0},
         {name:'Landmine Press',detail:'3 × 8/side standing in forward lean — SLED PUSH pattern (true horizontal locked-elbow press, replaces bench because position matches race)',zone:0},
         {name:'Straight-Arm Pulldown',detail:'3 × 12 cable, hinge into it — SKIERG pull phase (the most overlooked Hyrox lift — bench/pull-ups don\'t cover this pattern)',zone:0},
@@ -851,8 +850,7 @@ function getBuildWeek(weekNum) {
         {name:'— AM — Heavy Upper Maintenance —',detail:'Hold station-translated strength',zone:0},
         {name:'Warm Up + Pre-Lift',detail:'15 min',zone:0},
         {name:'Push Press',detail:'3 × 3 @ heavy — wall ball power-endurance',zone:0},
-        {name:'Weighted Pull-Ups (Strength)',detail:'2 × 5 weighted — sled pull strength',zone:0},
-        {name:'Pull-Ups AMRAP (Endurance)',detail:'1 × AMRAP bodyweight — pull endurance maintenance',zone:0},
+        {name:'Weighted Pull-Ups',detail:'3 × 5 weighted, last set a bodyweight AMRAP. Sled-pull strength plus pull endurance maintenance.',zone:0},
         {name:'T-Bar Row',detail:'3 × 5 heavy — sled pull + row machine',zone:0},
         {name:'Landmine Press',detail:'3 × 6/side — sled push position transfer',zone:0},
         {name:'Straight-Arm Pulldown',detail:'3 × 10 — SkiErg pull phase',zone:0},
@@ -1020,8 +1018,7 @@ function getDallasBuildWeek(weekNum) {
         {name:'— AM —',detail:'Solo race prep — station-specific upper',zone:0},
         {name:'Warm Up + Pre-Lift',detail:'15 min',zone:0},
         {name:'Push Press',detail:'4 × 4 @ RPE 7-8 — wall balls',zone:0},
-        {name:'Weighted Pull-Ups (Strength)',detail:'2 × 5 weighted — sled pull',zone:0},
-        {name:'Pull-Ups AMRAP (Endurance)',detail:'1 × AMRAP bodyweight',zone:0},
+        {name:'Weighted Pull-Ups',detail:'3 × 5 weighted, last set a bodyweight AMRAP. Sled-pull strength plus pull endurance.',zone:0},
         {name:'T-Bar Row',detail:'3 × 6 heavy — sled pull + row',zone:0},
         {name:'Landmine Press',detail:'3 × 6/side — sled push',zone:0},
         {name:'Straight-Arm Pulldown',detail:'3 × 10 — SkiErg',zone:0},
