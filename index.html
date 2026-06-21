@@ -81,8 +81,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .ex-simple{padding:12px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
 .ex-simple:last-child{border-bottom:none}
 .pill-pr{background:var(--accent);color:#fff}
-.fill-prev{padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-weight:700;font-size:13px;flex:1}
-.fill-prev:active{opacity:.6}
 .tabs{display:flex;gap:4px;background:var(--bg2);border-radius:10px;padding:3px;margin-bottom:20px}
 .tab{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:700;text-align:center;color:var(--text2);transition:all .15s}
 .tab.active{background:var(--accent);color:#FFF}
@@ -1976,7 +1974,6 @@ function renderToday(overrideDate) {
         // Ghost placeholders = last week's number for the same set (index-aligned)
         const prev = Storage.getPreviousLog(dateStr, ex.name);
         const prevSetsRaw = Array.isArray(prev?.sets) ? prev.sets : null;
-        const hasPrev = !!(prev && (prevSetsRaw ? prevSetsRaw.some(x => x && (x.weight || x.reps)) : (prev.weight || prev.reps)));
         const prevMax = Storage.getMaxWeight(dateStr, ex.name);
         const sessionMax = (Array.isArray(log.sets) ? log.sets : []).reduce((m, s) => { const n = parseFloat(s?.weight); return (!isNaN(n) && n > m) ? n : m; }, 0);
         const isPR = sessionMax > 0 && sessionMax > prevMax;
@@ -2007,10 +2004,7 @@ function renderToday(overrideDate) {
           </div>
           ${why ? `<div class="why-box"><span class="why-label">Why this matters</span><span class="why-text">${why}</span></div>` : ''}
           <div class="cset-grid">${rows}</div>
-          <div class="row" style="gap:8px;margin-top:10px">
-            ${hasPrev ? `<button class="fill-prev" onclick="App.fillLastWeek('${dateStr}',${i},${totalRows},'${nameEsc}')">Fill last week</button>` : ''}
-            <button class="add-set" style="flex:1;margin-top:0" onclick="App.addSet('${dateStr}',${i},'${nameEsc}',${totalRows})">+ Add Set</button>
-          </div>
+          <button class="add-set" onclick="App.addSet('${dateStr}',${i},'${nameEsc}',${totalRows})">+ Add Set</button>
         </div>`;
       }).join('');
       })()}
@@ -2506,23 +2500,6 @@ const App = {
     const sets = this._collectSets(dateStr, index, totalRows);
     sets.push({ weight: '', reps: '', done: false });
     Storage.saveExerciseLog(dateStr, index, { sets, exerciseName: exName });
-    this.refresh();
-  },
-
-  // Drop last week's per-set numbers into the inputs (only fills blanks-> last week's value)
-  fillLastWeek(dateStr, index, totalRows, exName) {
-    const prev = Storage.getPreviousLog(dateStr, exName);
-    if (!prev) return;
-    const prevSets = Array.isArray(prev.sets) ? prev.sets : null;
-    for (let s = 1; s <= totalRows; s++) {
-      const w = prevSets ? (prevSets[s-1]?.weight || '') : (s === 1 ? (prev.weight || '') : '');
-      const r = prevSets ? (prevSets[s-1]?.reps || '') : (s === 1 ? (prev.reps || '') : '');
-      const wi = document.getElementById(`log-w-${index}-${s}`);
-      const ri = document.getElementById(`log-r-${index}-${s}`);
-      if (wi && w) wi.value = w;
-      if (ri && r) ri.value = r;
-    }
-    this.saveLog(dateStr, index, exName, totalRows);
     this.refresh();
   },
 
