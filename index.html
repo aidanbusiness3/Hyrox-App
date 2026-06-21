@@ -64,8 +64,22 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .ex-check.done{background:var(--accent);border-color:var(--accent)}
 .ex-check svg{opacity:0;transition:opacity .15s}
 .ex-check.done svg{opacity:1}
-.set-grid{display:grid;grid-template-columns:32px 1fr 1fr 1fr 36px;gap:6px;align-items:center;margin-top:10px;padding-left:40px}
+.set-grid{display:grid;grid-template-columns:32px 1fr 1fr 36px;gap:6px;align-items:center;margin-top:10px;padding-left:40px}
 .set-grid-header{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;text-align:center}
+.ex-badge{width:26px;height:26px;min-width:26px;border-radius:7px;background:var(--bg3);color:var(--text);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+.pill-muted{background:var(--bg2);color:var(--text2)}
+.why-box{border-left:3px solid var(--accent);background:var(--accent-dim);border-radius:0 8px 8px 0;padding:8px 12px;margin-top:10px}
+.why-label{color:var(--accent);font-weight:800;text-transform:uppercase;font-size:9px;letter-spacing:.6px;display:block;margin-bottom:2px}
+.why-text{font-size:12.5px;color:var(--text);line-height:1.45}
+.cset-grid{display:grid;grid-template-columns:26px 1fr 1fr 30px;gap:8px;align-items:center;row-gap:9px;margin-top:12px}
+.set-check{width:26px;height:26px;min-width:26px;border-radius:50%;border:2px solid var(--text3);display:flex;align-items:center;justify-content:center;background:var(--surface);transition:all .15s;margin:0 auto}
+.set-check.on{background:var(--accent);border-color:var(--accent)}
+.set-check svg{opacity:0;stroke:#fff;transition:opacity .15s}
+.set-check.on svg{opacity:1}
+.add-set{width:100%;padding:10px;border-radius:10px;border:1px dashed var(--border);background:transparent;color:var(--text2);font-weight:700;font-size:13px;margin-top:10px}
+.add-set:active{opacity:.6}
+.ex-simple{padding:12px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.ex-simple:last-child{border-bottom:none}
 .tabs{display:flex;gap:4px;background:var(--bg2);border-radius:10px;padding:3px;margin-bottom:20px}
 .tab{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:700;text-align:center;color:var(--text2);transition:all .15s}
 .tab.active{background:var(--accent);color:#FFF}
@@ -167,9 +181,9 @@ const ATHLETE = {
   goalTimeStretch: '1:05:00', // Stretch — if everything clicks
   goalTimeDream: '0:59:59',   // Dream — sub-1 hour, elite territory
   prTime: '1:15:09',
-  pr5K: null,                 // Baseline TT: Sat 2026-05-23 (16 days before plan starts). Goal progression sub-21 → sub-19 → sub-18.
-  pr5KDate: '2026-05-23',     // Scheduled baseline test
-  currentWeeklyMileage: 25,   // Baseline May 2026. Foundation progresses to 35, Build to 47.
+  pr5K: null,                 // No pre-program baseline. First benchmark Wk 8 (Aug 10). Goal progression sub-21 → sub-19 → sub-18.
+  pr5KDate: '2026-08-10',     // Wk 8 benchmark (end of first build block), re-test Wk 12
+  currentWeeklyMileage: 25,   // Starting volume. Base phase progresses to 50 mi/wk by Wk 12.
 
   trainingStart: '2026-06-22',
   totalWeeks: 24,
@@ -518,10 +532,10 @@ const WORKOUT_DETAILS = {
 };
 
 // =============================================
-// 26-WEEK TRAINING PLAN GENERATOR
-// Start: May 25, 2026 (Mon) — moved up 2 weeks (Aidan back from LA early)
-// Race 1: Tampa Mixed Doubles  — Fri Oct 23, 2026 (Week 22)
-// Race 2: Dallas Solo (A-race) — Fri Nov 20, 2026 (Week 26)
+// 24-WEEK TRAINING PLAN GENERATOR
+// Start: Jun 22, 2026 (Mon) — Week 1, full throttle, no baseline block
+// Race 1: Tampa Mixed Doubles  — Fri Oct 23, 2026 (Week 18)
+// Race 2: Dallas Solo (A-race) — Fri Nov 20, 2026 (Week 22)
 // =============================================
 
 // ===== AIDAN ELITE 15 TRAJECTORY — 24-week plan =====
@@ -1168,6 +1182,54 @@ function generateTrainingPlan() {
 
 const TRAINING_PLAN = generateTrainingPlan();
 
+// Read the prescribed number of sets from a detail string like "5 × 5 @ 275 lb"
+// or "4 × 25 reps". Returns 1 when there's no leading "N ×" pattern. Capped at 10.
+function parseSetCount(detail) {
+  if (!detail) return 1;
+  const m = detail.match(/^\s*(\d+)\s*[×x]\s*/);
+  if (!m) return 1;
+  const n = parseInt(m[1], 10);
+  if (!n || n < 1) return 1;
+  return Math.min(n, 10);
+}
+
+// Read the reps token from "N × M ..." (e.g. "5 × 5 @ 275" -> "5", "4 × 25 reps" -> "25",
+// "3 × 8/leg" -> "8/leg", "3 × 45 sec" -> "45 sec"). Empty string if none.
+function parseReps(detail) {
+  if (!detail) return '';
+  const m = detail.match(/[×x]\s*([0-9][0-9\-–]*(?:\s?(?:reps?|sec|min|m))?(?:\/(?:leg|side))?)/i);
+  return m ? m[1].trim() : '';
+}
+
+// One-sentence training rationale per exercise (keyword-matched so name variants all resolve).
+// Order matters: specific patterns before general ones.
+function exerciseWhy(name) {
+  const n = (name || '').toLowerCase();
+  const has = (...k) => k.some(x => n.includes(x));
+  if (has('sandbag')) return 'Race station: groove the 100m lunge pattern at weight so race day feels rehearsed, not new.';
+  if (has('bulgarian') || has('split squat') || has('lunge')) return 'Single-leg strength feeds straight into the sandbag lunge and keeps both legs balanced under fatigue.';
+  if (has('hip thrust')) return 'Direct glute power for sled-push drive and the hip extension behind every running stride.';
+  if (has('nordic')) return 'Eccentric hamstring strength roughly halves running-injury risk (Petushek 2019) and adds push-off power.';
+  if (has('rdl') || has('deadlift') || has('trap') || has('hinge')) return 'Posterior-chain hinge that powers the sled pull and armors your back for fatigued running.';
+  if (has('goblet')) return 'Lighter squat pattern to groove depth and bracing before the heavy work.';
+  if (has('squat') || has('hack') || has('pendulum')) return 'Heavy squats build the raw leg drive behind your 152 kg sled push — your single biggest race carryover.';
+  if (has('box jump') || has('jump')) return 'Explosive plyometrics sharpen running economy (Blagrove 2018) — more speed per stride for free.';
+  if (has('calf')) return 'Strong calves drive the sled push and absorb impact across 8 km of running.';
+  if (has('plank') || has('ab wheel') || has('pallof') || has('dead bug')) return 'Anti-rotation, anti-extension core keeps your trunk solid during carries, lunges, and tired running.';
+  if (has('push press')) return "Overhead power-endurance is the wall-ball engine — so 100 throws don't crush your shoulders late in the race.";
+  if (has('landmine')) return 'Trains the exact forward-lean pressing angle of the sled push — true position transfer.';
+  if (has('straight-arm') || has('pulldown') || has('skierg')) return 'Builds the lat-driven pull of the SkiErg — the pattern bench and pull-ups miss.';
+  if (has('weighted pull') || has('pull-up') || has('pullup') || has('pull up')) return 'Vertical pulling strength is your sled-pull power and late-race grip insurance.';
+  if (has('t-bar') || has('row')) return 'Heavy horizontal pulling means a faster sled pull and a stronger row-machine split.';
+  if (has('db press') || has('bench') || has('press')) return 'Pressing strength and shoulder durability for high-volume wall-ball overhead work.';
+  if (has('farmer')) return "Grip and trap endurance so the farmer's-carry station never becomes your bottleneck.";
+  if (has('wall ball')) return 'High-rep wall-ball volume is the highest-leverage station work for your finish time (Owen Silver protocol).';
+  if (has('sled push')) return 'Rehearse the 152 kg push so race-day load feels familiar — pure specificity.';
+  if (has('sled pull')) return 'Grooves the hand-over-hand pull rhythm and builds the back strength it demands.';
+  if (has('burpee')) return 'Steady-cadence burpee broad jumps train the station that spikes your heart rate most — pace, never sprint.';
+  return '';
+}
+
 // =============================================
 // LOCAL STORAGE WRAPPER
 // =============================================
@@ -1362,8 +1424,9 @@ const Storage = {
       const w = data.completedWorkouts[d];
       if (!w.logs) continue;
       for (const [idx, log] of Object.entries(w.logs)) {
-        // Match by checking if we stored the exercise name
-        if (log.exerciseName === exerciseName && (log.weight || log.reps)) return log;
+        if (log.exerciseName !== exerciseName) continue;
+        const hasSetData = Array.isArray(log.sets) && log.sets.some(s => s && (s.weight || s.reps));
+        if (hasSetData || log.weight || log.reps) return log;
       }
     }
     return null;
@@ -1459,12 +1522,12 @@ const Dates = {
   },
   
   getCurrentWeek() {
-    const start = new Date('2026-05-25T00:00:00');
+    const start = new Date('2026-06-22T00:00:00');
     const now = new Date();
     now.setHours(0, 0, 0, 0);
     const diff = now - start;
     const weekNum = Math.floor(diff / (1000 * 60 * 60 * 24 * 7)) + 1;
-    return Math.max(1, Math.min(26, weekNum));
+    return Math.max(1, Math.min(24, weekNum));
   },
   
   getTodayWorkout() {
@@ -1841,14 +1904,20 @@ function renderToday(overrideDate) {
     <div class="label">Exercises</div>
     <div class="mb-24">
       ${(() => {
+        let liftIdx = 0;
         return workout.exercises.map((ex, i) => {
-        const isDone = Storage.isExerciseComplete(dateStr, i);
         const log = Storage.getExerciseLog(dateStr, i);
         const isLoggable = !ex.zone && ex.name !== 'Full Rest' && ex.name !== 'Rest' && ex.name !== 'Celebrate' && ex.name !== 'Cool Down' && ex.name !== 'Warm Up' && ex.name !== 'Recovery' && ex.name !== 'Gear Check' && ex.name !== 'PRE-RACE' && ex.name !== 'RACE' && ex.name !== 'PACING' && ex.name !== 'STATIONS';
+        const isLiftCard = isLoggable && /^\s*\d+\s*[×x]/.test(ex.detail || '');
 
-        return `<div class="ex-row">
-          <div class="row" onclick="App.toggleExercise('${dateStr}',${i},this.closest('.ex-row'))">
-            <div class="ex-check ${isDone ? 'done' : ''}">
+        // --- Non-lift items: session headers + simple checkable rows (warm-ups, runs, stretches) ---
+        if (!isLiftCard) {
+          if (/^\s*—/.test(ex.name)) {
+            return `<div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin:18px 0 6px">${ex.name.replace(/—/g,'').trim()}</div>`;
+          }
+          const isDone = Storage.isExerciseComplete(dateStr, i);
+          return `<div class="ex-simple">
+            <div class="ex-check ${isDone ? 'done' : ''}" onclick="App.toggleExercise('${dateStr}',${i},this.closest('.ex-simple'))">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${isDone ? '#FFF' : '#1E1A16'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <div style="flex:1;min-width:0">
@@ -1856,25 +1925,47 @@ function renderToday(overrideDate) {
               <div class="t-xs t-muted mt-4">${ex.detail}</div>
             </div>
             ${ex.zone ? `<span class="pill z${ex.zone}">Z${ex.zone}</span>` : ''}
+          </div>`;
+        }
+
+        // --- Lift card (style C) ---
+        const letter = String.fromCharCode(65 + (liftIdx++));
+        const nSets = parseSetCount(ex.detail);
+        const reps = parseReps(ex.detail);
+        const why = exerciseWhy(ex.name);
+        const nameEsc = ex.name.replace(/'/g,"\\'");
+        const logSets = Array.isArray(log.sets) ? log.sets : [];
+        const totalRows = Math.max(nSets, logSets.length); // grows with Add Set
+        // Ghost placeholders = last week's number for the same set (index-aligned)
+        const prev = Storage.getPreviousLog(dateStr, ex.name);
+        const prevSetsRaw = Array.isArray(prev?.sets) ? prev.sets : null;
+        const phW = (s) => (prevSetsRaw ? prevSetsRaw[s-1]?.weight : (prev?.weight)) || 'lbs';
+        const phR = (s) => (prevSetsRaw ? prevSetsRaw[s-1]?.reps : (prev?.reps)) || 'reps';
+        const getW = (s) => logSets[s-1]?.weight || '';
+        const getR = (s) => logSets[s-1]?.reps || '';
+        const isOn = (s) => logSets[s-1]?.done ? 'on' : '';
+        let rows = '';
+        for (let s = 1; s <= totalRows; s++) {
+          rows += `<div class="set-num">${s < 10 ? '0' + s : s}</div>
+            <input class="input" type="text" inputmode="decimal" placeholder="${phW(s)}" id="log-w-${i}-${s}" value="${getW(s)}" onchange="App.saveLog('${dateStr}',${i},'${nameEsc}',${totalRows})" style="font-size:13px;padding:8px 6px">
+            <input class="input" type="text" inputmode="numeric" placeholder="${phR(s)}" id="log-r-${i}-${s}" value="${getR(s)}" onchange="App.saveLog('${dateStr}',${i},'${nameEsc}',${totalRows})" style="font-size:13px;padding:8px 6px">
+            <div class="set-check ${isOn(s)}" onclick="App.toggleSet('${dateStr}',${i},${s},${totalRows},'${nameEsc}',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>`;
+        }
+        return `<div class="card mb-14">
+          <div class="row" style="align-items:flex-start;gap:10px">
+            <div style="flex:1;min-width:0">
+              <div class="t-md fw-8">${ex.name}</div>
+              <div class="t-xs t-muted mt-4">${ex.detail}</div>
+            </div>
+            <div class="ex-badge">${letter}</div>
           </div>
-          ${isLoggable ? `
-          ${(() => {
-            const prev = Storage.getPreviousLog(dateStr, ex.name);
-            return prev ? `<div class="t-xs t-faint" style="padding-left:40px;margin-top:6px">Last: ${prev.weight ? prev.weight + ' lbs' : ''}${prev.weight && prev.reps ? ' × ' : ''}${prev.reps || ''}${prev.sets ? ' · ' + prev.sets + ' sets' : ''}</div>` : '';
-          })()}
-          <div class="set-grid" style="margin-top:${Storage.getPreviousLog(dateStr, ex.name) ? '6' : '10'}px">
-            <div class="set-grid-header"></div>
-            <div class="set-grid-header">Weight</div>
-            <div class="set-grid-header">Reps</div>
-            <div class="set-grid-header">Sets</div>
-            <div class="set-grid-header"></div>
-            <div class="set-num">1</div>
-            <input class="input" type="text" inputmode="decimal" placeholder="lbs" id="log-w-${i}" value="${log.weight||''}" onchange="App.saveLog('${dateStr}',${i},'${ex.name.replace(/'/g,"\\'")}')" style="font-size:13px;padding:8px 4px">
-            <input class="input" type="text" inputmode="numeric" placeholder="reps" id="log-r-${i}" value="${log.reps||''}" onchange="App.saveLog('${dateStr}',${i},'${ex.name.replace(/'/g,"\\'")}')" style="font-size:13px;padding:8px 4px">
-            <input class="input" type="text" inputmode="numeric" placeholder="sets" id="log-s-${i}" value="${log.sets||''}" onchange="App.saveLog('${dateStr}',${i},'${ex.name.replace(/'/g,"\\'")}')" style="font-size:13px;padding:8px 4px">
-            <div></div>
+          <div class="row" style="gap:6px;margin-top:8px">
+            <span class="pill pill-muted">Sets: ${nSets}</span>
+            ${reps ? `<span class="pill pill-muted">Reps: ${reps}</span>` : ''}
           </div>
-          ` : ''}
+          ${why ? `<div class="why-box"><span class="why-label">Why this matters</span><span class="why-text">${why}</span></div>` : ''}
+          <div class="cset-grid">${rows}</div>
+          <button class="add-set" onclick="App.addSet('${dateStr}',${i},'${nameEsc}',${totalRows})">+ Add Set</button>
         </div>`;
       }).join('');
       })()}
@@ -1936,7 +2027,7 @@ function renderCalendar() {
 
   return `<div class="view">
     <div class="t-xl fw-9 mb-4">Plan</div>
-    <div class="t-sm t-muted mb-24">30 weeks to Dallas · Nov 21, 2026</div>
+    <div class="t-sm t-muted mb-24">24-week plan · Tampa Oct 23 · Dallas Nov 20, 2026</div>
 
     <!-- Phase pills (tappable) -->
     <div class="row mb-24" style="gap:6px;flex-wrap:wrap">
@@ -2040,8 +2131,8 @@ function renderStats() {
       <div class="metric"><span class="t-sm t-muted">LT Pace</span><span class="t-sm fw-7 tabular">${ATHLETE.ltPacePerMile}/mile @ ${ATHLETE.ltHeartRate}bpm</span></div>
       <div class="metric"><span class="t-sm t-muted">Easy Pace</span><span class="t-sm fw-7 tabular">${ATHLETE.easyPacePerMile}/mile</span></div>
       <div class="metric"><span class="t-sm t-muted">Bench 1RM</span><span class="t-sm fw-7 tabular">${ATHLETE.benchPress1RM} lbs</span></div>
-      <div class="metric"><span class="t-sm t-muted">5K PR</span><span class="t-sm fw-7 tabular">${ATHLETE.pr5K || '— (TT Sat May 23)'}</span></div>
-      <div class="metric"><span class="t-sm t-muted">Weekly Mileage</span><span class="t-sm fw-7 tabular">${ATHLETE.currentWeeklyMileage} mi → 47 by Wk 14</span></div>
+      <div class="metric"><span class="t-sm t-muted">5K PR</span><span class="t-sm fw-7 tabular">${ATHLETE.pr5K || '— (benchmark Wk 8)'}</span></div>
+      <div class="metric"><span class="t-sm t-muted">Weekly Mileage</span><span class="t-sm fw-7 tabular">${ATHLETE.currentWeeklyMileage} mi → 50 by Wk 12</span></div>
       <div class="metric"><span class="t-sm t-muted">Hyrox PR</span><span class="t-sm fw-7 tabular">${ATHLETE.prTime}</span></div>
       <div class="metric"><span class="t-sm t-muted">A Goal</span><span class="t-sm fw-7 t-accent">Sub ${ATHLETE.goalTimeA}</span></div>
       <div class="metric"><span class="t-sm t-muted">Stretch</span><span class="t-sm fw-7" style="color:var(--orange)">Sub ${ATHLETE.goalTimeStretch}</span></div>
@@ -2154,8 +2245,8 @@ function renderStats() {
       <div class="t-xs t-muted" style="line-height:1.6">Phoenix <strong>-31s</strong> · Houston <strong>-29s</strong> — actively FASTER than goal both races. Don't over-train. Just maintain.</div>
     </div>
     <div class="card mb-24" style="padding:14px 16px">
-      <div class="t-sm fw-7 mb-4">🔄 Friday Rotation (4-week cycle)</div>
-      <div class="t-xs t-muted" style="line-height:1.6">Friday compromised session rotates through your weak stations:<br>• <strong>Wk A</strong> — Burpee BJ Focus (×2 touches)<br>• <strong>Wk B</strong> — Wall Ball Focus (heavy volume)<br>• <strong>Wk C</strong> — Row + Sled Pull (technique)<br>• <strong>Wk D</strong> — Lunges + SkiErg<br><br>Each station gets ~2 dedicated sessions per phase. Burpee BJ + Wall Balls also get accessory work on Thursday lift days.</div>
+      <div class="t-sm fw-7 mb-4">🔄 Saturday Sim Rotation (4-week cycle)</div>
+      <div class="t-xs t-muted" style="line-height:1.6">Saturday race-format session rotates so adaptation never plateaus:<br>• <strong>Wk A</strong> (1,5,9) — Mini Sim: 4×(1km @ race pace + 1 station)<br>• <strong>Wk B</strong> (2,6,10) — Compromised Intervals: 5×(1km @ threshold + 30 wall balls)<br>• <strong>Wk C</strong> (3,7,11) — Half Hyrox Sim: 4×1km + 4 stations @ 85%<br>• <strong>Wk D</strong> (4,8,12) — James Kelly EMOM: 8×3min (400m + max burpees)<br><br>Friday is the standalone VO2 session — kept single so Saturday's sim stays fresh.</div>
     </div>
 
     <div class="label">Training Philosophy — Research-Backed</div>
@@ -2165,11 +2256,11 @@ function renderStats() {
     </div>
     <div class="card mb-12" style="padding:14px 16px">
       <div class="t-sm fw-7 mb-4">📈 The Two Levers</div>
-      <div class="t-xs t-muted" style="line-height:1.6"><strong>1. Aerobic volume:</strong> Currently 25 mi/wk → target 47 by Week 14. Owen Silver went 1:04 → 1:00 in 6 months by going 10K → 60K/wk.<br><strong>2. Threshold capacity:</strong> Foundation Wed = threshold intervals (3-5 × 6-8 min). Build phase adds VO2 4×4. Lauren Weeks (3× world champ) calls threshold "the anchor."</div>
+      <div class="t-xs t-muted" style="line-height:1.6"><strong>1. Aerobic volume:</strong> 25 mi/wk → target 50 by Week 12 (Base phase). Owen Silver went 1:04 → 1:00 in 6 months by going 10K → 60K/wk.<br><strong>2. Threshold capacity:</strong> Base Wed = threshold intervals building 4×800m → 8×1km (Owen Silver benchmark). Fri = VO2 max. Lauren Weeks (3× world champ) calls threshold "the anchor."</div>
     </div>
     <div class="card mb-12" style="padding:14px 16px">
       <div class="t-sm fw-7 mb-4">🏋️ Strength — Heavy, Not Hypertrophy</div>
-      <div class="t-xs t-muted" style="line-height:1.6">Squat / DL / Hip Thrust at <strong>3×3-5 @ 85-92% 1RM</strong>. Blagrove 2018 meta-analysis: heavy strength improves running economy with large effect size (SMD = -1.42). Roncevic: "get stronger, not build muscles."<br><br><strong>4-week progression cycle:</strong><br>• Wk 1: Find 3RM (baseline)<br>• Wk 2: 3×3 @ 95%<br>• Wk 3: 3×3 @ 100% (PR test)<br>• Wk 4: DELOAD 3×5 @ 80%<br>• Wk 5+: Add 5 lb, restart cycle<br><br>Doubles phase (Wk 13+) = maintenance only (3×3 @ 85%).</div>
+      <div class="t-xs t-muted" style="line-height:1.6">Squat / DL / Hip Thrust at <strong>3×3-5 @ 85-92% 1RM</strong>. Blagrove 2018 meta-analysis: heavy strength improves running economy with large effect size (SMD = -1.42). Roncevic: "get stronger, not build muscles."<br><br><strong>Base progression (Wks 1-12):</strong><br>• Wks 1-3: Squat 5×5 @ 75-80% (start full-throttle, loads already known)<br>• Wks 5-7: 5×5 @ 80-85%, add 5-10 lb when top set hits RPE 7<br>• Wks 9-11: 4×4 @ 85-90% (heavier, neural)<br>• Wk 12: New 3RM test (target +5-10 lb)<br>• Wks 4 & 8: DELOAD 3×5 @ 70%<br><br>Build phase (Wk 13+) = maintenance only (3×3 @ 85%).</div>
     </div>
     <div class="card mb-12" style="padding:14px 16px">
       <div class="t-sm fw-7 mb-4">😤 Compromised Running — Daily</div>
@@ -2181,7 +2272,7 @@ function renderStats() {
     </div>
     <div class="card mb-24" style="padding:14px 16px">
       <div class="t-sm fw-7 mb-4">⏱️ 5K Time Trial — Engine Benchmark</div>
-      <div class="t-xs t-muted" style="line-height:1.6"><strong>Baseline TT: Sat ${Dates.formatDate(ATHLETE.pr5KDate)}</strong> (2 days before plan starts Mon 2026-05-25). Re-test Wk 8 (end of Foundation). Elite 15 prereq sub-17:00. Realistic progression: sub-21 → sub-19 → sub-18. ${ATHLETE.pr5K ? `<br><strong>Current PR: ${ATHLETE.pr5K}</strong>` : '<br>No PR set yet.'}</div>
+      <div class="t-xs t-muted" style="line-height:1.6">No pre-program baseline — we start training Week 1, full throttle. First benchmark at <strong>Wk 8</strong> (Aug 10), re-test Wk 12. Elite 15 prereq sub-17:00. Realistic progression: sub-21 → sub-19 → sub-18. ${ATHLETE.pr5K ? `<br><strong>Current PR: ${ATHLETE.pr5K}</strong>` : '<br>No PR set yet.'}</div>
     </div>
 
     <div class="label">Run + Roxzone Formula</div>
@@ -2340,11 +2431,45 @@ const App = {
     if (name) { name.style.textDecoration = done ? 'line-through' : ''; name.style.opacity = done ? '.4' : ''; }
   },
 
-  saveLog(dateStr, index, exName) {
-    const w = document.getElementById('log-w-'+index)?.value || '';
-    const r = document.getElementById('log-r-'+index)?.value || '';
-    const s = document.getElementById('log-s-'+index)?.value || '';
-    Storage.saveExerciseLog(dateStr, index, {weight:w, reps:r, sets:s, exerciseName: exName});
+  // Read every set row from the DOM, preserving each set's done flag from storage
+  _collectSets(dateStr, index, totalRows) {
+    const existing = Storage.getExerciseLog(dateStr, index);
+    const exSets = Array.isArray(existing.sets) ? existing.sets : [];
+    const sets = [];
+    for (let s = 1; s <= totalRows; s++) {
+      const w = document.getElementById(`log-w-${index}-${s}`)?.value || '';
+      const r = document.getElementById(`log-r-${index}-${s}`)?.value || '';
+      sets.push({ weight: w, reps: r, done: exSets[s-1]?.done || false });
+    }
+    return sets;
+  },
+
+  saveLog(dateStr, index, exName, totalRows) {
+    totalRows = totalRows || 1;
+    const sets = this._collectSets(dateStr, index, totalRows);
+    Storage.saveExerciseLog(dateStr, index, { sets, exerciseName: exName });
+  },
+
+  toggleSet(dateStr, index, setIndex, totalRows, exName, el) {
+    const sets = this._collectSets(dateStr, index, totalRows);
+    if (sets[setIndex-1]) sets[setIndex-1].done = !sets[setIndex-1].done;
+    Storage.saveExerciseLog(dateStr, index, { sets, exerciseName: exName });
+    el.classList.toggle('on');
+  },
+
+  addSet(dateStr, index, exName, totalRows) {
+    const sets = this._collectSets(dateStr, index, totalRows);
+    sets.push({ weight: '', reps: '', done: false });
+    Storage.saveExerciseLog(dateStr, index, { sets, exerciseName: exName });
+    this.refresh();
+  },
+
+  refresh() {
+    const app = document.getElementById('app');
+    const y = app ? app.scrollTop : 0;
+    this.navigate(this.currentView);
+    const a2 = document.getElementById('app');
+    if (a2) a2.scrollTop = y;
   },
 
   saveRunStats(dateStr) {
