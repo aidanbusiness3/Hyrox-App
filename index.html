@@ -80,6 +80,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .add-set:active{opacity:.6}
 .ex-simple{padding:12px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
 .ex-simple:last-child{border-bottom:none}
+.pill-pr{background:var(--accent);color:#fff}
+.fill-prev{padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-weight:700;font-size:13px;flex:1}
+.fill-prev:active{opacity:.6}
 .tabs{display:flex;gap:4px;background:var(--bg2);border-radius:10px;padding:3px;margin-bottom:20px}
 .tab{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:700;text-align:center;color:var(--text2);transition:all .15s}
 .tab.active{background:var(--accent);color:#FFF}
@@ -1212,21 +1215,21 @@ function exerciseWhy(name) {
   if (has('nordic')) return 'Eccentric hamstring strength roughly halves running-injury risk (Petushek 2019) and adds push-off power.';
   if (has('rdl') || has('deadlift') || has('trap') || has('hinge')) return 'Posterior-chain hinge that powers the sled pull and armors your back for fatigued running.';
   if (has('goblet')) return 'Lighter squat pattern to groove depth and bracing before the heavy work.';
-  if (has('squat') || has('hack') || has('pendulum')) return 'Heavy squats build the raw leg drive behind your 152 kg sled push — your single biggest race carryover.';
-  if (has('box jump') || has('jump')) return 'Explosive plyometrics sharpen running economy (Blagrove 2018) — more speed per stride for free.';
+  if (has('squat') || has('hack') || has('pendulum')) return 'Heavy squats build the raw leg drive behind your 152 kg sled push, your single biggest race carryover.';
+  if (has('box jump') || has('jump')) return 'Explosive plyometrics sharpen running economy (Blagrove 2018), more speed per stride for free.';
   if (has('calf')) return 'Strong calves drive the sled push and absorb impact across 8 km of running.';
   if (has('plank') || has('ab wheel') || has('pallof') || has('dead bug')) return 'Anti-rotation, anti-extension core keeps your trunk solid during carries, lunges, and tired running.';
   if (has('push press')) return "Overhead power-endurance is the wall-ball engine — so 100 throws don't crush your shoulders late in the race.";
-  if (has('landmine')) return 'Trains the exact forward-lean pressing angle of the sled push — true position transfer.';
-  if (has('straight-arm') || has('pulldown') || has('skierg')) return 'Builds the lat-driven pull of the SkiErg — the pattern bench and pull-ups miss.';
+  if (has('landmine')) return 'Trains the exact forward-lean pressing angle of the sled push. True position transfer.';
+  if (has('straight-arm') || has('pulldown') || has('skierg')) return 'Builds the lat-driven pull of the SkiErg, the pattern bench and pull-ups miss.';
   if (has('weighted pull') || has('pull-up') || has('pullup') || has('pull up')) return 'Vertical pulling strength is your sled-pull power and late-race grip insurance.';
   if (has('t-bar') || has('row')) return 'Heavy horizontal pulling means a faster sled pull and a stronger row-machine split.';
   if (has('db press') || has('bench') || has('press')) return 'Pressing strength and shoulder durability for high-volume wall-ball overhead work.';
   if (has('farmer')) return "Grip and trap endurance so the farmer's-carry station never becomes your bottleneck.";
   if (has('wall ball')) return 'High-rep wall-ball volume is the highest-leverage station work for your finish time (Owen Silver protocol).';
-  if (has('sled push')) return 'Rehearse the 152 kg push so race-day load feels familiar — pure specificity.';
+  if (has('sled push')) return 'Rehearse the 152 kg push so race-day load feels familiar. Pure specificity.';
   if (has('sled pull')) return 'Grooves the hand-over-hand pull rhythm and builds the back strength it demands.';
-  if (has('burpee')) return 'Steady-cadence burpee broad jumps train the station that spikes your heart rate most — pace, never sprint.';
+  if (has('burpee')) return 'Steady-cadence burpee broad jumps train the station that spikes your heart rate most. Pace, never sprint.';
   return '';
 }
 
@@ -1430,6 +1433,21 @@ const Storage = {
       }
     }
     return null;
+  },
+
+  // Heaviest weight ever logged for an exercise BEFORE the given date (for PR detection)
+  getMaxWeight(currentDateStr, exerciseName) {
+    const data = this._load();
+    let max = 0;
+    for (const [d, w] of Object.entries(data.completedWorkouts)) {
+      if (d >= currentDateStr || !w.logs) continue;
+      for (const log of Object.values(w.logs)) {
+        if (log.exerciseName !== exerciseName) continue;
+        const sets = Array.isArray(log.sets) ? log.sets : [{ weight: log.weight }];
+        for (const s of sets) { const n = parseFloat(s?.weight); if (!isNaN(n) && n > max) max = n; }
+      }
+    }
+    return max;
   },
 
   // Day swaps — swap workouts between days
@@ -1860,6 +1878,14 @@ function renderToday(overrideDate) {
   const isComplete = Storage.isWorkoutComplete(dateStr);
   const zoneInfo = workout.zone && workout.zone >= 1 ? ZONES[workout.zone - 1] : null;
 
+  // Next upcoming race + deload flag (both read straight from the plan, no input)
+  const todayS = Dates.todayStr();
+  let nextRaceName = '', nextRaceDate = '';
+  if (todayS <= ATHLETE.doublesDate) { nextRaceName = ATHLETE.doublesRace; nextRaceDate = ATHLETE.doublesDate; }
+  else if (todayS <= ATHLETE.goalDate) { nextRaceName = ATHLETE.goalRace; nextRaceDate = ATHLETE.goalDate; }
+  const wksToRace = nextRaceDate ? Math.max(0, Dates.weeksUntil(nextRaceDate)) : 0;
+  const isDeload = weekNum ? isDeloadWeek(weekNum) : false;
+
   return `<div class="view">
     <!-- Date Nav -->
     <div class="row-between mb-20">
@@ -1874,6 +1900,17 @@ function renderToday(overrideDate) {
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
       </button>
     </div>
+
+    ${isDeload ? `
+    <div class="card mb-16" style="background:rgba(232,85,46,.1);border:1px solid rgba(232,85,46,.25);display:flex;align-items:center;gap:10px;padding:12px 14px">
+      <span style="font-size:18px">⚠️</span>
+      <div><div class="t-sm fw-8 t-accent">Deload Week</div><div class="t-xs t-muted">Pull back ~25% on volume and intensity. This is the gas station, not a setback.</div></div>
+    </div>` : ''}
+    ${nextRaceName ? `
+    <div class="row-between mb-16" style="background:var(--bg2);border-radius:10px;padding:9px 14px">
+      <span class="t-xs t-muted fw-6">🏁 Next race · ${nextRaceName}</span>
+      <span class="t-sm fw-8 t-accent">${wksToRace} ${wksToRace === 1 ? 'week' : 'weeks'} out</span>
+    </div>` : ''}
 
     <!-- Title -->
     <div class="row-between mb-4">
@@ -1939,6 +1976,10 @@ function renderToday(overrideDate) {
         // Ghost placeholders = last week's number for the same set (index-aligned)
         const prev = Storage.getPreviousLog(dateStr, ex.name);
         const prevSetsRaw = Array.isArray(prev?.sets) ? prev.sets : null;
+        const hasPrev = !!(prev && (prevSetsRaw ? prevSetsRaw.some(x => x && (x.weight || x.reps)) : (prev.weight || prev.reps)));
+        const prevMax = Storage.getMaxWeight(dateStr, ex.name);
+        const sessionMax = (Array.isArray(log.sets) ? log.sets : []).reduce((m, s) => { const n = parseFloat(s?.weight); return (!isNaN(n) && n > m) ? n : m; }, 0);
+        const isPR = sessionMax > 0 && sessionMax > prevMax;
         const phW = (s) => (prevSetsRaw ? prevSetsRaw[s-1]?.weight : (prev?.weight)) || 'lbs';
         const phR = (s) => (prevSetsRaw ? prevSetsRaw[s-1]?.reps : (prev?.reps)) || 'reps';
         const getW = (s) => logSets[s-1]?.weight || '';
@@ -1959,13 +2000,17 @@ function renderToday(overrideDate) {
             </div>
             <div class="ex-badge">${letter}</div>
           </div>
-          <div class="row" style="gap:6px;margin-top:8px">
+          <div class="row" style="gap:6px;margin-top:8px;flex-wrap:wrap">
             <span class="pill pill-muted">Sets: ${nSets}</span>
             ${reps ? `<span class="pill pill-muted">Reps: ${reps}</span>` : ''}
+            ${isPR ? `<span class="pill pill-pr">🏆 PR</span>` : ''}
           </div>
           ${why ? `<div class="why-box"><span class="why-label">Why this matters</span><span class="why-text">${why}</span></div>` : ''}
           <div class="cset-grid">${rows}</div>
-          <button class="add-set" onclick="App.addSet('${dateStr}',${i},'${nameEsc}',${totalRows})">+ Add Set</button>
+          <div class="row" style="gap:8px;margin-top:10px">
+            ${hasPrev ? `<button class="fill-prev" onclick="App.fillLastWeek('${dateStr}',${i},${totalRows},'${nameEsc}')">Fill last week</button>` : ''}
+            <button class="add-set" style="flex:1;margin-top:0" onclick="App.addSet('${dateStr}',${i},'${nameEsc}',${totalRows})">+ Add Set</button>
+          </div>
         </div>`;
       }).join('');
       })()}
@@ -2461,6 +2506,23 @@ const App = {
     const sets = this._collectSets(dateStr, index, totalRows);
     sets.push({ weight: '', reps: '', done: false });
     Storage.saveExerciseLog(dateStr, index, { sets, exerciseName: exName });
+    this.refresh();
+  },
+
+  // Drop last week's per-set numbers into the inputs (only fills blanks-> last week's value)
+  fillLastWeek(dateStr, index, totalRows, exName) {
+    const prev = Storage.getPreviousLog(dateStr, exName);
+    if (!prev) return;
+    const prevSets = Array.isArray(prev.sets) ? prev.sets : null;
+    for (let s = 1; s <= totalRows; s++) {
+      const w = prevSets ? (prevSets[s-1]?.weight || '') : (s === 1 ? (prev.weight || '') : '');
+      const r = prevSets ? (prevSets[s-1]?.reps || '') : (s === 1 ? (prev.reps || '') : '');
+      const wi = document.getElementById(`log-w-${index}-${s}`);
+      const ri = document.getElementById(`log-r-${index}-${s}`);
+      if (wi && w) wi.value = w;
+      if (ri && r) ri.value = r;
+    }
+    this.saveLog(dateStr, index, exName, totalRows);
     this.refresh();
   },
 
