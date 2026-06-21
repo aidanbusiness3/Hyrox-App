@@ -567,21 +567,22 @@ const WORKOUT_DETAILS = {
 //   Hip Thrust 360 x 3 (1RM ~390 lb)
 //   Bench 285 x 1RM (MAINTENANCE — above E15 avg)
 
-// ===== AIDAN ELITE 15 TRAJECTORY — v5 (Aidan's reorganized split) =====
+// ===== AIDAN ELITE 15 TRAJECTORY — v6 (speed-priority split, softened volume) =====
 // Start: Mon Jun 22, 2026
 //
-// Base-phase weekly split (3 doubles, hard days spaced Tue/Thu/Sat):
-//   Mon: Long Run (single)
-//   Tue: Heavy Lower AM + VO2 Max PM (DOUBLE — all hard leg work on one day)
-//   Wed: Heavy Upper AM + Easy Aerobic PM (DOUBLE — legs rest)
+// Base-phase weekly split (speed over distance, 3 quality runs spaced Mon/Thu/Sat):
+//   Mon: VO2 Max (single — own day, fresh legs, the speed priority)
+//   Tue: Heavy Lower AM + Easy Recovery PM (DOUBLE — only heavy hamstring day, Nordics here)
+//   Wed: Heavy Upper AM + Station Finisher PM (DOUBLE — wall ball + sled frequency)
 //   Thu: Sim (single — stations folded in here)
 //   Fri: Rest + Mobility Flow
 //   Sat: Threshold (single — isolated quality run after rest)
-//   Sun: Easy Run + Posterior-Chain Strength (DOUBLE)
+//   Sun: Easy Long Run + Light Posterior Prehab (DOUBLE — main aerobic volume, kept easy)
 //
-// Why: VO2 stacks on the lower day so Wednesday legs recover. Sim sits mid-week,
-// Friday rest isolates the Saturday threshold for quality, Sunday adds posterior
-// volume. Build / race-week phases keep their own structure below.
+// Why: VO2 leads the week on fresh legs instead of stacking on squats. Long run
+// demoted to Sunday easy since distance is de-prioritized. Mileage ramp softened.
+// Posterior work split: heavy hinge + Nordics on Tue, light prehab on Sun (no
+// eccentric overload two days running). Build / race-week phases unchanged below.
 
 const PHASES = [
   { id: 'base',         name: 'Aerobic + Strength Base', weeks: [1, 12],   color: '#3B82F6', emoji: '⚡' },
@@ -602,19 +603,19 @@ function isDeloadWeek(weekNum) {
 
 // ===== TWO-WEEK WORK-SHIFT OVERLAY (Weeks 1-2: Jun 22 - Jul 5, 2026) =====
 // Aidan's work schedule for the first two weeks. Tells each day when to slot
-// the session around the shift, mapped to the v5 split above.
+// the session around the shift, mapped to the v6 split above.
 function getWorkShiftNote(weekNum, day) {
   if (weekNum !== 1 && weekNum !== 2) return null;
   const notes = {
-    Monday:    'WORK 10:00am to 4:30pm. Do the long run this evening, around 5:00pm. Morning works only if you start by 8:00am.',
-    Tuesday:   'WORK 4:00pm to 10:00pm. This is the hard double and both sessions go before work. Heavy Lower around 7:30am, then VO2 around noon once you have eaten and recovered. Out the door by 3:30pm. If it is too much in one morning, drop the VO2 to Wednesday PM.',
-    Wednesday: 'OFF work. Heavy Upper in the AM, easy aerobic run in the PM. Legs get their break today.',
-    Thursday:  'OFF work. Sim in the morning. 5:00am works on a weekday when the gym opens early, but any time today is fine since you are off. This is where the station work lives now.',
+    Monday:    'WORK 10:00am to 4:30pm. VO2 is the priority session, run it on fresh legs. Best before work, around 7:00am, or this evening around 5:00pm if mornings are rushed.',
+    Tuesday:   'WORK 4:00pm to 10:00pm. Both sessions before work. Heavy Lower around 7:30am, easy recovery run around 12:30pm. Out the door by 3:30pm.',
+    Wednesday: 'OFF work. Heavy Upper in the AM, short station finisher (wall ball + sled) right after or later in the day.',
+    Thursday:  'OFF work. Sim in the morning. 5:00am works on a weekday when the gym opens early, but any time today is fine since you are off. The station volume lives inside this sim.',
     Friday:    'WORK 4:00pm to 10:00pm. Rest day. Do the mobility flow in the morning. It sets up a fresh Saturday threshold.',
     Saturday:  weekNum === 1
       ? 'WORK 10:00am to 4:00pm. Threshold is a road or track run, no gym needed. Run it this evening around 4:45pm, or before 8:30am if you prefer mornings.'
       : 'WORK 3:00pm to 10:00pm. Threshold is a road or track run, no gym needed. Run it late morning around 10:00am, out the door by 2:00pm.',
-    Sunday:    'WORK 3:00pm to 10:00pm. Easy run plus the posterior lift in the morning, finish by 2:00pm. If time is tight, run easy and keep the lift to the main three (RDL, hip thrust, Nordics).'
+    Sunday:    'WORK 3:00pm to 10:00pm. Easy long run plus the light posterior prehab in the morning, finish by 2:00pm. Keep the run easy so Monday VO2 stays fresh. If time is tight, just run and do the prehab another day.'
   };
   return notes[day] || null;
 }
@@ -624,8 +625,9 @@ function getBaseWeek(weekNum) {
   const isDeload = (weekNum === 4 || weekNum === 8);
   const phaseWk = weekNum;
 
-  const longMin = isDeload ? 50 : Math.min(75 + Math.floor((phaseWk - 1) / 2) * 5, 100);
-  const easyMin = isDeload ? 30 : Math.min(30 + Math.floor((phaseWk - 1) / 4) * 5, 45);
+  // Softened ramp: priority is speed over distance right now, so volume eases in.
+  const longMin = isDeload ? 45 : Math.min(55 + Math.floor((phaseWk - 1) / 3) * 5, 85);
+  const easyMin = isDeload ? 25 : Math.min(25 + Math.floor((phaseWk - 1) / 4) * 5, 40);
 
   let thresholdSession;
   if (isDeload) thresholdSession = '20 min easy run + 4 strides (deload week)';
@@ -685,17 +687,21 @@ function getBaseWeek(weekNum) {
   }
 
   const week = [
-    // ===== MONDAY: Long Run (SINGLE) =====
-    { day:'Monday', type:'run', title:`Long Easy Run — ${longMin} min`, icon:'🛣️', zone:2,
-      exercises:[
-        {name:'Pre-Run Dynamic Warmup',detail:'4 min: leg swings + knee hugs + walking lunges + high knees + butt kicks',zone:0},
-        {name:'Long Easy Run',detail:`${longMin} min @ 9:00-9:30/mile (Z2). HR < 155, conversational. If hills push HR up, walk them. Slowest pace IS the workout.`,zone:2},
-        {name:'Post-Run Static Stretch',detail:'8 min: pigeon + couch stretch + calf + hamstring + lat + pec + child\'s pose',zone:0}
+    // ===== MONDAY: VO2 Max (SINGLE — own day, fresh legs, speed priority) =====
+    { day:'Monday', type:'intervals', title: isDeload ? 'Easy Run (Deload)' : 'VO2 Max Intervals', icon: isDeload ? '🏃' : '🔥', zone: isDeload ? 2 : 5,
+      exercises: isDeload ? [
+        {name:'Pre-Run Dynamic',detail:'4 min',zone:0},
+        {name:'Easy Run',detail:'35-40 min @ Z2 conversational. Deload week.',zone:2}
+      ] : [
+        {name:'Pre-Run Dynamic Warmup',detail:'4 min dynamic + 15 min easy + 4 strides',zone:2},
+        {name:'VO2 Intervals',detail:vo2Session,zone:5},
+        {name:'Cool Down',detail:'10 min easy',zone:1},
+        {name:'Post-Run Static Stretch',detail:'8 min static',zone:0}
       ],
-      duration:`${longMin} min`, focus:`📍 WHY: Single highest-volume aerobic stimulus of the week. Easy mileage builds capillary density and mitochondria (VO2 max correlates -0.71 with Hyrox finish, Brandt 2025). The slower you can hold the same HR, the fitter you are getting. Long run is the day, no PM run, give it full focus.` },
+      duration: isDeload ? '40 min' : '55 min', focus: isDeload ? '📍 WHY: Deload week. Easy aerobic only.' : `📍 WHY: VO2 max gets its own day on fresh legs, preceded only by Sunday's easy aerobic, so you can actually hold vVO2 pace and drive 53 toward 60+. This is the speed priority right now, so it leads the week. One quality VO2 session is the sustainable weekly dose. Run it hard but clean, full recoveries between reps.` },
 
-    // ===== TUESDAY: Heavy Lower AM + VO2 Max PM (DOUBLE — all hard leg work concentrated here) =====
-    { day:'Tuesday', type:'strength', title:'AM Heavy Lower + PM VO2 Max', icon:'🏋️', zone:0,
+    // ===== TUESDAY: Heavy Lower AM + Easy Recovery PM (DOUBLE) =====
+    { day:'Tuesday', type:'strength', title:'AM Heavy Lower + PM Easy Recovery', icon:'🏋️', zone:0,
       exercises:[
         {name:'— AM SESSION — Heavy Lower —',detail:'~80 min total',zone:0},
         {name:'Warm Up',detail:'10 min bike + dynamic mobility',zone:0},
@@ -710,13 +716,13 @@ function getBaseWeek(weekNum) {
         {name:'Plank (anti-extension)',detail:'3 × 45 sec, rib cage down, glutes squeezed',zone:0},
         {name:'Ab Wheel Rollout',detail:'3 × 8 from knees, control the negative',zone:0},
         {name:'Post-Workout Static Stretch',detail:'8 min: pigeon + couch stretch + hamstring + calf + child\'s pose',zone:0},
-        {name: isDeload ? '— PM SESSION — Easy Run (Deload) —' : '— PM SESSION — VO2 Max Intervals —',detail: isDeload ? 'Easy aerobic, deload week' : '~55 min. Fuel and recover between sessions first.',zone: isDeload ? 2 : 5},
-        {name: isDeload ? 'Easy Run' : 'VO2 Intervals',detail: isDeload ? '35-40 min @ Z2 conversational. Deload week.' : `15 min easy to the track + 4 strides, then ${vo2Session}, 10 min cool down.`,zone: isDeload ? 2 : 5}
+        {name:`— PM SESSION — Easy Recovery Run ${easyMin} min —`,detail:'Recovery + volume',zone:2},
+        {name:'Easy Recovery Run',detail:`${easyMin} min @ 10:00-10:30/mile (Z1-Z2). Slower than slow. HR < 145.`,zone:2}
       ],
-      duration:`AM 80 min + PM ${isDeload ? '40' : '55'} min`, focus:`📍 WHY: All the hard leg work lands on one day so Wednesday can genuinely rest the legs. Heavy squat is direct 152 kg sled push carryover, and your strength is +14% above E15 average, so maintain with small progression (Blagrove 2018: heavy strength improves running economy). VO2 max is the PM here to keep climbing 53 toward 60+. Stacking intervals after squats is demanding, so keep the squat top sets crisp, then fuel before the run.` },
+      duration:`AM 80 min + PM ${easyMin} min`, focus:`📍 WHY: Heavy squat is direct 152 kg sled push carryover, and your strength is +14% above E15 average, so maintain with small progression (Blagrove 2018: heavy strength improves running economy). This is the one heavy hamstring day (Nordics live here, not Sunday). The easy PM run flushes the legs and adds Z2 volume without intensity.` },
 
-    // ===== WEDNESDAY: Heavy Upper AM (Station-Translated) + Easy Aerobic PM (DOUBLE — legs rest) =====
-    { day:'Wednesday', type:'strength', title:'AM Heavy Upper (Station-Translated) + PM Easy Aerobic', icon:'💪', zone:0,
+    // ===== WEDNESDAY: Heavy Upper AM (Station-Translated) + Station Finisher PM (DOUBLE) =====
+    { day:'Wednesday', type:'strength', title:'AM Heavy Upper (Station-Translated) + PM Station Finisher', icon:'💪', zone:0,
       exercises:[
         {name:'— AM SESSION — Heavy Upper —',detail:'~65 min. Every movement = direct station translation.',zone:0},
         {name:'Warm Up',detail:'10 min + band pull-aparts + scap activation',zone:0},
@@ -729,10 +735,11 @@ function getBaseWeek(weekNum) {
         {name:'Farmer\'s Carry Heavy',detail:'3 × 40m at race weight (2 × 24 kg) — direct FARMER\'S CARRY station + grip endurance + trap size',zone:0},
         {name:'Pallof Press (anti-rotation)',detail:'3 × 10/side half-kneeling — anti-rotation core for asymmetric station loading',zone:0},
         {name:'Post-Workout Static Stretch',detail:'8 min: lat + pec + child\'s pose + t-spine',zone:0},
-        {name:`— PM SESSION — Easy Aerobic ${easyMin + 5} min —`,detail:'Polarized volume, legs stay easy',zone:2},
-        {name:'Easy Aerobic Run',detail:`${easyMin + 5} min @ 9:00-9:30/mile Z2${phaseWk >= 7 ? '. Add 4 × 20 sec strides at the end (neuromuscular speed)' : ''}`,zone:2}
+        {name:'— PM SESSION — Station Finisher —',detail:'~15 min, short and crisp',zone:3},
+        {name:'Wall Ball',detail:'4 × 25 @ 9 kg, 3.05m target, 45 sec rest (100 reps, rebuilds toward Owen Silver 200/wk)',zone:0},
+        {name:'Sled Push',detail:`3 × 20m at ${phaseWk <= 4 ? '50% race weight' : phaseWk <= 8 ? '70% race weight' : 'RACE weight (152 kg)'}, technique and power, not a grind`,zone:0}
       ],
-      duration:`AM 65 min + PM ${easyMin + 5} min`, focus:`📍 WHY: Upper day gives the legs a real break the day after squats and VO2. Every movement has a direct station target. Push Press feeds wall balls. Weighted pull-ups and T-Bar Row feed sled pull and the row machine. Landmine Press matches the sled push position. Straight-Arm Pulldown trains the SkiErg pull. Heavy farmer carries build grip and trap size. The easy PM run keeps Z2 volume flowing without taxing the legs.` },
+      duration:`AM 65 min + PM 15 min finisher`, focus:`📍 WHY: Upper day the day after squats. Every movement has a direct station target. Push Press feeds wall balls. Weighted pull-ups and T-Bar Row feed sled pull and the row machine. Landmine Press matches the sled push position. Straight-Arm Pulldown trains the SkiErg pull. The PM finisher rebuilds the wall-ball and sled frequency that the Owen Silver model is built on, kept short so it does not blunt the legs for Thursday's sim.` },
 
     // ===== THURSDAY: Sim (SINGLE — stations folded in here) =====
     { day:'Thursday', type:'hyrox', title:`Sim — ${satTitle}`, icon:'🏁', zone:4,
@@ -765,21 +772,22 @@ function getBaseWeek(weekNum) {
       ],
       duration: isDeload ? '40 min' : '55 min', focus: isDeload ? '📍 WHY: Deload week. Easy aerobic only.' : '📍 WHY: Isolated behind Friday rest so you hit it fresh. Threshold is the anchor of every elite Hyrox plan and the most leveraged session for race pace. Every Hyrox run is 1km, so these reps are sport-specific. Quality over fatigue here. This is a road or track run, no gym needed.' },
 
-    // ===== SUNDAY: Easy Run + Posterior-Chain Strength (DOUBLE) =====
-    { day:'Sunday', type:'strength', title:'Easy Run + Posterior-Chain Strength', icon:'🦵', zone:2,
+    // ===== SUNDAY: Easy / Long Run + Light Posterior Prehab (DOUBLE) =====
+    { day:'Sunday', type:'run', title:`Easy Long Run — ${longMin} min + Posterior Prehab`, icon:'🛣️', zone:2,
       exercises:[
-        {name:'— SESSION 1 — Easy Aerobic Run —',detail:'Recovery + volume',zone:2},
-        {name:'Easy Aerobic Run',detail:`${easyMin} min @ 9:30-10:00/mile (Z2). Conversational, HR < 150.`,zone:2},
-        {name: isDeload ? '— SESSION 2 — Posterior-Chain (Deload, light) —' : '— SESSION 2 — Posterior-Chain Strength —',detail: isDeload ? '~30 min, cut to 2 sets' : '~45 min, moderate, not max',zone:0},
-        {name:'Romanian Deadlift',detail: isDeload ? '3 × 8 light, technique focus' : '4 × 8 moderate, slow eccentric. Lighter than Tuesday\'s trap-bar, this is hamstring and glute volume, not a max.',zone:0},
-        {name:'Hip Thrust',detail:'3 × 12 moderate (glute drive for sled push and late-race run power)',zone:0},
-        {name:'Nordic Hamstring Curl',detail:'3 × 6 (eccentric hamstring, halves running injury risk — Petushek 2019)',zone:0},
-        {name:'Back Extension',detail:'3 × 15 (spinal erector endurance to stay upright when running fatigued)',zone:0},
-        {name:'Chest-Supported Row',detail:'3 × 12 (mid-back balance for all the pressing, supports sled pull)',zone:0},
-        {name:'Face Pulls',detail:'3 × 20 (rear delt and shoulder health)',zone:0},
-        {name:'Post-Workout Static Stretch',detail:'8 min: pigeon + hamstring + glute + lat',zone:0}
+        {name:'— SESSION 1 — Easy Long Run —',detail:'Main aerobic volume of the week',zone:2},
+        {name:'Pre-Run Dynamic Warmup',detail:'4 min: leg swings + knee hugs + walking lunges + high knees + butt kicks',zone:0},
+        {name:'Easy Long Run',detail:`${longMin} min @ 9:00-9:30/mile (Z2). HR < 155, conversational. Kept easy so Monday's VO2 stays fresh.`,zone:2},
+        {name:'— SESSION 2 — Posterior Prehab (light, injury prevention) —',detail: isDeload ? '~15 min, very light' : '~25 min, bands and bodyweight, NOT a strength day',zone:0},
+        {name:'Single-Leg Glute Bridge',detail:'2 × 12/side (glute max + medius activation)',zone:0},
+        {name:'Light RDL or Good Morning',detail:'2 × 12 light load, slow eccentric (hamstring health, not heavy, heavy hinge is Tuesday)',zone:0},
+        {name:'Banded or Slider Hamstring Curl',detail:'2 × 15 light (no Nordics here, they live on Tuesday)',zone:0},
+        {name:'Back Extension',detail:'2 × 15 bodyweight (erector endurance for upright running when fatigued)',zone:0},
+        {name:'Band Pull-Aparts + Face Pulls',detail:'2 × 20 each (rear delt and shoulder health)',zone:0},
+        {name:'Bird Dog + Dead Bug',detail:'2 × 10/side each (anti-extension core, spinal control)',zone:0},
+        {name:'Static Stretch + Mobility',detail:'8 min: pigeon + hamstring + glute + lat',zone:0}
       ],
-      duration:`Run ${easyMin} min + 45 min lift`, focus:`📍 WHY: An easy aerobic run plus a moderate posterior-chain lift. Hamstrings, glutes, erectors and mid-back keep you upright and powerful late in a race, and they sit a bit underdone next to the squat and press days. Kept moderate so it feeds Monday's long run rather than wrecking it. Keep daily mobility going.` }
+      duration:`Run ${longMin} min + 25 min prehab`, focus:`📍 WHY: The week's main easy aerobic volume, kept truly easy so Monday's VO2 lands on fresh legs. The posterior work here is deliberately light, maintenance and injury prevention only. Heavy hinge and Nordics are Tuesday's job. This protects the hamstrings (no eccentric overload two days running) while keeping glutes, erectors and rear delts healthy. Keep daily mobility going.` }
   ];
 
   return week;
