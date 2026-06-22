@@ -78,6 +78,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .set-check.on svg{opacity:1}
 .add-set{width:100%;padding:10px;border-radius:10px;border:1px dashed var(--border);background:transparent;color:var(--text2);font-weight:700;font-size:13px;margin-top:10px}
 .add-set:active{opacity:.6}
+.rm-set{padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-weight:700;font-size:13px;flex:1}
+.rm-set:active{opacity:.6}
 .ex-simple{padding:12px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
 .ex-simple:last-child{border-bottom:none}
 .pill-pr{background:var(--accent);color:#fff}
@@ -2002,7 +2004,7 @@ function renderToday(overrideDate) {
         const why = exerciseWhy(ex.name);
         const nameEsc = ex.name.replace(/'/g,"\\'");
         const logSets = Array.isArray(log.sets) ? log.sets : [];
-        const totalRows = Math.max(nSets, logSets.length); // grows with Add Set
+        const totalRows = logSets.length > 0 ? logSets.length : nSets; // add/remove adjust this
         // Ghost placeholders = last week's number for the same set (index-aligned)
         const prev = Storage.getPreviousLog(dateStr, ex.name);
         const prevSetsRaw = Array.isArray(prev?.sets) ? prev.sets : null;
@@ -2036,7 +2038,10 @@ function renderToday(overrideDate) {
           </div>
           ${why ? `<div class="why-box"><span class="why-label">Why this matters</span><span class="why-text">${why}</span></div>` : ''}
           <div class="cset-grid">${rows}</div>
-          <button class="add-set" onclick="App.addSet('${dateStr}',${i},'${nameEsc}',${totalRows})">+ Add Set</button>
+          <div class="row" style="gap:8px;margin-top:10px">
+            ${totalRows > 1 ? `<button class="rm-set" onclick="App.removeSet('${dateStr}',${i},'${nameEsc}',${totalRows})">− Remove</button>` : ''}
+            <button class="add-set" style="flex:1;margin-top:0" onclick="App.addSet('${dateStr}',${i},'${nameEsc}',${totalRows})">+ Add Set</button>
+          </div>
         </div>`;
       }).join('');
       })()}
@@ -2531,6 +2536,14 @@ const App = {
   addSet(dateStr, index, exName, totalRows) {
     const sets = this._collectSets(dateStr, index, totalRows);
     sets.push({ weight: '', reps: '', done: false });
+    Storage.saveExerciseLog(dateStr, index, { sets, exerciseName: exName });
+    this.refresh();
+  },
+
+  removeSet(dateStr, index, exName, totalRows) {
+    if (totalRows <= 1) return;
+    const sets = this._collectSets(dateStr, index, totalRows);
+    sets.pop();
     Storage.saveExerciseLog(dateStr, index, { sets, exerciseName: exName });
     this.refresh();
   },
