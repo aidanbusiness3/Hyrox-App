@@ -1167,9 +1167,14 @@ function generateTrainingPlan() {
     else if (week === 22)  weekDays = getDallasRaceWeek();
     else                   weekDays = getResetWeek(week);
 
-    // Aidan does his own warm-ups: strip all warmup/activation boxes from every day.
+    // Aidan does his own warm-ups, stretching, and skips dedicated core work for now.
+    // Strip warm-up/activation boxes, core/trunk isolation, and post-workout stretching from every day.
+    // (Cool Down stays, and the dedicated Friday Mobility Flow day stays since its name doesn't match.)
     const isWarmupBox = n => /warm[\s-]?up/i.test(n) || /pre-?lift activation/i.test(n) || /pre-?run dynamic/i.test(n);
-    weekDays = weekDays.map(d => ({ ...d, exercises: d.exercises.filter(ex => !isWarmupBox(ex.name)) }));
+    const isCoreBox = n => /plank/i.test(n) || /ab wheel/i.test(n) || /pallof/i.test(n) || /dead bug/i.test(n) || /bird dog/i.test(n) || /hollow body/i.test(n);
+    const isStretchBox = n => /stretch/i.test(n);
+    const stripBox = ex => !isWarmupBox(ex.name) && !isCoreBox(ex.name) && !isStretchBox(ex.name);
+    weekDays = weekDays.map(d => ({ ...d, exercises: d.exercises.filter(stripBox) }));
 
     const weekStartDate = new Date(startDate);
     weekStartDate.setDate(weekStartDate.getDate() + (week - 1) * 7);
