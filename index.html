@@ -679,7 +679,7 @@ function getBaseWeek(weekNum) {
         {name:'Box Jumps',detail:'4 × 3 explosive, full recovery between sets. Power goes first while the CNS is fresh. Reactive strength for running economy + burpee broad jump (Spurrs 2003, Saunders 2006).',zone:0},
         {name:'Front Squat',detail:squatLoad,zone:0},
         {name:'Trap Bar Deadlift',detail:hingeLoad,zone:0},
-        {name:'Back-Rack Walking Lunges',detail:'3 × 12/leg, sandbag across the upper back to match the station (no floor space? sub stationary REVERSE lunges, same load, step back and return on the spot). Direct sandbag-lunge pattern + single-leg running strength.',zone:0},
+        {name:'Reverse Lunges',detail:'3 × 12/leg, sandbag across the upper back to match the station load position. Step back and drive to standing on the spot. Direct sandbag-lunge pattern + single-leg running strength.',zone:0},
         {name:'Hip Thrust',detail:hipThrustLoad,zone:0},
         {name:'Nordic Hamstring Curl',detail:'3 × 6 (band-assisted Wks 1-4 -> bodyweight Wks 5-8 -> weighted Wks 9-12), eccentric hamstring cuts running injury risk ~51% (Petushek 2019) and adds push-off power',zone:0},
         {name:'Calf Raises',detail:'3 × 15 straight-leg (gastroc) + 3 × 15 bent-knee/seated (soleus), heavy. Sled push drive + running economy + cramp prevention.',zone:0},
@@ -1219,7 +1219,7 @@ function exerciseWhy(name) {
   const n = (name || '').toLowerCase();
   const has = (...k) => k.some(x => n.includes(x));
   if (has('front squat')) return 'The wall ball is a front-rack squat into a drive. Front squat trains the exact pattern and the upright posture you need under fatigue, with less spinal compression than back squat (Gullett 2009).';
-  if (has('sandbag') || (has('lunge') && !has('bulgarian') && !has('split squat'))) return 'The sandbag is racked across your traps for 100m of lunges. Back-rack walking (or stationary reverse) lunges replicate that load position and the walking demand under fatigue.';
+  if (has('sandbag') || (has('lunge') && !has('bulgarian') && !has('split squat'))) return 'The sandbag-lunge station is back-racked across your traps for 100m. Back-rack reverse lunges replicate that load position and unilateral pattern under fatigue.';
   if (has('bulgarian') || has('split squat')) return 'Unilateral strength to balance left vs right and feed the single-leg stance of running. Backup to walking lunges if space is tight.';
   if (has('hip thrust')) return 'Heavy hip extension is the engine of the sled push and every running stride. Hip thrusts build horizontal-force production (Contreras 2017) directly for the 152 kg sled.';
   if (has('nordic')) return 'Eccentric hamstring strength cuts running and hamstring injury risk by ~51% (Petushek 2019, van Dyk 2019) and feeds the sled pull plus late-race running.';
