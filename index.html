@@ -604,25 +604,6 @@ function isDeloadWeek(weekNum) {
   return [4, 8].includes(weekNum);
 }
 
-// ===== TWO-WEEK WORK-SHIFT OVERLAY (Weeks 1-2: Jun 22 - Jul 5, 2026) =====
-// Aidan's work schedule for the first two weeks. Tells each day when to slot
-// the session around the shift, mapped to the v6 split above.
-function getWorkShiftNote(weekNum, day) {
-  if (weekNum !== 1 && weekNum !== 2) return null;
-  const notes = {
-    Monday:    'WORK 10:00am to 4:30pm. Heavy Lower before work, around 7:00am, or this evening around 5:00pm. Easy recovery run the other side of the day, or skip it if pushed.',
-    Tuesday:   'WORK 4:00pm to 10:00pm. Heavy Upper before work, anytime in the morning. Out the door by 3:30pm.',
-    Wednesday: 'OFF work. The double-hard day, and it lands on a free day. VO2 in the AM on fresh legs, station work in the PM.',
-    Thursday:  'OFF work. Sim in the morning. 5:00am works on a weekday when the gym opens early, but any time today is fine since you are off.',
-    Friday:    'WORK 4:00pm to 10:00pm. Rest day. Do the mobility flow in the morning. It sets up a fresh Saturday threshold.',
-    Saturday:  weekNum === 1
-      ? 'WORK 10:00am to 4:00pm. Threshold is a road or track run, no gym needed. Run it this evening around 4:45pm, or before 8:30am if you prefer mornings.'
-      : 'WORK 3:00pm to 10:00pm. Threshold is a road or track run, no gym needed. Run it late morning around 10:00am, out the door by 2:00pm.',
-    Sunday:    'WORK 3:00pm to 10:00pm. Easy long run plus the light posterior prehab in the morning, finish by 2:00pm. Keep the run easy so you are not flat for Monday heavy lower. If time is tight, just run and do the prehab another day.'
-  };
-  return notes[day] || null;
-}
-
 // ===== PHASE 1 — BASE (Weeks 1-12) =====
 function getBaseWeek(weekNum) {
   const isDeload = (weekNum === 4 || weekNum === 8);
@@ -1909,7 +1890,6 @@ function renderToday(overrideDate) {
   else if (todayS <= ATHLETE.goalDate) { nextRaceName = ATHLETE.goalRace; nextRaceDate = ATHLETE.goalDate; }
   const wksToRace = nextRaceDate ? Math.max(0, Dates.weeksUntil(nextRaceDate)) : 0;
   const isDeload = weekNum ? isDeloadWeek(weekNum) : false;
-  const workShift = weekNum ? getWorkShiftNote(weekNum, workout.day) : null;
 
   return `<div class="view">
     <!-- Date Nav -->
@@ -1930,11 +1910,6 @@ function renderToday(overrideDate) {
     <div class="card mb-16" style="background:rgba(232,85,46,.1);border:1px solid rgba(232,85,46,.25);display:flex;align-items:center;gap:10px;padding:12px 14px">
       <span style="font-size:18px">⚠️</span>
       <div><div class="t-sm fw-8 t-accent">Deload Week</div><div class="t-xs t-muted">Pull back ~25% on volume and intensity. This is the gas station, not a setback.</div></div>
-    </div>` : ''}
-    ${workShift ? `
-    <div class="card mb-16" style="background:rgba(59,130,246,.10);border:1px solid rgba(59,130,246,.28);display:flex;align-items:flex-start;gap:10px;padding:12px 14px">
-      <span style="font-size:18px">🕐</span>
-      <div><div class="t-sm fw-8" style="color:#2563EB">Work-Shift Timing</div><div class="t-xs t-muted" style="line-height:1.5">${workShift}</div></div>
     </div>` : ''}
     ${nextRaceName ? `
     <div class="row-between mb-16" style="background:var(--bg2);border-radius:10px;padding:9px 14px">
