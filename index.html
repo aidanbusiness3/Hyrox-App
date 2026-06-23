@@ -705,9 +705,8 @@ function getBaseWeek(weekNum) {
         {name:'Push Press',detail:`${phaseWk <= 6 ? '5 × 5 @ RPE 7-8' : '4 × 5 @ RPE 8'}, direct WALL BALL transfer (overhead power-endurance + leg drive)`,zone:0},
         {name:'Weighted Pull-Ups',detail:'4 × 6 weighted (add weight if 12+ BW). Make the last set a bodyweight AMRAP to failure. Covers sled-pull strength plus pull endurance for late-race pulling.',zone:0},
         {name:'Bent-Over Barbell Row',detail:'4 × 6 heavy, direct SLED PULL + ROW machine (heavy hinge-and-pull)',zone:0},
-        {name:'Landmine Press',detail:'3 × 8/side standing in forward lean, SLED PUSH pattern (horizontal locked-elbow press, position matches race)',zone:0},
+        {name:'Weighted Push-Ups',detail:'4 × 8-12 with a vest, plate on the back, or band across the shoulders. Closed-chain horizontal press = direct SLED PUSH transfer (Calatayud 2014). Full scapular protraction at the top, controlled eccentric. If too easy, elevate the feet on a bench. Trains serratus + anterior core + triceps lockout, the actual upper-body demands of the sled push.',zone:0},
         {name:'Straight-Arm Pulldown',detail:'3 × 12 cable, hinge into it, SKIERG pull phase (bench and pull-ups do not cover this pattern)',zone:0},
-        {name:'Farmer\'s Carry Heavy',detail:'3 × 40m at race weight (2 × 24 kg), FARMER\'S CARRY station + grip endurance + trap size',zone:0},
         {name:'Pallof Press (anti-rotation)',detail:'3 × 10/side half-kneeling, anti-rotation core for asymmetric station loading',zone:0},
         {name:'Post-Workout Static Stretch',detail:'8 min: lat + pec + child\'s pose + t-spine',zone:0}
       ],
@@ -1240,6 +1239,7 @@ function exerciseWhy(name) {
   if (has('calf')) return 'Soleus carries 6-8x bodyweight per stride (Dorn 2012) and plantar-flexor stiffness drives running economy (Fletcher 2010). Also the engine of the sled push and the top cramp site late in races.';
   if (has('plank') || has('ab wheel') || has('pallof') || has('dead bug')) return 'Anti-rotation, anti-extension core keeps your trunk solid during carries, lunges, and tired running.';
   if (has('push press')) return "Overhead power-endurance is the wall-ball engine — so 100 throws don't crush your shoulders late in the race.";
+  if (has('push-up') || has('push up') || has('pushup')) return 'Closed-chain horizontal press, the sled push pattern. Builds serratus protraction + anterior core + triceps lockout, the actual upper-body demands of the sled push (Calatayud 2014).';
   if (has('landmine')) return 'Trains the exact forward-lean pressing angle of the sled push. True position transfer.';
   if (has('straight-arm') || has('pulldown') || has('skierg')) return 'Builds the lat-driven pull of the SkiErg, the pattern bench and pull-ups miss.';
   if (has('weighted pull') || has('pull-up') || has('pullup') || has('pull up')) return 'Vertical pulling strength is your sled-pull power and late-race grip insurance.';
