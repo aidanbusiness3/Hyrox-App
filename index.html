@@ -509,7 +509,7 @@ const WORKOUT_DETAILS = {
     { name: 'Plank Hold', sets: '3', reps: '45s', notes: '' }
   ],
   strengthLowerDetails: [
-    { name: 'Back Squat', sets: '4', reps: '6-8', notes: 'ATG if possible' },
+    { name: 'Front Squat', sets: '4', reps: '6-8', notes: 'ATG if possible' },
     { name: 'Romanian Deadlift', sets: '4', reps: '8-10', notes: '' },
     { name: 'Bulgarian Split Squat', sets: '3', reps: '10 each', notes: '' },
     { name: 'Leg Curl', sets: '3', reps: '12', notes: '' },
@@ -629,26 +629,27 @@ function getBaseWeek(weekNum) {
   else if (phaseWk <= 10) vo2Session = '5 × 4 min @ vVO2 (~6:50-7:05/mile), 3 min easy jog';
   else vo2Session = '4 × 5 min @ vVO2 (~6:50-7:05/mile), 3 min easy jog';
 
-  // Real strength loads from Aidan's 3RMs (Jun 17, 2026)
+  // Real strength loads from Aidan's 3RMs (Jun 17, 2026). Squat = FRONT squat:
+  // loads estimated at ~85% of the back-squat max (~310 lb front), calibrate by feel until tested.
   let squatLoad, hingeLoad, hipThrustLoad;
   if (isDeload) {
-    squatLoad = '3 × 5 @ 255 lb (70%, deload — technique focus)';
+    squatLoad = '3 × 5 @ 215 lb (70%, deload, technique focus)';
     hingeLoad = '3 × 5 @ 335 lb (Trap Bar DL, deload)';
     hipThrustLoad = '3 × 8 @ 275 lb (deload)';
   } else if (phaseWk <= 3) {
-    squatLoad = '5 × 5 @ 275-290 lb (75-80% 1RM)';
+    squatLoad = '5 × 5 @ 230-250 lb (75-80% of est. front squat max, dial in by feel, top set RPE 7-8)';
     hingeLoad = '4 × 5 @ 355-380 lb (Trap Bar DL, 75-80%)';
     hipThrustLoad = '4 × 8 @ 275-305 lb (70-78%)';
   } else if (phaseWk <= 7) {
-    squatLoad = '5 × 5 @ 290-310 lb (80-85% 1RM). Add 5-10 lb when top set RPE 7.';
+    squatLoad = '5 × 5 @ 250-265 lb (80-85%). Add 5-10 lb when top set hits RPE 7.';
     hingeLoad = '4 × 5 @ 380-405 lb (80-85%)';
     hipThrustLoad = '4 × 6 @ 300-330 lb (78-85%)';
   } else if (phaseWk <= 11) {
-    squatLoad = '4 × 4 @ 310-330 lb (85-90% 1RM). Heavier triples, neural strength.';
+    squatLoad = '4 × 4 @ 265-280 lb (85-90%). Heavier work, neural strength.';
     hingeLoad = '4 × 4 @ 405-425 lb (85-90%)';
     hipThrustLoad = '4 × 5 @ 330-350 lb (85-90%)';
   } else {
-    squatLoad = '🎯 NEW 3RM TEST — target 340-345 lb (+5-10 lb vs current 335)';
+    squatLoad = '🎯 NEW FRONT SQUAT 3RM TEST — target 285-295 lb';
     hingeLoad = '🎯 NEW 3RM TEST — target 445 lb';
     hipThrustLoad = '🎯 NEW 3RM TEST — target 370-375 lb';
   }
@@ -675,7 +676,7 @@ function getBaseWeek(weekNum) {
     { day:'Monday', type:'strength', title:'AM Heavy Lower + PM Easy Recovery', icon:'🏋️', zone:0,
       exercises:[
         {name:'— AM SESSION — Heavy Lower —',detail:'',zone:0},
-        {name:'Back Squat',detail:squatLoad,zone:0},
+        {name:'Front Squat',detail:squatLoad,zone:0},
         {name:'Trap Bar Deadlift',detail:hingeLoad,zone:0},
         {name:'Hip Thrust',detail:hipThrustLoad,zone:0},
         {name:'Nordic Hamstring Curl',detail:'3 × 6 (band-assisted Wks 1-4 -> bodyweight Wks 5-8 -> weighted Wks 9-12), eccentric hamstring halves running injury risk (Petushek 2019) and adds push-off power',zone:0},
@@ -688,7 +689,7 @@ function getBaseWeek(weekNum) {
         {name:`— PM SESSION — Easy Recovery Run ${easyMin} min —`,detail:'Recovery + volume',zone:2},
         {name:'Easy Recovery Run',detail:`${easyMin} min @ 10:00-10:30/mile (Z1-Z2). Slower than slow. HR < 145.`,zone:2}
       ],
-      duration:`AM 70 min + PM ${easyMin} min`, focus:`📍 WHY: Week opens with the heavy lift. Heavy squat is direct 152 kg sled push carryover, and your strength is +14% above E15 average, so maintain with small progression (Blagrove 2018: heavy strength improves running economy). This is the one heavy hamstring day, Nordics live here. The easy PM run flushes the legs and adds Z2 volume.` },
+      duration:`AM 70 min + PM ${easyMin} min`, focus:`📍 WHY: Week opens with the heavy lift. Front squat is the most specific strength base for the wall ball (front-rack squat into the drive) and keeps you upright under fatigue, and it loads the quads hard with less spinal compression than a back squat (Gullett 2009) on a day you also trap-bar deadlift. Maintain with small progression (Blagrove 2018: heavy strength improves running economy). Nordics live here, the one heavy hamstring day. Easy PM run flushes the legs.` },
 
     // ===== TUESDAY: Heavy Upper (SINGLE, station-translated) =====
     { day:'Tuesday', type:'strength', title:'Heavy Upper (Station-Translated)', icon:'💪', zone:0,
@@ -788,7 +789,7 @@ function getBuildWeek(weekNum) {
       exercises:[
         {name:'— AM —',detail:'Maintenance, not PRs',zone:0},
         {name:'Warm Up + Pre-Lift',detail:'15 min total',zone:0},
-        {name:'Back Squat',detail:`3 × 3 @ ${isDeload ? '255 lb (70%)' : '310-320 lb (85-88%)'} (maintenance)`,zone:0},
+        {name:'Front Squat',detail:`3 × 3 @ ${isDeload ? '215 lb (70%)' : '265-275 lb (85-88%)'} (maintenance)`,zone:0},
         {name:'Trap Bar DL',detail:'3 × 4 @ 405 lb (85%)',zone:0},
         {name:'Hip Thrust',detail:'3 × 6 @ 320 lb (82%)',zone:0},
         {name:'Nordic Hamstring Curl',detail:'3 × 6 weighted (eccentric hamstring maintenance)',zone:0},
@@ -961,7 +962,7 @@ function getDallasBuildWeek(weekNum) {
       exercises:[
         {name:'— AM —',detail:'',zone:0},
         {name:'Warm Up + Pre-Lift',detail:'15 min',zone:0},
-        {name:'Back Squat',detail:'4 × 4 @ 310 lb (85%)',zone:0},
+        {name:'Front Squat',detail:'4 × 4 @ 265 lb (85%)',zone:0},
         {name:'Trap DL',detail:'3 × 5 @ 380 lb (80%)',zone:0},
         {name:'Hip Thrust',detail:'3 × 6 @ 300 lb',zone:0},
         {name:'Nordic Hamstring Curl',detail:'3 × 6 (eccentric hamstring maintenance)',zone:0},
@@ -1113,7 +1114,7 @@ function getResetWeek(weekNum) {
       duration:'70 min', focus:'📍 WHY: Light return to structure.' },
     { day:'Tuesday', type:'strength', title:'Light Lower', icon:'🏋️', zone:0,
       exercises:[
-        {name:'Back Squat',detail:'4 × 5 @ 240 lb (65%, light)',zone:0},
+        {name:'Front Squat',detail:'4 × 5 @ 200 lb (65%, light)',zone:0},
         {name:'Trap DL',detail:'3 × 5 @ 320 lb (light)',zone:0},
         {name:'Hip Thrust',detail:'3 × 8 @ 255 lb (light)',zone:0},
         {name:'Plank',detail:'3 × 45 sec',zone:0}
