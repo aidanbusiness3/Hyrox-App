@@ -675,16 +675,14 @@ function getBaseWeek(weekNum) {
     // ===== MONDAY: Heavy Lower AM + Easy Recovery PM (DOUBLE) =====
     { day:'Monday', type:'strength', title:'AM Heavy Lower + PM Easy Recovery', icon:'🏋️', zone:0,
       exercises:[
-        {name:'— AM SESSION — Heavy Lower —',detail:'Order: power, then heavy squat + hinge, then accessories, core last (ACSM ordering).',zone:0},
+        {name:'— AM SESSION — Heavy Lower —',detail:'Order: power, then heaviest compounds, then accessories heaviest to lightest (ACSM ordering).',zone:0},
         {name:'Box Jumps',detail:'4 × 3 explosive, full recovery between sets. Power goes first while the CNS is fresh. Reactive strength for running economy + burpee broad jump (Spurrs 2003, Saunders 2006).',zone:0},
         {name:'Front Squat',detail:squatLoad,zone:0},
         {name:'Trap Bar Deadlift',detail:hingeLoad,zone:0},
         {name:'Back-Rack Walking Lunges',detail:'3 × 12/leg, sandbag across the upper back to match the station (no floor space? sub stationary REVERSE lunges, same load, step back and return on the spot). Direct sandbag-lunge pattern + single-leg running strength.',zone:0},
-        {name:'Nordic Hamstring Curl',detail:'3 × 6 (band-assisted Wks 1-4 -> bodyweight Wks 5-8 -> weighted Wks 9-12), eccentric hamstring cuts running injury risk ~51% (Petushek 2019) and adds push-off power',zone:0},
         {name:'Hip Thrust',detail:hipThrustLoad,zone:0},
+        {name:'Nordic Hamstring Curl',detail:'3 × 6 (band-assisted Wks 1-4 -> bodyweight Wks 5-8 -> weighted Wks 9-12), eccentric hamstring cuts running injury risk ~51% (Petushek 2019) and adds push-off power',zone:0},
         {name:'Calf Raises',detail:'3 × 15 straight-leg (gastroc) + 3 × 15 bent-knee/seated (soleus), heavy. Sled push drive + running economy + cramp prevention.',zone:0},
-        {name:'Plank (anti-extension)',detail:'3 × 45 sec, rib cage down, glutes squeezed',zone:0},
-        {name:'Ab Wheel Rollout',detail:'3 × 8 from knees, control the negative',zone:0},
         {name:'Post-Workout Static Stretch',detail:'8 min: pigeon + couch stretch + hamstring + calf + child\'s pose',zone:0},
         {name:`— PM SESSION — Easy Recovery Run ${easyMin} min —`,detail:'Recovery + volume',zone:2},
         {name:'Easy Recovery Run',detail:`${easyMin} min @ 10:00-10:30/mile (Z1-Z2). Slower than slow. HR < 145.`,zone:2}
@@ -1215,15 +1213,16 @@ function parseReps(detail) {
 function exerciseWhy(name) {
   const n = (name || '').toLowerCase();
   const has = (...k) => k.some(x => n.includes(x));
-  if (has('sandbag')) return 'Race station: groove the 100m lunge pattern at weight so race day feels rehearsed, not new.';
-  if (has('bulgarian') || has('split squat') || has('lunge')) return 'Single-leg strength feeds straight into the sandbag lunge and keeps both legs balanced under fatigue.';
-  if (has('hip thrust')) return 'Direct glute power for sled-push drive and the hip extension behind every running stride.';
-  if (has('nordic')) return 'Eccentric hamstring strength roughly halves running-injury risk (Petushek 2019) and adds push-off power.';
-  if (has('rdl') || has('deadlift') || has('trap') || has('hinge')) return 'Posterior-chain hinge that powers the sled pull and armors your back for fatigued running.';
+  if (has('front squat')) return 'The wall ball is a front-rack squat into a drive. Front squat trains the exact pattern and the upright posture you need under fatigue, with less spinal compression than back squat (Gullett 2009).';
+  if (has('sandbag') || (has('lunge') && !has('bulgarian') && !has('split squat'))) return 'The sandbag is racked across your traps for 100m of lunges. Back-rack walking (or stationary reverse) lunges replicate that load position and the walking demand under fatigue.';
+  if (has('bulgarian') || has('split squat')) return 'Unilateral strength to balance left vs right and feed the single-leg stance of running. Backup to walking lunges if space is tight.';
+  if (has('hip thrust')) return 'Heavy hip extension is the engine of the sled push and every running stride. Hip thrusts build horizontal-force production (Contreras 2017) directly for the 152 kg sled.';
+  if (has('nordic')) return 'Eccentric hamstring strength cuts running and hamstring injury risk by ~51% (Petushek 2019, van Dyk 2019) and feeds the sled pull plus late-race running.';
+  if (has('rdl') || has('deadlift') || has('trap') || has('hinge')) return 'Heavy hinge that powers the sled pull, row erg and ski erg. Trap-bar version cuts spinal shear vs barbell DL on a day you also front squat.';
   if (has('goblet')) return 'Lighter squat pattern to groove depth and bracing before the heavy work.';
-  if (has('squat') || has('hack') || has('pendulum')) return 'Heavy squats build the raw leg drive behind your 152 kg sled push, your single biggest race carryover.';
-  if (has('box jump') || has('jump')) return 'Explosive plyometrics sharpen running economy (Blagrove 2018), more speed per stride for free.';
-  if (has('calf')) return 'Strong calves drive the sled push and absorb impact across 8 km of running.';
+  if (has('squat') || has('hack') || has('pendulum')) return 'Heavy bilateral squat for raw leg drive across all eight stations.';
+  if (has('box jump') || has('jump')) return 'Reactive strength improves running economy (Spurrs 2003, Saunders 2006) and feeds the burpee broad jump. Done fresh for max power.';
+  if (has('calf')) return 'Soleus carries 6-8x bodyweight per stride (Dorn 2012) and plantar-flexor stiffness drives running economy (Fletcher 2010). Also the engine of the sled push and the top cramp site late in races.';
   if (has('plank') || has('ab wheel') || has('pallof') || has('dead bug')) return 'Anti-rotation, anti-extension core keeps your trunk solid during carries, lunges, and tired running.';
   if (has('push press')) return "Overhead power-endurance is the wall-ball engine — so 100 throws don't crush your shoulders late in the race.";
   if (has('landmine')) return 'Trains the exact forward-lean pressing angle of the sled push. True position transfer.';
