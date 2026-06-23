@@ -664,6 +664,19 @@ function getBaseWeek(weekNum) {
     lungeDetail = '3 × 20/leg moderate load, sandbag across upper back. STATION-ENDURANCE bias week, rehearses the unbroken 100m demand. Step back on the spot, no rest within the set.';
   }
 
+  // Row alternation: odd weeks bent-over (hip-hinge specificity), even weeks chest-supported (spinal relief day after deads)
+  let rowName, rowDetail;
+  if (isDeload) {
+    rowName = 'Chest-Supported T-Bar Row';
+    rowDetail = '3 × 8 moderate (deload). Spine-friendly version while still hitting lats and mid-back.';
+  } else if (phaseWk % 2 === 1) {
+    rowName = 'Bent-Over Barbell Row';
+    rowDetail = '4 × 6 HEAVY from hip-hinge stance. Direct SLED PULL posture + row erg pattern. Trains standing trunk stability under load.';
+  } else {
+    rowName = 'Chest-Supported T-Bar Row';
+    rowDetail = '4 × 8 heavy. Same lat + mid-back stimulus as the bent-over, with the lower back unloaded (relief week the day after deadlifts).';
+  }
+
   const rotIdx = (weekNum - 1) % 4;
   let satTitle, satDetail;
   if (rotIdx === 0) {
@@ -704,7 +717,7 @@ function getBaseWeek(weekNum) {
       exercises:[
         {name:'Push Press',detail:`${phaseWk <= 6 ? '5 × 5 @ RPE 7-8' : '4 × 5 @ RPE 8'}, direct WALL BALL transfer (overhead power-endurance + leg drive)`,zone:0},
         {name:'Weighted Pull-Ups',detail:'4 × 6 weighted (add weight if 12+ BW). Make the last set a bodyweight AMRAP to failure. Covers sled-pull strength plus pull endurance for late-race pulling.',zone:0},
-        {name:'Bent-Over Barbell Row',detail:'4 × 6 heavy, direct SLED PULL + ROW machine (heavy hinge-and-pull)',zone:0},
+        {name:rowName,detail:rowDetail,zone:0},
         {name:'Weighted Push-Ups',detail:'4 × 8-12 with a vest, plate on the back, or band across the shoulders. Closed-chain horizontal press = direct SLED PUSH transfer (Calatayud 2014). Full scapular protraction at the top, controlled eccentric. If too easy, elevate the feet on a bench. Trains serratus + anterior core + triceps lockout, the actual upper-body demands of the sled push.',zone:0},
         {name:'Straight-Arm Pulldown',detail:'3 × 12 cable, hinge into it, SKIERG pull phase (bench and pull-ups do not cover this pattern)',zone:0},
         {name:'Pallof Press (anti-rotation)',detail:'3 × 10/side half-kneeling, anti-rotation core for asymmetric station loading',zone:0},
@@ -1243,7 +1256,8 @@ function exerciseWhy(name) {
   if (has('landmine')) return 'Trains the exact forward-lean pressing angle of the sled push. True position transfer.';
   if (has('straight-arm') || has('pulldown') || has('skierg')) return 'Builds the lat-driven pull of the SkiErg, the pattern bench and pull-ups miss.';
   if (has('weighted pull') || has('pull-up') || has('pullup') || has('pull up')) return 'Vertical pulling strength is your sled-pull power and late-race grip insurance.';
-  if (has('t-bar') || has('row')) return 'Heavy horizontal pulling means a faster sled pull and a stronger row-machine split.';
+  if (has('chest-supported')) return 'Heavy horizontal pull, equivalent lat + mid-back stimulus to a bent-over row with the lumbar spine unloaded. Alternates with bent-over weeks for back recovery the day after heavy deadlifts.';
+  if (has('bent-over') || has('t-bar') || has('row')) return 'Heavy horizontal pull from a hip-hinge stance. Closest gym match to the sled-pull posture and the row-erg pattern, plus standing trunk-stability under load (Fenwick 2009).';
   if (has('db press') || has('bench') || has('press')) return 'Pressing strength and shoulder durability for high-volume wall-ball overhead work.';
   if (has('farmer')) return "Grip and trap endurance so the farmer's-carry station never becomes your bottleneck.";
   if (has('wall ball')) return 'High-rep wall-ball volume is the highest-leverage station work for your finish time (Owen Silver protocol).';
