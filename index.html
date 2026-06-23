@@ -654,6 +654,16 @@ function getBaseWeek(weekNum) {
     hipThrustLoad = '🎯 NEW 3RM TEST — target 370-375 lb';
   }
 
+  // Reverse lunge hybrid: odd weeks strength bias, even weeks station-endurance bias
+  let lungeDetail;
+  if (isDeload) {
+    lungeDetail = '3 × 8/leg light, sandbag across upper back, technique focus (deload).';
+  } else if (phaseWk % 2 === 1) {
+    lungeDetail = '4 × 8/leg HEAVY, sandbag across upper back to match the station load. STRENGTH bias week, build the ceiling. Step back and drive to standing on the spot.';
+  } else {
+    lungeDetail = '3 × 20/leg moderate load, sandbag across upper back. STATION-ENDURANCE bias week, rehearses the unbroken 100m demand. Step back on the spot, no rest within the set.';
+  }
+
   const rotIdx = (weekNum - 1) % 4;
   let satTitle, satDetail;
   if (rotIdx === 0) {
@@ -676,13 +686,13 @@ function getBaseWeek(weekNum) {
     { day:'Monday', type:'strength', title:'AM Heavy Lower + PM Easy Recovery', icon:'🏋️', zone:0,
       exercises:[
         {name:'— AM SESSION — Heavy Lower —',detail:'Order: power, then heaviest compounds, then accessories heaviest to lightest (ACSM ordering).',zone:0},
-        {name:'Box Jumps',detail:'4 × 3 explosive, full recovery between sets. Power goes first while the CNS is fresh. Reactive strength for running economy + burpee broad jump (Spurrs 2003, Saunders 2006).',zone:0},
+        {name:'Box Jumps',detail:'4 × 4 explosive, rest 2-3 min between sets, full recovery. STEP DOWN off the box (do NOT jump down, protects the Achilles). Power goes first while the CNS is fresh. Reactive strength for running economy + burpee broad jump (Spurrs 2003, Saunders 2006).',zone:0},
         {name:'Front Squat',detail:squatLoad,zone:0},
         {name:'Trap Bar Deadlift',detail:hingeLoad,zone:0},
-        {name:'Reverse Lunges',detail:'3 × 12/leg, sandbag across the upper back to match the station load position. Step back and drive to standing on the spot. Direct sandbag-lunge pattern + single-leg running strength.',zone:0},
+        {name:'Reverse Lunges',detail:lungeDetail,zone:0},
         {name:'Hip Thrust',detail:hipThrustLoad,zone:0},
         {name:'Nordic Hamstring Curl',detail:'3 × 6 (band-assisted Wks 1-4 -> bodyweight Wks 5-8 -> weighted Wks 9-12), eccentric hamstring cuts running injury risk ~51% (Petushek 2019) and adds push-off power',zone:0},
-        {name:'Calf Raises',detail:'3 × 15 straight-leg (gastroc) + 3 × 15 bent-knee/seated (soleus), heavy. Sled push drive + running economy + cramp prevention.',zone:0},
+        {name:'Calf Raises',detail:'Heavy slow resistance for Achilles tendon stiffness (Fletcher 2010). Straight-leg 3 × 8-12 HEAVY (gastroc) + seated/bent-knee 3 × 15-20 (soleus). TEMPO: 3 sec eccentric, 1 sec pause at the bottom, controlled drive up. Drives running economy + sled push + cramp prevention.',zone:0},
         {name:'Post-Workout Static Stretch',detail:'8 min: pigeon + couch stretch + hamstring + calf + child\'s pose',zone:0},
         {name:`— PM SESSION — Easy Recovery Run ${easyMin} min —`,detail:'Recovery + volume',zone:2},
         {name:'Easy Recovery Run',detail:`${easyMin} min @ 10:00-10:30/mile (Z1-Z2). Slower than slow. HR < 145.`,zone:2}
