@@ -620,14 +620,23 @@ function getBaseWeek(weekNum) {
   else if (phaseWk <= 6) thresholdSession = '4 × 1km @ 7:25-7:40/mile, 60 sec rest';
   else if (phaseWk <= 8) thresholdSession = '5 × 1km @ 7:25-7:40/mile, 60 sec rest';
   else if (phaseWk <= 10) thresholdSession = '6 × 1km @ 7:25-7:40/mile, 60 sec rest';
-  else thresholdSession = '8 × 1km @ 7:25-7:40/mile, 60 sec rest (Owen Silver elite benchmark)';
+  else if (phaseWk === 11) thresholdSession = '7 × 1km @ 7:25-7:40/mile, 60 sec rest (step toward Owen Silver benchmark)';
+  else thresholdSession = '8 × 1km @ 7:25-7:40/mile, 60 sec rest (Owen Silver elite benchmark, peak test)';
 
   let vo2Session;
-  if (isDeload) vo2Session = 'Easy run 35-40 min Z2 (no VO2 deload week)';
-  else if (phaseWk <= 2) vo2Session = '4 × 3 min @ vVO2 (~7:00-7:15/mile), 2 min easy jog';
-  else if (phaseWk <= 6) vo2Session = '4 × 4 min @ vVO2 (~6:50-7:05/mile), 3 min easy jog';
-  else if (phaseWk <= 10) vo2Session = '5 × 4 min @ vVO2 (~6:50-7:05/mile), 3 min easy jog';
-  else vo2Session = '4 × 5 min @ vVO2 (~6:50-7:05/mile), 3 min easy jog';
+  // Wednesday VO2 alternation from Wk 3: odd weeks Norwegian-style (raise the ceiling),
+  // even weeks 1km race-pace repeats (race-rep specificity). Wks 1-2 are build-in.
+  if (isDeload) {
+    vo2Session = 'Easy run 35-40 min Z2 (no VO2 deload week)';
+  } else if (phaseWk <= 2) {
+    vo2Session = '4 × 3 min @ vVO2 (~7:00-7:15/mile), 2 min easy jog (build-in)';
+  } else if (phaseWk % 2 === 1) {
+    const wks = phaseWk <= 6 ? '4 × 4 min' : phaseWk <= 10 ? '5 × 4 min' : '4 × 5 min';
+    vo2Session = `NORWEGIAN: ${wks} @ vVO2 (~6:50-7:05/mile), 3 min easy jog. Raise the ceiling, cannot speak between reps.`;
+  } else {
+    const reps = phaseWk <= 6 ? '5 × 1km' : '6 × 1km';
+    vo2Session = `RACE-PACE: ${reps} @ ~7:00-7:25/mile (your Hyrox 1km target), 60-90 sec rest. Race-rep practice at the exact distance.`;
+  }
 
   // Real strength loads from Aidan's 3RMs (Jun 17, 2026). Squat = FRONT squat:
   // loads estimated at ~85% of the back-squat max (~310 lb front), calibrate by feel until tested.
@@ -775,7 +784,7 @@ function getBaseWeek(weekNum) {
       exercises:[
         {name:'— SESSION 1 — Easy Long Run —',detail:'Main aerobic volume of the week',zone:2},
         {name:'Pre-Run Dynamic Warmup',detail:'4 min: leg swings + knee hugs + walking lunges + high knees + butt kicks',zone:0},
-        {name:'Easy Long Run',detail:`${longMin} min @ 9:00-9:30/mile (Z2). HR < 155, conversational. Keep it easy so you are not wrecked for Monday's heavy lower.`,zone:2},
+        {name:'Easy Long Run',detail:`${longMin} min @ 9:00-9:30/mile (Z2). HR < 155, conversational. FINISH with 4-6 × 20 sec strides at ~mile pace, walk-back recovery between. Strides improve running economy 2-4% for free (Yamamoto 2008) and cost almost no fatigue. Keep the rest of the run easy so Monday's heavy lower is not compromised.`,zone:2},
         {name:'— SESSION 2 — Posterior Prehab (light, injury prevention) —',detail: isDeload ? '~15 min, very light' : '~25 min, bands and bodyweight, NOT a strength day',zone:0},
         {name:'Single-Leg Glute Bridge',detail:'2 × 12/side (glute max + medius activation)',zone:0},
         {name:'Light RDL or Good Morning',detail:'2 × 12 light load, slow eccentric (hamstring health, kept light, heavy hinge is Monday)',zone:0},
