@@ -587,9 +587,12 @@ const WORKOUT_DETAILS = {
 // prioritized over distance. Warm-up boxes stripped globally (Aidan warms up
 // himself). Build / race-week phases unchanged below.
 
+// Macro compressed (v8): Aidan had 3-4 weeks of self-directed base before the program,
+// so the program base is shortened from 12 to 8 weeks. Build extends from 5 to 9 weeks
+// (more race-specific time before Tampa). Calendar dates and race weeks unchanged.
 const PHASES = [
-  { id: 'base',         name: 'Aerobic + Strength Base', weeks: [1, 12],   color: '#3B82F6', emoji: '⚡' },
-  { id: 'build',        name: 'Race-Specific Build',     weeks: [13, 17],  color: '#FF8C00', emoji: '🎯' },
+  { id: 'base',         name: 'Aerobic + Strength Base', weeks: [1, 8],    color: '#3B82F6', emoji: '⚡' },
+  { id: 'build',        name: 'Race-Specific Build',     weeks: [9, 17],   color: '#FF8C00', emoji: '🎯' },
   { id: 'tampa',        name: 'Tampa Race Week',         weeks: [18, 18],  color: '#9333EA', emoji: '🏁' },
   { id: 'dallas_build', name: 'Dallas Solo Build',       weeks: [19, 21],  color: '#E8552E', emoji: '⚔️' },
   { id: 'dallas',       name: 'Dallas Race Week',        weeks: [22, 22],  color: '#FFE500', emoji: '🔥' },
@@ -600,8 +603,10 @@ function getPhase(weekNum) {
   return PHASES.find(p => weekNum >= p.weeks[0] && weekNum <= p.weeks[1]) || PHASES[0];
 }
 
+// Deloads on the compressed macro: one mid-base deload (Cal Wk 4 = original Wk 8),
+// and Build keeps its own internal deload structure.
 function isDeloadWeek(weekNum) {
-  return [4, 8].includes(weekNum);
+  return [4].includes(weekNum);
 }
 
 // ===== PHASE 1 — BASE (Weeks 1-12) =====
@@ -1191,8 +1196,13 @@ function generateTrainingPlan() {
     const deload = isDeloadWeek(week);
 
     let weekDays;
-    if (week <= 12)        weekDays = getBaseWeek(week);
-    else if (week <= 17)   weekDays = getBuildWeek(week);
+    // Base compressed to 8 cal wks: skip the build-in (orig Wks 1-2) and first deload
+    // (orig Wk 4), run the meaningful Wks 5-12 protocols. Cal Wk 4 -> Proto Wk 8 deload.
+    if (week <= 8)         weekDays = getBaseWeek(week + 4);
+    // Build extended to 9 cal wks: stretch the original 5-wk Build (13-17) across 9 cal
+    // weeks. Cal Wks 9-13 -> Build Wks 13-17 ramp. Cal Wks 14-17 hold at Build Wk 17 peak
+    // protocols pending a richer Build progression closer to race week.
+    else if (week <= 17)   weekDays = getBuildWeek(Math.min(week + 4, 17));
     else if (week === 18)  weekDays = getTampaRaceWeek();
     else if (week <= 21)   weekDays = getDallasBuildWeek(week);
     else if (week === 22)  weekDays = getDallasRaceWeek();
